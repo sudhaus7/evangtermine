@@ -1,4 +1,16 @@
 <?php
+
+/*
+ * This file is part of the TYPO3 project.
+ *
+ * @author Frank Berger <fberger@sudhaus7.de>
+ *
+ * For the full copyright and license information, please view
+ * the LICENSE file that was distributed with this source code.
+ *
+ * The TYPO3 project - inspiring people to share!
+ */
+
 namespace ArbkomEKvW\Evangtermine\Util;
 
 /***************************************************************
@@ -32,37 +44,30 @@ namespace ArbkomEKvW\Evangtermine\Util;
 */
 class UrlUtility
 {
-    
     /**
      * Load content string from Web Url. User curl if possible
-     * 
+     *
      * @param string $url
      * @return string
      */
     public static function loadUrl($url)
     {
+        if (function_exists('curl_init')) {
+            $ch = curl_init($url);
 
-      if (function_exists('curl_init'))
-      {
-        $ch = curl_init($url);
+            curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
+            curl_setopt($ch, CURLOPT_HEADER, false);
 
-        curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
-        curl_setopt($ch, CURLOPT_HEADER, false);
+            if (defined('CURLOPT_IPRESOLVE') && defined('CURL_IPRESOLVE_V4')) {
+                curl_setopt($ch, CURLOPT_IPRESOLVE, CURL_IPRESOLVE_V4);
+            }
 
-        if (defined('CURLOPT_IPRESOLVE') && defined('CURL_IPRESOLVE_V4')){
-            curl_setopt($ch, CURLOPT_IPRESOLVE, CURL_IPRESOLVE_V4);
+            $content = curl_exec($ch);
+            curl_close($ch);
+        } else {
+            $content = file_get_contents($url);
         }
 
-        $content = curl_exec($ch);
-        curl_close($ch);
-      }
-
-      else
-      {
-        $content = file_get_contents($url);
-      }
-
-      return $content;
+        return $content;
     }
-
 }

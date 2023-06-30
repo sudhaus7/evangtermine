@@ -1,5 +1,19 @@
 <?php
+
+/*
+ * This file is part of the TYPO3 project.
+ *
+ * @author Frank Berger <fberger@sudhaus7.de>
+ *
+ * For the full copyright and license information, please view
+ * the LICENSE file that was distributed with this source code.
+ *
+ * The TYPO3 project - inspiring people to share!
+ */
+
 namespace ArbkomEKvW\Evangtermine\ViewHelpers;
+
+use TYPO3Fluid\Fluid\Core\ViewHelper\AbstractViewHelper;
 
 /***************************************************************
  *
@@ -26,23 +40,22 @@ namespace ArbkomEKvW\Evangtermine\ViewHelpers;
  *  This copyright notice MUST APPEAR in all copies of the script!
  ***************************************************************/
 
-class AttrViewHelper extends \TYPO3Fluid\Fluid\Core\ViewHelper\AbstractViewHelper {
-	
-	public function initializeArguments() {
-		$this->registerArgument('on', 'object', 'SimpleXMLElement object to look up attribute on', TRUE);
-		$this->registerArgument('name', 'string', 'name of attribute to look up', TRUE);
-	}
-	
-	/**
-	 * 
-	 * @return string
-	 */
-	public function render() {
-		
-		if (get_class($this->arguments['on']) == 'SimpleXMLElement') {
-			return $this->arguments['on'][$this->arguments['name']];
-		}
-		return '';
-		
-	}
+class AttrViewHelper extends AbstractViewHelper
+{
+    public function initializeArguments()
+    {
+        $this->registerArgument('on', 'object', 'SimpleXMLElement object to look up attribute on', true);
+        $this->registerArgument('name', 'string', 'name of attribute to look up', true);
+    }
+
+    /**
+     * @return string
+     */
+    public function render()
+    {
+        if (get_class($this->arguments['on']) == 'SimpleXMLElement') {
+            return $this->arguments['on'][$this->arguments['name']];
+        }
+        return '';
+    }
 }

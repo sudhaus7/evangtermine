@@ -1,4 +1,16 @@
 <?php
+
+/*
+ * This file is part of the TYPO3 project.
+ *
+ * @author Frank Berger <fberger@sudhaus7.de>
+ *
+ * For the full copyright and license information, please view
+ * the LICENSE file that was distributed with this source code.
+ *
+ * The TYPO3 project - inspiring people to share!
+ */
+
 namespace ArbkomEKvW\Evangtermine\Domain\Model;
 
 /***************************************************************
@@ -29,41 +41,37 @@ namespace ArbkomEKvW\Evangtermine\Domain\Model;
 /**
  * Eventcontainer Interface
  */
-interface EventcontainerInterface {
+interface EventcontainerInterface
+{
+    /**
+     * returns number of items in container
+     *
+     * @return int
+    */
+    public function getNumberOfItems();
 
-	/**
-	 * returns number of items in container
-	 *
-	 * @return integer
-	*/
-	public function getNumberOfItems();
-	
-	/**
-	 * sets the number of items in result
-	 * @param integer $numItems
-	 * @return void
-	 */
-	public function setNumberOfItems($numItems);
-	
-	/**
-	 * returns items array
-	 * @return array $items
-	 */
-	public function getItems();
-	
-	/**
-	 * sets items array
-	 *
-	 * @param array $items
-	 * @return void
-	 */
-	public function setItems(array $items);
-	
-	/**
-	 * transform XML into array and load item attributes
-	 * @param string $xmlString
-	 * @return void
-	 */
-	public function loadXML($xmlString);
-	
+    /**
+     * sets the number of items in result
+     * @param int $numItems
+     */
+    public function setNumberOfItems($numItems);
+
+    /**
+     * returns items array
+     * @return array $items
+     */
+    public function getItems();
+
+    /**
+     * sets items array
+     *
+     * @param array $items
+     */
+    public function setItems(array $items);
+
+    /**
+     * transform XML into array and load item attributes
+     * @param string $xmlString
+     */
+    public function loadXML($xmlString);
 }

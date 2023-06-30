@@ -1,6 +1,17 @@
 <?php
-namespace ArbkomEKvW\Evangtermine\Domain\Model;
 
+/*
+ * This file is part of the TYPO3 project.
+ *
+ * @author Frank Berger <fberger@sudhaus7.de>
+ *
+ * For the full copyright and license information, please view
+ * the LICENSE file that was distributed with this source code.
+ *
+ * The TYPO3 project - inspiring people to share!
+ */
+
+namespace ArbkomEKvW\Evangtermine\Domain\Model;
 
 /***************************************************************
  *
@@ -30,13 +41,10 @@ namespace ArbkomEKvW\Evangtermine\Domain\Model;
 /**
  * Grouplist
  */
-class Grouplist extends \ArbkomEKvW\Evangtermine\Domain\Model\Categorylist
+class Grouplist extends Categorylist
 {
-
     public function __construct()
     {
         parent::__construct('getGroups', 'tx_evangtermine_grouplist');
     }
-
-
 }

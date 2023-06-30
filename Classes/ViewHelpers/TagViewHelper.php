@@ -1,5 +1,19 @@
 <?php
+
+/*
+ * This file is part of the TYPO3 project.
+ *
+ * @author Frank Berger <fberger@sudhaus7.de>
+ *
+ * For the full copyright and license information, please view
+ * the LICENSE file that was distributed with this source code.
+ *
+ * The TYPO3 project - inspiring people to share!
+ */
+
 namespace ArbkomEKvW\Evangtermine\ViewHelpers;
+
+use TYPO3Fluid\Fluid\Core\ViewHelper\AbstractViewHelper;
 
 /***************************************************************
  *
@@ -30,40 +44,39 @@ namespace ArbkomEKvW\Evangtermine\ViewHelpers;
  * TagViewHelper puts value of 'node' into tag 'name' with optional 'class' attribute
  * if value of 'node' is empty, an empty string is returned
  * @author rothc
- *
  */
-class TagViewHelper extends \TYPO3Fluid\Fluid\Core\ViewHelper\AbstractViewHelper {
-    
+class TagViewHelper extends AbstractViewHelper
+{
     // this is new in TYPO3 8.x
-    protected $escapeOutput = FALSE;
+    protected $escapeOutput = false;
 
-    public function initializeArguments() {
-		$this->registerArgument('name', 'string', 'name of tag to generate', FALSE, 'span');
-		$this->registerArgument('class', 'string', 'class name for tag', FALSE);
-		$this->registerArgument('node', 'object', 'SimpleXMLElement object to generate tag for', TRUE);
-	}
-	
-	/**
-	 * 
-	 * @return string
-	 */
-	public function render() {
-		
-		// If wrong object or object empty, return empty string
-		if ( (get_class($this->arguments['node']) != 'SimpleXMLElement') || ($this->arguments['node'] == '') || ($this->arguments['node'] == FALSE) ) {
-			return '';
-		}
-		
-		// Prepare class attribute
-		if ($this->arguments['class']) {
-			$class = ' class="' . $this->arguments['class'] . '"';
-		} else {
-			$class = ' class="et' . $this->arguments['node']->getName() . '"';
-		}
-		
-		// build tag
-		$markup = sprintf('<%s%s>%s</%s>', $this->arguments['name'], $class, $this->arguments['node'], $this->arguments['name']);
-		
-		return $markup;
-	}
+    public function initializeArguments()
+    {
+        $this->registerArgument('name', 'string', 'name of tag to generate', false, 'span');
+        $this->registerArgument('class', 'string', 'class name for tag', false);
+        $this->registerArgument('node', 'object', 'SimpleXMLElement object to generate tag for', true);
+    }
+
+    /**
+     * @return string
+     */
+    public function render()
+    {
+        // If wrong object or object empty, return empty string
+        if ((get_class($this->arguments['node']) != 'SimpleXMLElement') || ($this->arguments['node'] == '') || ($this->arguments['node'] == false)) {
+            return '';
+        }
+
+        // Prepare class attribute
+        if ($this->arguments['class']) {
+            $class = ' class="' . $this->arguments['class'] . '"';
+        } else {
+            $class = ' class="et' . $this->arguments['node']->getName() . '"';
+        }
+
+        // build tag
+        $markup = sprintf('<%s%s>%s</%s>', $this->arguments['name'], $class, $this->arguments['node'], $this->arguments['name']);
+
+        return $markup;
+    }
 }

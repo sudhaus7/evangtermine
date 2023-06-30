@@ -1,5 +1,19 @@
 <?php
+
+/*
+ * This file is part of the TYPO3 project.
+ *
+ * @author Frank Berger <fberger@sudhaus7.de>
+ *
+ * For the full copyright and license information, please view
+ * the LICENSE file that was distributed with this source code.
+ *
+ * The TYPO3 project - inspiring people to share!
+ */
+
 namespace ArbkomEKvW\Evangtermine\Util;
+
+use ArbkomEKvW\Evangtermine\Domain\Model\EtKeys;
 
 /***************************************************************
  *
@@ -29,52 +43,50 @@ namespace ArbkomEKvW\Evangtermine\Util;
 /**
  * Settings utility
  */
- class SettingsUtility {
- 	
- 	/**
- 	 * fetch etkey params from TypoScript/Flexform settings
- 	 * @param array $settingsArray
- 	 * @param \ArbkomEKvW\Evangtermine\Domain\Model\EtKeys $etks
- 	 */
- 	public function fetchParamsFromSettings(array $settingsArray, \ArbkomEKvW\Evangtermine\Domain\Model\EtKeys $etks) {
- 	
- 		foreach ($settingsArray as $key => $value) {
- 			if (substr($key, 0, 6) == 'etkey_' && $value != '') {
- 				$targetMethod = 'set' . ucfirst(substr($key, 6));
- 				if (method_exists($etks, $targetMethod)) {
- 					$etks->{$targetMethod}($value);
- 				}
- 			}
- 		}
- 		
- 		// evaluate additional params field in flexform
- 		if (isset($settingsArray['evt_addprms']) && $settingsArray['evt_addprms'] != '') {
- 			$addprms = explode('&', $settingsArray['evt_addprms']);
- 			foreach ($addprms as $keyval) {
- 				list($key, $value) = explode('=', trim($keyval));
- 				$targetMethod = 'set' . ucfirst(trim($key));
- 				if (method_exists($etks, $targetMethod)) {
- 					$etks->{$targetMethod}(trim($value));
- 				}
- 			}
- 		}
- 	}
- 	
- 	/**
- 	 * fetch etkey params from Request
- 	 * @param unknown $requestParams
- 	 * @param \ArbkomEKvW\Evangtermine\Domain\Model\EtKeys $etks
- 	 */
- 	public function fetchParamsFromRequest($requestParams, \ArbkomEKvW\Evangtermine\Domain\Model\EtKeys $etks) {
- 		
- 		foreach ($requestParams as $key => $value) {
- 			
- 			$targetMethod = 'set' . ucfirst($key);
- 			
- 			if (method_exists($etks, $targetMethod)) {
- 				$etks->{$targetMethod}($value);
- 			}
- 		}
- 	}
- 	
- }
+class SettingsUtility
+{
+    /**
+     * fetch etkey params from TypoScript/Flexform settings
+     * @param array $settingsArray
+     * @param EtKeys $etks
+     */
+    public function fetchParamsFromSettings(array $settingsArray, EtKeys $etks)
+    {
+        foreach ($settingsArray as $key => $value) {
+            if (substr($key, 0, 6) == 'etkey_' && $value != '') {
+                $targetMethod = 'set' . ucfirst(substr($key, 6));
+                if (method_exists($etks, $targetMethod)) {
+                    $etks->{$targetMethod}($value);
+                }
+            }
+        }
+
+        // evaluate additional params field in flexform
+        if (isset($settingsArray['evt_addprms']) && $settingsArray['evt_addprms'] != '') {
+            $addprms = explode('&', $settingsArray['evt_addprms']);
+            foreach ($addprms as $keyval) {
+                [$key, $value] = explode('=', trim($keyval));
+                $targetMethod = 'set' . ucfirst(trim($key));
+                if (method_exists($etks, $targetMethod)) {
+                    $etks->{$targetMethod}(trim($value));
+                }
+            }
+        }
+    }
+
+    /**
+     * fetch etkey params from Request
+     * @param unknown $requestParams
+     * @param EtKeys $etks
+     */
+    public function fetchParamsFromRequest($requestParams, EtKeys $etks)
+    {
+        foreach ($requestParams as $key => $value) {
+            $targetMethod = 'set' . ucfirst($key);
+
+            if (method_exists($etks, $targetMethod)) {
+                $etks->{$targetMethod}($value);
+            }
+        }
+    }
+}

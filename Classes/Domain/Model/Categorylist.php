@@ -1,6 +1,17 @@
 <?php
-namespace ArbkomEKvW\Evangtermine\Domain\Model;
 
+/*
+ * This file is part of the TYPO3 project.
+ *
+ * @author Frank Berger <fberger@sudhaus7.de>
+ *
+ * For the full copyright and license information, please view
+ * the LICENSE file that was distributed with this source code.
+ *
+ * The TYPO3 project - inspiring people to share!
+ */
+
+namespace ArbkomEKvW\Evangtermine\Domain\Model;
 
 /***************************************************************
  *
@@ -27,49 +38,44 @@ namespace ArbkomEKvW\Evangtermine\Domain\Model;
  *  This copyright notice MUST APPEAR in all copies of the script!
  ***************************************************************/
 
-use \TYPO3\CMS\Core\Utility\GeneralUtility;
 use ArbkomEKvW\Evangtermine\Util\CategoryUtil;
+use TYPO3\CMS\Core\Utility\GeneralUtility;
+use TYPO3\CMS\Extbase\DomainObject\AbstractEntity;
 
 /**
  * Categorylist
  */
-class Categorylist extends \TYPO3\CMS\Extbase\DomainObject\AbstractEntity
+class Categorylist extends AbstractEntity
 {
-
-    protected $itemList = null;
+    protected $itemList;
 
     public function __construct($typeMethod = 'getCategories', $sessionKey = 'tx_evangtermine_categorylist')
     {
         // if itemList is empty, load from session
-        if (! $this->itemList)
-        {
+        if (! $this->itemList) {
             $this->itemList = $GLOBALS['TSFE']->fe_user->getKey('ses', $sessionKey);
 
             // if necessary, initialize it
-            if (! $this->itemList)
-            {
+            if (! $this->itemList) {
                 $this->itemList = [];
                 $categoryUtil = GeneralUtility::makeInstance(CategoryUtil::class);
                 $categoryUtil->$typeMethod($this->itemList);
-                
+
                 $newlist = [];
-                foreach ($this->itemList['items'] as $item)
-                {
-                    $newlist[strval($item[1])] = $item[0];
+                foreach ($this->itemList['items'] as $item) {
+                    $newlist[(string)($item[1])] = $item[0];
                 }
                 $this->itemList['items'] = $newlist;
 
                 $GLOBALS['TSFE']->fe_user->setKey('ses', $sessionKey, $this->itemList);
-                
-		        $GLOBALS['TSFE']->fe_user->storeSessionData();
+
+                $GLOBALS['TSFE']->fe_user->storeSessionData();
             }
         }
     }
 
-    
     public function getItemslist()
     {
         return $this->itemList['items'];
     }
-
 }

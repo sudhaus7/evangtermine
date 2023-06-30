@@ -1,6 +1,21 @@
 <?php
+
+/*
+ * This file is part of the TYPO3 project.
+ *
+ * @author Frank Berger <fberger@sudhaus7.de>
+ *
+ * For the full copyright and license information, please view
+ * the LICENSE file that was distributed with this source code.
+ *
+ * The TYPO3 project - inspiring people to share!
+ */
+
 namespace ArbkomEKvW\Evangtermine\Domain\Model;
 
+use Exception;
+use SimpleXMLElement;
+use TYPO3\CMS\Extbase\DomainObject\AbstractEntity;
 
 /***************************************************************
  *
@@ -30,128 +45,129 @@ namespace ArbkomEKvW\Evangtermine\Domain\Model;
 /**
  * Eventcontainer
  */
-class Eventcontainer extends \TYPO3\CMS\Extbase\DomainObject\AbstractEntity implements \ArbkomEKvW\Evangtermine\Domain\Model\EventcontainerInterface {
-	
-	/**
-	 * itemsInResult 
-	 *
-	 * @var integer
-	 */
-	private $numberOfItems = 0;
-	
-	/**
-	 * items array of SimpleXML objects
-	 *
-	 * @var array
-	 */
-	private $items = array();
-	
-	/**
-	 * content of the <meta> tag in XML result 
-	 * @var \SimpleXMLElement
-	 */
-	private $metaData = NULL;
-	
-	/**
-	 * detail-tag, only present in single view
-	 * @var array
-	 */
-	private $detail = NULL;
-	
-	/**
-	 * returns number of items in container
-	 * 
-	 * @return integer
-	 */
-	public function getNumberOfItems() {
-		return $this->numberOfItems;
-	}
-	
-	/**
-	 * sets the number of items in result
-	 * @param integer 
-	 * @return void
-	 */
-	public function setNumberOfItems($numItems) {
-		$this->numberOfItems = $numItems;
-	}
-	
-	/**
-	 * returns items array
-	 * @return array $items
-	 */
-	public function getItems() {
-		return $this->items;
-	}
-	
-	/**
-	 * sets items array
-	 * 
-	 * @param array $items
-	 * @return void
-	 */
-	public function setItems(array $items) {
-		$this->items = $items;
-	}
-	
+class Eventcontainer extends AbstractEntity implements EventcontainerInterface
+{
+    /**
+     * itemsInResult
+     *
+     * @var int
+     */
+    private $numberOfItems = 0;
 
-	public function getMetaData() {
-		return $this->metaData;
-	}
-	
-	public function setMetaData($metaData) {
-		$this->metaData = $metaData;
-	}
-	
-	public function setDetail($detail) {
-		$this->detail = $detail;
-	}
-	
-	public function getDetail() {
-		return $this->detail;
-	}
-	
-	/**
-	 * transform XML into array and load item attributes
-	 * @param string $xmlString
-	 * @return void
-	 */
-	public function loadXML($xmlString) {
-		
-		$xmlString = trim($xmlString);
-		
-		if (!$xmlString || substr($xmlString, 0, 5) != '<?xml') {
-			$this->reset();
-		} else {
-			try {
-				$xmlSimple = new \SimpleXMLElement($xmlString);
-			} catch (\Exception $e) {
-				$this->reset();
-				return;
-			}
-			
-			// extract event data
-			$this->setItems($xmlSimple->xpath('//Veranstaltung'));
-			$this->setNumberOfItems(count($this->getItems()));
-			
-			// extract meta data
-			$this->setMetaData($xmlSimple->Export->meta);
-			
-			// extract detail
-			$this->setDetail($xmlSimple->Export->detail->item);
-		}
-		
-	}
-	
-	/**
-	 * set values to empty
-	 */
-	private function reset() {
-		$this->setNumberOfItems(0);
-		$this->setItems(array());
-		$this->setMetaData(NULL);
-	}
-	
-	
-	
+    /**
+     * items array of SimpleXML objects
+     *
+     * @var array
+     */
+    private $items = [];
+
+    /**
+     * content of the <meta> tag in XML result
+     * @var SimpleXMLElement
+     */
+    private $metaData;
+
+    /**
+     * detail-tag, only present in single view
+     * @var array
+     */
+    private $detail;
+
+    /**
+     * returns number of items in container
+     *
+     * @return int
+     */
+    public function getNumberOfItems()
+    {
+        return $this->numberOfItems;
+    }
+
+    /**
+     * sets the number of items in result
+     * @param int
+     */
+    public function setNumberOfItems($numItems)
+    {
+        $this->numberOfItems = $numItems;
+    }
+
+    /**
+     * returns items array
+     * @return array $items
+     */
+    public function getItems()
+    {
+        return $this->items;
+    }
+
+    /**
+     * sets items array
+     *
+     * @param array $items
+     */
+    public function setItems(array $items)
+    {
+        $this->items = $items;
+    }
+
+    public function getMetaData()
+    {
+        return $this->metaData;
+    }
+
+    public function setMetaData($metaData)
+    {
+        $this->metaData = $metaData;
+    }
+
+    public function setDetail($detail)
+    {
+        $this->detail = $detail;
+    }
+
+    public function getDetail()
+    {
+        return $this->detail;
+    }
+
+    /**
+     * transform XML into array and load item attributes
+     * @param string $xmlString
+     */
+    public function loadXML($xmlString)
+    {
+        $xmlString = trim($xmlString);
+
+        if (!$xmlString || substr($xmlString, 0, 5) != '<?xml') {
+            $this->reset();
+        } else {
+            try {
+                $xmlSimple = new SimpleXMLElement($xmlString);
+            } catch (Exception $e) {
+                $this->reset();
+                return;
+            }
+
+            // extract event data
+            $this->setItems($xmlSimple->xpath('//Veranstaltung'));
+            $this->setNumberOfItems(count($this->getItems()));
+
+            // extract meta data
+            $this->setMetaData($xmlSimple->Export->meta);
+
+            // extract detail
+            $this->setDetail($xmlSimple->Export->detail->item);
+        }
+    }
+
+    /**
+     * set values to empty
+     */
+    private function reset()
+    {
+        $this->setNumberOfItems(0);
+        $this->setItems([]);
+        $this->setMetaData(null);
+    }
 }

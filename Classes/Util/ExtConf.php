@@ -1,6 +1,17 @@
 <?php
-namespace ArbkomEKvW\Evangtermine\Util;
 
+/*
+ * This file is part of the TYPO3 project.
+ *
+ * @author Frank Berger <fberger@sudhaus7.de>
+ *
+ * For the full copyright and license information, please view
+ * the LICENSE file that was distributed with this source code.
+ *
+ * The TYPO3 project - inspiring people to share!
+ */
+
+namespace ArbkomEKvW\Evangtermine\Util;
 
 /***************************************************************
  *
@@ -27,34 +38,36 @@ namespace ArbkomEKvW\Evangtermine\Util;
  *  This copyright notice MUST APPEAR in all copies of the script!
  ***************************************************************/
 
- use \TYPO3\CMS\Core\Utility\GeneralUtility;
- use \TYPO3\CMS\Core\Configuration\ExtensionConfiguration;
+use TYPO3\CMS\Core\Configuration\ExtensionConfiguration;
+use TYPO3\CMS\Core\SingletonInterface;
+use TYPO3\CMS\Core\Utility\GeneralUtility;
 
 /**
  * class ExtConf
  * Gives access to the configuration data in ext_conf_template.txt
  */
-class ExtConf implements \TYPO3\CMS\Core\SingletonInterface {
-	
-	/**
-	 * Unserialized extConf Data
-	 * @var array
-	 */
-	private $extConfArray = null;
-	
-	/**
-	 * constructor
-	 */
-	public function __construct() {
-		$this->extConfArray = GeneralUtility::makeInstance(ExtensionConfiguration::class)->get('evangtermine');
-	}
-	
-	/**
-	 * returns extConf data array
-	 * @return array
-	 */
-	public function getExtConfArray() {
-		return $this->extConfArray;
-	}
-	
+class ExtConf implements SingletonInterface
+{
+    /**
+     * Unserialized extConf Data
+     * @var array
+     */
+    private $extConfArray;
+
+    /**
+     * constructor
+     */
+    public function __construct()
+    {
+        $this->extConfArray = GeneralUtility::makeInstance(ExtensionConfiguration::class)->get('evangtermine');
+    }
+
+    /**
+     * returns extConf data array
+     * @return array
+     */
+    public function getExtConfArray()
+    {
+        return $this->extConfArray;
+    }
 }

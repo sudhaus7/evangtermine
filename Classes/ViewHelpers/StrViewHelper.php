@@ -1,5 +1,19 @@
 <?php
+
+/*
+ * This file is part of the TYPO3 project.
+ *
+ * @author Frank Berger <fberger@sudhaus7.de>
+ *
+ * For the full copyright and license information, please view
+ * the LICENSE file that was distributed with this source code.
+ *
+ * The TYPO3 project - inspiring people to share!
+ */
+
 namespace ArbkomEKvW\Evangtermine\ViewHelpers;
+
+use TYPO3Fluid\Fluid\Core\ViewHelper\AbstractViewHelper;
 
 /**
  * *************************************************************
@@ -30,26 +44,24 @@ namespace ArbkomEKvW\Evangtermine\ViewHelpers;
 
 /**
  * StrViewHelper
- * In case {someObject} in a fluid template does not resolve to the object's string value this ViewHelper can be useful. 
- * SimpleXMLElement objects for example required this at time of writing (06/2015) 
+ * In case {someObject} in a fluid template does not resolve to the object's string value this ViewHelper can be useful.
+ * SimpleXMLElement objects for example required this at time of writing (06/2015)
  */
-class StrViewHelper extends \TYPO3Fluid\Fluid\Core\ViewHelper\AbstractViewHelper {
-	
-	public function initializeArguments() {
-		$this->registerArgument ( 'on', 'object', 'Object for toString', TRUE );
-	}
-	
-	/**
-	 *
-	 * @return string
-	 */
-	public function render() {
+class StrViewHelper extends AbstractViewHelper
+{
+    public function initializeArguments()
+    {
+        $this->registerArgument('on', 'object', 'Object for toString', true);
+    }
 
-		if ($this->arguments['on']) {
-			return $this->arguments['on']->__toString();
-		} else {
-			return '';
-		}
-		
-	}
+    /**
+     * @return string
+     */
+    public function render()
+    {
+        if ($this->arguments['on']) {
+            return $this->arguments['on']->__toString();
+        }
+        return '';
+    }
 }

@@ -1,4 +1,16 @@
 <?php
+
+/*
+ * This file is part of the TYPO3 project.
+ *
+ * @author Frank Berger <fberger@sudhaus7.de>
+ *
+ * For the full copyright and license information, please view
+ * the LICENSE file that was distributed with this source code.
+ *
+ * The TYPO3 project - inspiring people to share!
+ */
+
 namespace ArbkomEKvW\Evangtermine\Util;
 
 /***************************************************************
@@ -26,9 +38,8 @@ namespace ArbkomEKvW\Evangtermine\Util;
  *  This copyright notice MUST APPEAR in all copies of the script!
  ***************************************************************/
 
-use \TYPO3\CMS\Core\Utility\GeneralUtility;
-use ArbkomEKvW\Evangtermine\Util\ExtConf;
-use ArbkomEKvW\Evangtermine\Util\UrlUtility;
+use RuntimeException;
+use TYPO3\CMS\Core\Utility\GeneralUtility;
 
 /**
 * class CategoryUtil
@@ -36,13 +47,10 @@ use ArbkomEKvW\Evangtermine\Util\UrlUtility;
 */
 class CategoryUtil
 {
-    
     private $host = '';
 
     /**
-     * Constructor fetches name of foreign host for category retrieval 
-     * 
-     * @return void 
+     * Constructor fetches name of foreign host for category retrieval
      */
     public function __construct()
     {
@@ -52,9 +60,8 @@ class CategoryUtil
 
     /**
      * Get categories list from foreign host. Method used as itemsProcFunc in Flexform
-     * 
-     * @param array $configuration 
-     * @return void 
+     *
+     * @param array $configuration
      */
     public function getCategories(array &$configuration)
     {
@@ -63,41 +70,36 @@ class CategoryUtil
 
         $categories[] = ['Alle Kategorien', 'all'];
 
-        foreach ($rawCategories as $item)
-        {
+        foreach ($rawCategories as $item) {
             $categories[] = [ $item->name, $item->id ];
         }
 
         $configuration['items'] = $categories;
     }
 
-
     /**
      * Get groups list from foreign host. Method used as itemsProcFunc in Flexform
-     * 
-     * @param array $configuration 
-     * @return void 
+     *
+     * @param array $configuration
      */
     public function getGroups(array &$configuration)
     {
         $url = 'https://' . $this->host . '/service/people.json';
         $rawGroups = $this->getUrlContent($url);
 
-        foreach ($rawGroups as $item)
-        {
+        foreach ($rawGroups as $item) {
             $groups[] = [ $item->name, $item->id ];
         }
 
         $configuration['items'] = $groups;
     }
 
-
     /**
      * Get JSON String with categories or audience from URL.
-     * 
-     * @param string $url 
-     * @return array Decoded JSON 
-     * @throws Exception 
+     *
+     * @param string $url
+     * @return array Decoded JSON
+     * @throws Exception
      */
     private function getUrlContent($url)
     {
@@ -105,12 +107,10 @@ class CategoryUtil
         $contentString = UrlUtility::loadUrl($url);
 
         $contentArray = json_decode($contentString);
-        if ($contentArray === null)
-        {
-            throw new \RuntimeException('No valid JSON in ' . $url);
+        if ($contentArray === null) {
+            throw new RuntimeException('No valid JSON in ' . $url);
         }
 
         return $contentArray;
     }
-
 }

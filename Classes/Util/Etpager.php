@@ -1,4 +1,16 @@
 <?php
+
+/*
+ * This file is part of the TYPO3 project.
+ *
+ * @author Frank Berger <fberger@sudhaus7.de>
+ *
+ * For the full copyright and license information, please view
+ * the LICENSE file that was distributed with this source code.
+ *
+ * The TYPO3 project - inspiring people to share!
+ */
+
 namespace ArbkomEKvW\Evangtermine\Util;
 
 /***************************************************************
@@ -29,110 +41,101 @@ namespace ArbkomEKvW\Evangtermine\Util;
 /**
  * Etpager
  */
-class Etpager  {
-	
-	// pager bar size (number of page fields to click on)
-	const pgrbSize = 5;
-	
-	// Steps between fields in self::pgrbSize
-	const pgrbSteps = 4;
-	
-	// Steps from pagebar border to pagebar center 
-	const pgrbBorderToCenter = 2;
-	
-	/**
-	 * pager data for display in view
-	 * @var array
-	 */
-	protected $pgr;
-	
-	/**
-	 * Build Pager datastructure
-	 * @param mixed $totalItems 
-	 * @param mixed $itemsPerPage 
-	 * @param mixed $pageID 
-	 * @return void 
-	 */
-	public function up($totalItems, $itemsPerPage, $currentPage) {
-		
-		// Number of Events in result
-		if (is_object($totalItems)) {
-			$totalItems = intval($totalItems->__toString());
-		} else {
-			$totalItems = intval($totalItems);
-		}
-		
-		$itemsPerPage = intval($itemsPerPage);
-		
-		// Number of pages in pager
-		$this->pgr['pages'] =  ceil( $totalItems / $itemsPerPage );
-		
-		// Current page
-		$this->pgr['current'] = isset($currentPage) ? $currentPage : 1;
-		
-		$this->getPagerBarLimits();
-		$this->getBrowserTriggers();
+class Etpager
+{
+    // pager bar size (number of page fields to click on)
+    const pgrbSize = 5;
 
-		// make values for pager bar
-		$this->pgr['pgrBarValues'] = array();
-		for ($i = $this->pgr['pgrBarBegin']; $i <= $this->pgr['pgrBarEnd']; $i++) {
-			$this->pgr['pgrBarValues'][] = $i;
-		}
-		
-	}
-	
-	
-	private function getPagerBarLimits() {
-		
-		// current page is near end of pagelist
-		if ( ($this->pgr['pages'] - self::pgrbSize) < $this->pgr['current']) {
-			
-			$this->pgr['pgrBarEnd'] = $this->pgr['pages']; 
-		
-		// current page is near beginning of pagelist
-		} elseif ( ($this->pgr['current'] + self::pgrbBorderToCenter) <= self::pgrbSize) {
-			
-			$this->pgr['pgrBarEnd'] = self::pgrbSize;
-			
-		// current page is somewhere in the middle 
-		} else {
-			$this->pgr['pgrBarEnd'] = $this->pgr['current'] + self::pgrbBorderToCenter;
-		}
-		
-		// now the begin limit 
-		if ( ($this->pgr['pgrBarEnd'] - self::pgrbSteps) <= 1) {
-			$this->pgr['pgrBarBegin'] = 1;
-		} else {
-			$this->pgr['pgrBarBegin'] = $this->pgr['pgrBarEnd'] - self::pgrbSteps;
-		}
-	}
-	
-	
-	private function getBrowserTriggers() {
-		
-		if ($this->pgr['pgrBarBegin'] >= self::pgrbBorderToCenter) {
-			$this->pgr['lBrowser'] = 1;
-			$this->pgr['lBrowserNext'] = ($this->pgr['current'] > 1) ? $this->pgr['current'] - 1 : 1;
-		} else {
-			$this->pgr['lBrowser'] = 0;
-		}
-		
-		
-		if ($this->pgr['current'] < $this->pgr['pgrBarEnd']) {
-			$this->pgr['rBrowser'] = 1;
-			$this->pgr['rBrowserNext'] = $this->pgr['current'] + 1; 
-		} else {
-			$this->pgr['rBrowser'] = 0;
-		}
-	}
+    // Steps between fields in self::pgrbSize
+    const pgrbSteps = 4;
 
-	/**
-	 * @return array 
-	 */
-	public function getPgr()
-	{
-		return $this->pgr;
-	}
-	
-	
+    // Steps from pagebar border to pagebar center
+    const pgrbBorderToCenter = 2;
+
+    /**
+     * pager data for display in view
+     * @var array
+     */
+    protected $pgr;
+
+    /**
+     * Build Pager datastructure
+     * @param mixed $totalItems
+     * @param mixed $itemsPerPage
+     * @param mixed $pageID
+     */
+    public function up($totalItems, $itemsPerPage, $currentPage)
+    {
+        // Number of Events in result
+        if (is_object($totalItems)) {
+            $totalItems = (int)($totalItems->__toString());
+        } else {
+            $totalItems = (int)$totalItems;
+        }
+
+        $itemsPerPage = (int)$itemsPerPage;
+
+        // Number of pages in pager
+        $this->pgr['pages'] =  ceil($totalItems / $itemsPerPage);
+
+        // Current page
+        $this->pgr['current'] = isset($currentPage) ? $currentPage : 1;
+
+        $this->getPagerBarLimits();
+        $this->getBrowserTriggers();
+
+        // make values for pager bar
+        $this->pgr['pgrBarValues'] = [];
+        for ($i = $this->pgr['pgrBarBegin']; $i <= $this->pgr['pgrBarEnd']; $i++) {
+            $this->pgr['pgrBarValues'][] = $i;
+        }
+    }
+
+    private function getPagerBarLimits()
+    {
+        // current page is near end of pagelist
+        if (($this->pgr['pages'] - self::pgrbSize) < $this->pgr['current']) {
+            $this->pgr['pgrBarEnd'] = $this->pgr['pages'];
+
+        // current page is near beginning of pagelist
+        } elseif (($this->pgr['current'] + self::pgrbBorderToCenter) <= self::pgrbSize) {
+            $this->pgr['pgrBarEnd'] = self::pgrbSize;
+
+        // current page is somewhere in the middle
+        } else {
+            $this->pgr['pgrBarEnd'] = $this->pgr['current'] + self::pgrbBorderToCenter;
+        }
+
+        // now the begin limit
+        if (($this->pgr['pgrBarEnd'] - self::pgrbSteps) <= 1) {
+            $this->pgr['pgrBarBegin'] = 1;
+        } else {
+            $this->pgr['pgrBarBegin'] = $this->pgr['pgrBarEnd'] - self::pgrbSteps;
+        }
+    }
+
+    private function getBrowserTriggers()
+    {
+        if ($this->pgr['pgrBarBegin'] >= self::pgrbBorderToCenter) {
+            $this->pgr['lBrowser'] = 1;
+            $this->pgr['lBrowserNext'] = ($this->pgr['current'] > 1) ? $this->pgr['current'] - 1 : 1;
+        } else {
+            $this->pgr['lBrowser'] = 0;
+        }
+
+        if ($this->pgr['current'] < $this->pgr['pgrBarEnd']) {
+            $this->pgr['rBrowser'] = 1;
+            $this->pgr['rBrowserNext'] = $this->pgr['current'] + 1;
+        } else {
+            $this->pgr['rBrowser'] = 0;
+        }
+    }
+
+    /**
+     * @return array
+     */
+    public function getPgr()
+    {
+        return $this->pgr;
+    }
 }
