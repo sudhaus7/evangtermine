@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes" ?>
 <xliff version="1.0">
-	<file 
+	<file
 		source-language="en"
 		datatype="plaintext"
 		original="messages"
@@ -12,10 +12,82 @@
 			<trans-unit id="extconftemplate.labelHost">
             	<source>Choose host:Select the church you will use Evangelische Termine in.</source>
             </trans-unit>
-                   
+
             <trans-unit id="extconftemplate.labelMode">
                 <source>Use cached data:Using cached data will be faster, but in some cases there might be not all content fields available.</source>
-            </trans-unit>			
+            </trans-unit>
+
+			<trans-unit id="pluginsheet.general">
+				<source>Default Setting</source>
+			</trans-unit>
+
+			<trans-unit id="pluginsheet.cdistrict">
+				<source>Region</source>
+			</trans-unit>
+
+			<trans-unit id="pluginsheet.opmode">
+				<source>Mode</source>
+			</trans-unit>
+
+			<trans-unit id="feflexform.vid">
+				<source>Organizer ID:</source>
+			</trans-unit>
+
+			<trans-unit id="feflexform.highlight">
+				<source>Highlights:</source>
+			</trans-unit>
+
+			<trans-unit id="feflexform.highlight.high">
+				<source>Highlights Only</source>
+			</trans-unit>
+
+			<trans-unit id="feflexform.highlight.all">
+				<source>All Events</source>
+			</trans-unit>
+
+			<trans-unit id="feflexform.et_q">
+				<source>Search Term:</source>
+			</trans-unit>
+
+			<trans-unit id="feflexform.eventtype">
+				<source>Category (Multiple selections possible):</source>
+			</trans-unit>
+
+			<trans-unit id="feflexform.people">
+				<source>Target Audience (Multiple selections possible):</source>
+			</trans-unit>
+
+			<trans-unit id="feflexform.itemsPerPage">
+				<source>Events per Page:</source>
+			</trans-unit>
+
+			<trans-unit id="feflexform.addprms">
+				<source>Additional Parameters:</source>
+			</trans-unit>
+
+			<trans-unit id="feflexform.region">
+				<source>Region ID (multi-digit district or church district number):</source>
+			</trans-unit>
+
+			<trans-unit id="feflexform.aid">
+				<source>Group Administrator ID (optional):</source>
+			</trans-unit>
+
+			<trans-unit id="feflexform.listmode">
+				<source>List View</source>
+			</trans-unit>
+
+			<trans-unit id="feflexform.teasermode">
+				<source>Teaser</source>
+			</trans-unit>
+
+			<trans-unit id="feflexform.detailmode">
+				<source>Detail View Events</source>
+			</trans-unit>
+
+			<trans-unit id="feflexform.detailpage">
+				<source>Page for Detail View:</source>
+			</trans-unit>
 
 		</body>
 
