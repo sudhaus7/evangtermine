@@ -1,34 +1,35 @@
+<html xmlns:f="http://typo3.org/ns/TYPO3/Fluid/ViewHelpers"
+      xmlns="http://www.w3.org/1999/xhtml"
+      lang="en"
+      f:schemaLocation="https://fluidtypo3.org/schemas/fluid-master.xsd"
+      data-namespace-typo3-fluid="true">
 <f:if condition="{pgr.pages} > 1">
+    <div class="et_pager_container">
+        <div class="light-theme simple-pagination">
+            <f:comment><!-- Left side browser --></f:comment>
+            <f:if condition="{pgr.lBrowser} == 1">
+                <a href="#" data-page="1" title="Seite 1">[1]</a>
+                <a href="#" data-page="{pgr.lBrowserNext}" title="Zurück">«</a>
+            </f:if>
 
-<div class="et_pager_container">
-	<div class="light-theme simple-pagination">
-	
-	 <f:comment>Left side browser</f:comment>
-	 <f:if condition="{pgr.lBrowser} == 1">
-		<f:link.action controller="Eventcontainer" action="list" arguments="{pageID: 1}" title="Seite 1">[1]</f:link.action>
-	 	<f:link.action controller="Eventcontainer" action="list" arguments="{pageID: pgr.lBrowserNext}" title="Zurück">«</f:link.action>	 
-	 </f:if>
-	 	
-	<f:for each="{pgr.pgrBarValues}" as="val">
-		<f:if condition="{pgr.current} != {val}">
-			<f:then>
-				<f:link.action controller="Eventcontainer" action="list" arguments="{pageID: val}" title="Seite {val}">{val}</f:link.action>
-			</f:then>
-			<f:else>
-				<span class="current">{val}</span>
-			</f:else>
-		</f:if>
-	</f:for>
-	
-	 <f:comment>Right side browser</f:comment>
-	 <f:if condition="{pgr.rBrowser} == 1">
-	 	<f:link.action controller="Eventcontainer" action="list" arguments="{pageID: pgr.rBrowserNext}" title="Seite {pgr.rBrowserNext}">»</f:link.action>
-	 	<f:link.action controller="Eventcontainer" action="list" arguments="{pageID: pgr.pages}" title="Seite {pgr.pages}">[{pgr.pages}]</f:link.action>
-	 </f:if>
-	 
-	</div>		
-</div>
+            <f:for each="{pgr.pgrBarValues}" as="val">
+                <f:if condition="{pgr.current} != {val}">
+                    <f:then>
+                        <a href="#" data-page="{val}" title="Seite {val}">{val}</a>
+                    </f:then>
+                    <f:else>
+                        <span class="current">{val}</span>
+                    </f:else>
+                </f:if>
+            </f:for>
 
+            <f:comment><!-- Right side browser --></f:comment>
+            <f:if condition="{pgr.rBrowser} == 1">
+                <a href="#" data-page="{pgr.rBrowserNext}" title="Seite {pgr.rBrowserNext}">»</a>
+                <a href="#" data-page="{pgr.pages}" title="Seite {pgr.pages}">[{pgr.pages}]</a>
+            </f:if>
+
+        </div>
+    </div>
 </f:if>
-
-<f:comment><f:debug>{pgr}</f:debug></f:comment>
+</html>

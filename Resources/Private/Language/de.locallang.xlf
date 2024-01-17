@@ -1,116 +1,124 @@
 <?xml version="1.0" encoding="utf-8" standalone="yes" ?>
 <xliff version="1.0">
-	<file 
+	<file
             source-language="en"
-            target-language="de" 
-            datatype="plaintext" 
-            original="messages" 
-            date="2019-01-22T10:58:00Z" 
+            target-language="de"
+            datatype="plaintext"
+            original="messages"
+            date="2019-01-22T10:58:00Z"
             product-name="evangtermine">
-            
+
 		<header/>
 		<body>
-                    <trans-unit id="extconftemplate.labelHost">
-                        <source></source>
-                        <target>Host festlegen:Bestimmen Sie hier, in welcher Landeskirche Sie Evangelische Termine einbinden möchten.</target>
-                    </trans-unit>
-                   
-                   <trans-unit id="extconftemplate.labelMode">
-                        <source></source>
-                        <target>Daten-Cache benutzen:Bei Cache-Benutzung werden die Daten schneller und Ressourcen schonender abgerufen, es sind aber u.U. nicht alle Inhaltsfelder vorhanden.</target>
-                    </trans-unit>
-                    
-                    <trans-unit id="pluginsheet.general">
-                    	<source></source>
-                    	<target>Voreinstellung</target>
-                    </trans-unit>
-                   
-                    <trans-unit id="pluginsheet.cdistrict">
-                    	<source></source>
-                    	<target>Region</target>
-                    </trans-unit>
-                    
-                    <trans-unit id="pluginsheet.opmode">
-                    	<source></source>
-                    	<target>Modus</target>
-                    </trans-unit>
-                    
-                    <trans-unit id="feflexform.vid">
-                    	<source></source>
-                    	<target>Veranstalter-Id:</target>
-                    </trans-unit>
-                    
-                    <trans-unit id="feflexform.highlight">
-                    	<source></source>
-                    	<target>Highlights:</target>
-                    </trans-unit>
-                    
-                    <trans-unit id="feflexform.highlight.high">
-                    	<source></source>
-                    	<target>Nur Highlights</target>
-                    </trans-unit>
-                    
-                    <trans-unit id="feflexform.highlight.all">
-                    	<source></source>
-                    	<target>Alle Veranstaltungen</target>
-                    </trans-unit>
-                    
-                    <trans-unit id="feflexform.et_q">
-                    	<source></source>
-                    	<target>Suchbegriff:</target>
-                    </trans-unit>
-                    
-                    <trans-unit id="feflexform.eventtype">
-                    	<source></source>
-                    	<target>Kategorie (Mehrfachauswahl möglich):</target>
-                    </trans-unit>
-                    
-                    <trans-unit id="feflexform.people">
-                    	<source></source>
-                    	<target>Zielgruppe (Mehrfachauswahl möglich):</target>
-                    </trans-unit>
-                    
-                    <trans-unit id="feflexform.itemsPerPage">
-                    	<source></source>
-                    	<target>Termine pro Seite:</target>
-                    </trans-unit>
-                    
-                    <trans-unit id="feflexform.addprms">
-                    	<source></source>
-                    	<target>Weitere Parameter:</target>
-                    </trans-unit>
-                    
-                    <trans-unit id="feflexform.region">
-                    	<source></source>
-                    	<target>Region-ID (mehrstellige Dekanats- oder Kirchenkreisnummer):</target>
-                    </trans-unit>
-                    
-                    <trans-unit id="feflexform.aid">
-                    	<source></source>
-                    	<target>Gruppenadministrator-ID (optional):</target>
-                    </trans-unit>
-                    
-                    <trans-unit id="feflexform.listmode">
-                    	<source></source>
-                    	<target>Listenansicht</target>
-                    </trans-unit>
-                    
-                    <trans-unit id="feflexform.teasermode">
-                    	<source></source>
-                    	<target>Teaser</target>
-                    </trans-unit>
-                    
-                    <trans-unit id="feflexform.detailmode">
-                    	<source></source>
-                    	<target>Detailansicht Termine</target>
-                    </trans-unit>
-                    
-                    <trans-unit id="feflexform.detailpage">
-                    	<source></source>
-                    	<target>Seite für Detailansicht:</target>
-                    </trans-unit>
-                    
+			<trans-unit id="extconftemplate.labelHost">
+				<source></source>
+				<target>Host festlegen:Bestimmen Sie hier, in welcher Landeskirche Sie Evangelische Termine einbinden möchten.</target>
+			</trans-unit>
+
+			<trans-unit id="extconftemplate.labelMode">
+				<source></source>
+				<target>Daten-Cache benutzen:Bei Cache-Benutzung werden die Daten schneller und Ressourcen schonender abgerufen, es sind aber u.U. nicht alle Inhaltsfelder vorhanden.</target>
+			</trans-unit>
+
+			<trans-unit id="pluginsheet.general">
+				<source></source>
+				<target>Voreinstellung</target>
+			</trans-unit>
+
+			<trans-unit id="pluginsheet.cdistrict">
+				<source></source>
+				<target>Region</target>
+			</trans-unit>
+
+			<trans-unit id="pluginsheet.opmode">
+				<source></source>
+				<target>Modus</target>
+			</trans-unit>
+
+			<trans-unit id="feflexform.vid">
+				<source></source>
+				<target>Veranstalter-Id:</target>
+			</trans-unit>
+
+			<trans-unit id="feflexform.highlight">
+				<source></source>
+				<target>Highlights:</target>
+			</trans-unit>
+
+			<trans-unit id="feflexform.highlight.high">
+				<source></source>
+				<target>Nur Highlights</target>
+			</trans-unit>
+
+			<trans-unit id="feflexform.highlight.all">
+				<source></source>
+				<target>Alle Veranstaltungen</target>
+			</trans-unit>
+
+			<trans-unit id="feflexform.et_q">
+				<source></source>
+				<target>Suchbegriff:</target>
+			</trans-unit>
+
+			<trans-unit id="feflexform.eventtype">
+				<source></source>
+				<target>Kategorie (Mehrfachauswahl möglich):</target>
+			</trans-unit>
+
+			<trans-unit id="feflexform.people">
+				<source></source>
+				<target>Zielgruppe (Mehrfachauswahl möglich):</target>
+			</trans-unit>
+
+			<trans-unit id="feflexform.regions">
+				<source>Regionen (Mehrfachauswahl möglich):</source>
+			</trans-unit>
+
+			<trans-unit id="feflexform.places">
+				<source>Orte (Mehrfachauswahl möglich):</source>
+			</trans-unit>
+
+			<trans-unit id="feflexform.itemsPerPage">
+				<source></source>
+				<target>Termine pro Seite:</target>
+			</trans-unit>
+
+			<trans-unit id="feflexform.addprms">
+				<source></source>
+				<target>Weitere Parameter:</target>
+			</trans-unit>
+
+			<trans-unit id="feflexform.region">
+				<source></source>
+				<target>Region-ID (mehrstellige Dekanats- oder Kirchenkreisnummer):</target>
+			</trans-unit>
+
+			<trans-unit id="feflexform.aid">
+				<source></source>
+				<target>Gruppenadministrator-ID (optional):</target>
+			</trans-unit>
+
+			<trans-unit id="feflexform.listmode">
+				<source></source>
+				<target>Listenansicht</target>
+			</trans-unit>
+
+			<trans-unit id="feflexform.teasermode">
+				<source></source>
+				<target>Teaser</target>
+			</trans-unit>
+
+			<trans-unit id="feflexform.detailmode">
+				<source></source>
+				<target>Detailansicht Termine</target>
+			</trans-unit>
+
+			<trans-unit id="feflexform.detailpage">
+				<source></source>
+				<target>Seite für Detailansicht:</target>
+			</trans-unit>
+
 		</body>
-                
+
 	</file>
 </xliff>

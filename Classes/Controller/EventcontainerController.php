@@ -42,64 +42,50 @@ use ArbkomEKvW\Evangtermine\Domain\Model\Categorylist;
 use ArbkomEKvW\Evangtermine\Domain\Model\EtKeys;
 use ArbkomEKvW\Evangtermine\Domain\Model\Grouplist;
 use ArbkomEKvW\Evangtermine\Domain\Repository\EventcontainerRepository;
+use ArbkomEKvW\Evangtermine\Domain\Repository\EventRepository;
 use ArbkomEKvW\Evangtermine\Util\Etpager;
 use ArbkomEKvW\Evangtermine\Util\ExtConf;
 use ArbkomEKvW\Evangtermine\Util\SettingsUtility;
+use Doctrine\DBAL\DBALException;
+use Doctrine\DBAL\Driver\Exception;
+use Psr\Http\Message\ResponseInterface;
+use TYPO3\CMS\Core\Cache\CacheManager;
+use TYPO3\CMS\Core\Cache\Exception\NoSuchCacheException;
 use TYPO3\CMS\Core\Messaging\AbstractMessage;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
-use TYPO3\CMS\Core\Utility\PathUtility;
 use TYPO3\CMS\Extbase\Mvc\Controller\ActionController;
+use TYPO3\CMS\Extbase\Mvc\Exception\StopActionException;
+use TYPO3\CMS\Extbase\Persistence\Generic\Exception\InvalidNumberOfConstraintsException;
+use TYPO3\CMS\Extbase\Utility\DebuggerUtility;
 
 /**
  * EventcontainerController
  */
 class EventcontainerController extends ActionController
 {
-    /**
-     * @var ArbkomEKvW\Evangtermine\Domain\Repository\EventcontainerRepository
-     */
-    protected $eventcontainerRepository;
+    protected CacheManager $cacheManager;
+    protected \DateTime $date;
+    protected EventcontainerRepository $eventcontainerRepository;
+    protected EventRepository $eventRepository;
 
     /**
      * Uid value of current tt_content record
      * serves as unique id of this plugin instance, used for session identification
-     * @var int
      */
-    private $currentPluginUid;
+    private int $currentPluginUid;
+
+    private SettingsUtility $settingsUtility;
+
+    private Categorylist $categorylist;
+
+    private Grouplist $grouplist;
+
+    private EtKeys $etkeys;
+
+    private Etpager $pager;
 
     /**
-     * session data
-     * @var array
-     */
-    private $session;
-
-    /**
-     * @var ArbkomEKvW\Evangtermine\Util\SettingsUtility
-     */
-    private $settingsUtility;
-
-    /**
-     * @var ArbkomEKvW\Evangtermine\Domain\Model\Categorylist
-     */
-    private $categorylist;
-
-    /**
-     * @var ArbkomEKvW\Evangtermine\Domain\Model\Grouplist
-     */
-    private $grouplist;
-
-    /**
-     * @var ArbkomEKvW\Evangtermine\Domain\Model\EtKeys
-     */
-    private $etkeys;
-
-    /**
-     * @var ArbkomEKvW\Evangtermine\Util\Etpager
-     */
-    private $pager;
-
-    /**
-     * @param SettingsUtility
+     * @param SettingsUtility $settingsUtility
      */
     public function injectSettingsUtility(SettingsUtility $settingsUtility)
     {
@@ -107,7 +93,7 @@ class EventcontainerController extends ActionController
     }
 
     /**
-     * @param EventcontainerRepository
+     * @param EventcontainerRepository $eventcontainerRepository
      */
     public function injectEventcontainerRepository(EventcontainerRepository $eventcontainerRepository)
     {
@@ -115,109 +101,33 @@ class EventcontainerController extends ActionController
     }
 
     /**
-     * @param Categorylist $categorylist
+     * @param EventRepository $eventRepository
      */
-    public function injectCategorylist(Categorylist $categorylist)
+    public function injectEventRepository(EventRepository $eventRepository)
     {
-        $this->categorylist = $categorylist;
+        $this->eventRepository = $eventRepository;
     }
 
-    /**
-     * @param Grouplist $grouplist
-     */
-    public function injectGrouplist(Grouplist $grouplist)
+    public function __construct(CacheManager $cacheManager)
     {
-        $this->grouplist = $grouplist;
+        $this->cacheManager = $cacheManager;
+        $this->date = new \DateTime('today midnight');
     }
 
-    /**
-     * @param Etpager $pager
-     */
-    public function injectPager(Etpager $pager)
-    {
-        $this->pager = $pager;
-    }
-
-    /**
-     * (non-PHPdoc)
-     * @see \TYPO3\CMS\Extbase\Mvc\Controller\ActionController::initializeAction()
-     */
     protected function initializeAction()
     {
         $this->currentPluginUid = $this->configurationManager->getContentObject()->data['uid'];
-
-        $this->session = $this->loadSession();
-
-        // if etkeys were stored before,
-        if (isset($this->session['etkeysJson'])) {
-            $this->etkeys = GeneralUtility::makeInstance(EtKeys::class);
-            $this->etkeys->initFromJson($this->session['etkeysJson']);
-        }
-
-        // include CSS and JS
-        $this->includeAdditionalHeaderData();
-    }
-
-    /**
-     * load session data
-     * @return mixed
-     */
-    private function loadSession()
-    {
-        // load session, but only for this single plugin instance
-        $sessionKey = 'tx_evangtermine' . $this->currentPluginUid;
-        $sessionData = $GLOBALS['TSFE']->fe_user->getKey('ses', $sessionKey);
-
-        return $sessionData;
-    }
-
-    /**
-     * save session data
-     */
-    private function saveSession()
-    {
-        $sessionKey = 'tx_evangtermine' . $this->currentPluginUid;
-
-        // Replace object with Json representation
-        $this->session['etkeysJson'] = $this->etkeys->toJson();
-
-        $GLOBALS['TSFE']->fe_user->setKey('ses', $sessionKey, $this->session);
-        $GLOBALS['TSFE']->fe_user->storeSessionData();
-    }
-
-    /**
-     * include CSS and JS resources
-     */
-    private function includeAdditionalHeaderData()
-    {
-        $additHDD = '';
-
-        if (isset($this->settings['jQueryUICSS'])) {
-            $additHDD .=
-            '<link rel="stylesheet" href="' . PathUtility::getAbsoluteWebPath($this->settings['jQueryUICSS']) . '" media="all" />' . "\n";
-        }
-
-        if (isset($this->settings['CSSFile'])) {
-            $additHDD .=
-            '<link rel="stylesheet" href="' . PathUtility::getAbsoluteWebPath($this->settings['CSSFile']) . '" media="all" />' . "\n";
-        }
-
-        if (isset($this->settings['jQuery'])) {
-            $additHDD .= '<script type="text/javascript" src="' . PathUtility::getAbsoluteWebPath($this->settings['jQuery']) . '"></script>' . "\n";
-        }
-
-        if (isset($this->settings['jQueryUI'])) {
-            $additHDD .= '<script type="text/javascript" src="' . PathUtility::getAbsoluteWebPath($this->settings['jQueryUI']) . '"></script>' . "\n";
-        }
-
-        $GLOBALS['TSFE']->additionalHeaderData['tx_evangtermine'] = $additHDD;
+        $this->categorylist = GeneralUtility::makeInstance(Categorylist::class);
+        $this->grouplist = GeneralUtility::makeInstance(Grouplist::class);
+        $this->etkeys = GeneralUtility::makeInstance(EtKeys::class);
+        $this->pager = GeneralUtility::makeInstance(Etpager::class);
     }
 
     /**
      * create new Etkeys object and load Settings
      * @return EtKeys $etkeys
      */
-    private function getNewFromSettings()
+    private function getNewFromSettings(): EtKeys
     {
         $etkeys = GeneralUtility::makeInstance(EtKeys::class);
 
@@ -234,57 +144,93 @@ class EventcontainerController extends ActionController
      * - update session
      * - retrieve XML data
      * - hand it to view
+     * @throws Exception
+     * @throws DBALException
+     * @throws InvalidNumberOfConstraintsException
+     * @throws NoSuchCacheException
      */
-    public function listAction()
+    public function listAction(): ResponseInterface
     {
-        if (!isset($this->session['etkeysJson'])) {
-            // no session data exists. set up fresh container object for params and load settings
-            $this->etkeys = $this->getNewFromSettings();
-        }
+        $requestArguments = $this->request->getArguments();
+        $formArguments = $requestArguments['etkeysForm'] ?? [];
+        $this->etkeys = $this->getNewFromSettings();
 
         // collect params from request
-        $this->settingsUtility->fetchParamsFromRequest($this->request->getArguments(), $this->etkeys);
+        $this->settingsUtility->fetchParamsFromRequest($requestArguments, $this->etkeys);
 
         // check if params are coming in from (search-) form
-        $requestArguments = $this->request->getArguments();
-        if (isset($requestArguments['etkeysForm']) && $requestArguments['etkeysForm']['pluginUid'] == $this->currentPluginUid) {
+        if (!empty($formArguments) && $formArguments['pluginUid'] == $this->currentPluginUid) {
             // did user trigger form parameter reset?
             if (isset($requestArguments['sf_reset'])) {
                 $this->etkeys = $this->getNewFromSettings(); // do reset
+                $formArguments = [];
             } else {
-                $this->settingsUtility->fetchParamsFromRequest($requestArguments['etkeysForm'], $this->etkeys);
+                $this->settingsUtility->fetchParamsFromRequest($formArguments, $this->etkeys);
             }
         }
 
-        // retrieve XML
-        $evntContainer = $this->eventcontainerRepository->findByEtKeys($this->etkeys);
+        $formArgumentsHash = sha1(\json_encode($formArguments));
+        $cache = $this->cacheManager->getCache('evangtermine_event_list');
+        $cacheKey = 'argumentshash-' . $formArgumentsHash . '-' . $this->date->format('Ymd');
+        $content = $cache->get($cacheKey);
 
-        // fine tune and save parameters to session
-        if ($this->etkeys->getQ() == 'none') {
-            $this->etkeys->setQ('');
+        if (empty($content)) {
+            $events = $this->eventRepository->findByEtKeys($this->etkeys);
+            $nrOfEvents = $this->eventRepository->getNumberOfEventsByEtKeys($this->etkeys);
+
+            // pager
+            $this->pager->up(
+                $nrOfEvents,
+                $this->etkeys->getItemsPerPage(),
+                $this->etkeys->getPageID()
+            );
+
+            $this->view->assignMultiple([
+                'events' => $events,
+                'nrOfEvents' => $nrOfEvents,
+                'etkeys' => $this->etkeys,
+                'pageId' => $GLOBALS['TSFE']->id,
+                'pluginUid' => $this->currentPluginUid,
+                'categoryList' => $this->categorylist->getItemslist(),
+                'groupList' => $this->grouplist->getItemslist(),
+                'placeList' => $this->eventRepository->findAllPlaces($this->settings),
+                'regionList' => $this->eventRepository->findAllRegions($this->settings),
+                'pagerdata' => $this->pager->getPgr(),
+            ]);
+
+            $content = $this->view->render();
+            $cache->set($cacheKey, $content);
+
+            /*
+            // retrieve XML
+            $evntContainer = $this->eventcontainerRepository->findByEtKeys($this->etkeys);
+            DebuggerUtility::var_dump($this->etkeys,'kks');
+    DebuggerUtility::var_dump($evntContainer,'sger');exit;
+            // fine tune and save parameters to session
+            if ($this->etkeys->getQ() == 'none') {
+                $this->etkeys->setQ('');
+            }
+
+            // Set up pager widget (no Widgets in Fluid ViewHelpers since TYPO3 v11!)
+            $this->pager->up(
+                $evntContainer->getMetaData()->totalItems,
+                $this->etkeys->getItemsPerPage(),
+                $this->etkeys->getPageID()
+            );
+
+            // hand model data to the view
+            $this->view->assignMultiple([
+                'events' => $evntContainer,
+                'etkeys' => $this->etkeys,
+                'pageId' => $GLOBALS['TSFE']->id,
+                'pluginUid' => $this->currentPluginUid,
+                'categoryList' => $this->categorylist->getItemslist(),
+                'groupList' => $this->grouplist->getItemslist(),
+                'pagerdata' => $this->pager->getPgr(),
+            ]);
+            */
         }
-        $this->saveSession();
-
-        // Set up pager widget (no Widgets in Fluid ViewHelpers since TYPO3 v11!)
-        $this->pager->up(
-            $evntContainer->getMetaData()->totalItems,
-            $this->etkeys->getItemsPerPage(),
-            $this->etkeys->getPageID()
-        );
-
-        // hand model data to the view
-        $this->view->assignMultiple([
-            'events' => $evntContainer,
-            'etkeys' => $this->etkeys,
-            'pageId' => $GLOBALS['TSFE']->id,
-            'pluginUid' => $this->currentPluginUid,
-            'categoryList' => $this->categorylist->getItemslist(),
-            'groupList' => $this->grouplist->getItemslist(),
-            'pagerdata' => $this->pager->getPgr(),
-        ]);
-
-        // Debugging only
-        // $this->view->assign('request', $this->request->getArguments());
+        return $this->htmlResponse($content);
     }
 
     /**
@@ -305,23 +251,24 @@ class EventcontainerController extends ActionController
 
     /**
      * action show
+     * @throws StopActionException
      */
     public function showAction()
     {
         $etkeys = GeneralUtility::makeInstance(EtKeys::class);
-
         $extconf = GeneralUtility::makeInstance(ExtConf::class);
+        $uid = $this->request->getArguments()['uid'] ?? null;
+        if (!empty($uid)) {
 
-        if (isset($this->request->getArguments()['ID'])) {
-            $etkeys->setID($this->request->getArguments()['ID']);
+            //$etkeys->setID($this->request->getArguments()['uid']);
 
             // retrieve XML
-            $evntContainer = $this->eventcontainerRepository->findByEtKeys($etkeys);
+            //$evntContainer = $this->eventcontainerRepository->findByEtKeys($etkeys);
 
             // hand model data to the view
-            $this->view->assign('event', $evntContainer->getItems()[0]);
-            $this->view->assign('meta', $evntContainer->getMetaData());
-            $this->view->assign('detailitems', $evntContainer->getDetail());
+            $this->view->assign('event', $this->eventRepository->findByUid($uid));
+            /*$this->view->assign('meta', $evntContainer->getMetaData());*/
+            /*$this->view->assign('detailitems', $evntContainer->getDetail());*/
             $this->view->assign('eventhost', $extconf->getExtConfArray()['host']);
         } else {
             $this->addFlashMessage('Keine Event-ID übergeben', '', AbstractMessage::ERROR);

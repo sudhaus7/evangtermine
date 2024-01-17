@@ -38,8 +38,15 @@ namespace ArbkomEKvW\Evangtermine\Util;
  *  This copyright notice MUST APPEAR in all copies of the script!
  ***************************************************************/
 
+use ArbkomEKvW\Evangtermine\Domain\Repository\EventRepository;
+use Doctrine\DBAL\DBALException;
+use Doctrine\DBAL\Driver\Exception;
 use RuntimeException;
+use TYPO3\CMS\Core\Cache\CacheManager;
+use TYPO3\CMS\Core\Cache\Exception\NoSuchCacheException;
+use TYPO3\CMS\Core\Cache\Frontend\VariableFrontend;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
+use TYPO3\CMS\Extbase\Utility\DebuggerUtility;
 
 /**
 * class CategoryUtil
@@ -47,15 +54,22 @@ use TYPO3\CMS\Core\Utility\GeneralUtility;
 */
 class CategoryUtil
 {
-    private $host = '';
+    private string $host = '';
+    protected CacheManager $cacheManager;
+    protected string $dateString;
+    protected VariableFrontend $cache;
 
     /**
      * Constructor fetches name of foreign host for category retrieval
+     * @throws NoSuchCacheException
      */
     public function __construct()
     {
         $extconf = GeneralUtility::makeInstance(ExtConf::class);
         $this->host = $extconf->getExtConfArray()['host'];
+        $this->cacheManager = GeneralUtility::makeInstance(CacheManager::class);
+        $this->dateString = (new \DateTime('today midnight'))->format('Ymd');
+        $this->cache = $this->cacheManager->getCache('evangtermine');
     }
 
     /**
@@ -65,15 +79,21 @@ class CategoryUtil
      */
     public function getCategories(array &$configuration)
     {
-        $url = 'https://' . $this->host . '/service/eventtypes.json';
-        $rawCategories = $this->getUrlContent($url);
+        $cacheKey = 'categories-' . $this->dateString;
+        $categories = $this->cache->get($cacheKey);
 
-        $categories[] = ['Alle Kategorien', 'all'];
+        if (empty($categories)) {
+            $url = 'https://' . $this->host . '/service/eventtypes.json';
+            $rawCategories = $this->getUrlContent($url);
 
-        foreach ($rawCategories as $item) {
-            $categories[] = [ $item->name, $item->id ];
+            $categories = [];
+            $categories[] = ['Alle Kategorien', 'all'];
+
+            foreach ($rawCategories as $item) {
+                $categories[] = [ $item->name, $item->id ];
+            }
+            $this->cache->set($cacheKey, $categories);
         }
-
         $configuration['items'] = $categories;
     }
 
@@ -84,14 +104,69 @@ class CategoryUtil
      */
     public function getGroups(array &$configuration)
     {
-        $url = 'https://' . $this->host . '/service/people.json';
-        $rawGroups = $this->getUrlContent($url);
+        $cacheKey = 'groups-' . $this->dateString;
+        $groups = $this->cache->get($cacheKey);
 
-        foreach ($rawGroups as $item) {
-            $groups[] = [ $item->name, $item->id ];
+        if (empty($groups)) {
+            $url = 'https://' . $this->host . '/service/people.json';
+            $rawGroups = $this->getUrlContent($url);
+
+            $groups = [];
+
+            foreach ($rawGroups as $item) {
+                $groups[] = [$item->name, $item->id];
+            }
+            $this->cache->set($cacheKey, $groups);
         }
-
         $configuration['items'] = $groups;
+    }
+
+    /**
+     * @param array $configuration
+     * @throws DBALException
+     * @throws Exception
+     */
+    public function getRegions(array &$configuration)
+    {
+        $cacheKey = 'regions-' . $this->dateString;
+        $regions = $this->cache->get($cacheKey);
+
+        if (empty($regions)) {
+            $eventRepo = GeneralUtility::makeInstance(EventRepository::class);
+            $regionsFromEvents = $eventRepo->findAllRegions();
+            foreach ($regionsFromEvents as $key => $region) {
+                $regions[] = [
+                    0 => $region,
+                    1 => $key,
+                ];
+            }
+            $this->cache->set($cacheKey, $regions);
+        }
+        $configuration['items'] = $regions;
+    }
+
+    /**
+     * @param array $configuration
+     * @throws DBALException
+     * @throws Exception
+     */
+    public function getPlaces(array &$configuration)
+    {
+        $cacheKey = 'places-' . $this->dateString;
+        $places = $this->cache->get($cacheKey);
+
+        if (empty($places)) {
+            $eventRepository = GeneralUtility::makeInstance(EventRepository::class);
+            $placesFromEvents = $eventRepository->findAllPlaces();
+            foreach ($placesFromEvents as $key => $place) {
+                $places[] = [
+                    0 => $place,
+                    1 => $key,
+                ];
+            }
+            $this->cache->set($cacheKey, $places);
+        }
+        $configuration['items'] = $places;
     }
 
     /**
@@ -99,9 +174,8 @@ class CategoryUtil
      *
      * @param string $url
      * @return array Decoded JSON
-     * @throws Exception
      */
-    private function getUrlContent($url)
+    private function getUrlContent(string $url): array
     {
         // URL abfragen, nur IPv4 Auflösung
         $contentString = UrlUtility::loadUrl($url);

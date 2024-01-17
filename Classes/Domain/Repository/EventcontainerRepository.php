@@ -41,12 +41,14 @@ namespace ArbkomEKvW\Evangtermine\Domain\Repository;
  */
 
 use ArbkomEKvW\Evangtermine\Domain\Model\EtKeys;
+use ArbkomEKvW\Evangtermine\Domain\Model\Eventcontainer;
 use ArbkomEKvW\Evangtermine\Domain\Model\EventcontainerInterface;
 use ArbkomEKvW\Evangtermine\Util\ExtConf;
 use ArbkomEKvW\Evangtermine\Util\UrlUtility;
 use TYPO3\CMS\Core\SingletonInterface;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 use TYPO3\CMS\Extbase\Persistence\Repository;
+use TYPO3\CMS\Extbase\Utility\DebuggerUtility;
 
 /**
  * EventcontainerRepository
@@ -54,16 +56,16 @@ use TYPO3\CMS\Extbase\Persistence\Repository;
 class EventcontainerRepository extends Repository implements SingletonInterface
 {
     /**
-     * @var ArbkomEKvW\Evangtermine\Util\ExtConf
+     * @var ExtConf
      */
-    private $extConf;
+    private ExtConf $extConf;
 
     /**
      * Url of xml script on remote server
      *
      * @var string
      */
-    protected $xmlSourceUrl = '';
+    protected string $xmlSourceUrl = '';
 
     /**
      * @param ExtConf
@@ -78,7 +80,7 @@ class EventcontainerRepository extends Repository implements SingletonInterface
      *
      * @return string
      */
-    public function getXmlSourceUrl()
+    public function getXmlSourceUrl(): string
     {
         if ($this->xmlSourceUrl === '') {
             $this->xmlSourceUrl = 'https://' . $this->extConf->getExtConfArray()['host'] . '/' . $this->extConf->getExtConfArray()['mode'];
@@ -92,7 +94,7 @@ class EventcontainerRepository extends Repository implements SingletonInterface
      * @param EtKeys $etKeys
      * @return EventcontainerInterface
      */
-    public function findByEtKeys(EtKeys $etKeys)
+    public function findByEtKeys(EtKeys $etKeys): EventcontainerInterface
     {
         // URL zusammenbauen: SourceURL plus $etKeys->getValue
         $query = ($etKeys->getValue()) ? '?' . $etKeys->getValue() : '';
@@ -102,9 +104,8 @@ class EventcontainerRepository extends Repository implements SingletonInterface
         $rawXml = UrlUtility::loadUrl($url);
 
         // XML im Eventcontainer wandeln
-        $result = GeneralUtility::makeInstance('ArbkomEKvW\Evangtermine\Domain\Model\Eventcontainer');
+        $result = GeneralUtility::makeInstance(EventContainer::class);
         $result->loadXML($rawXml);
-
         return $result;
     }
 }

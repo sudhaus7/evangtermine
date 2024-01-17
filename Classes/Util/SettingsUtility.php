@@ -14,6 +14,7 @@
 namespace ArbkomEKvW\Evangtermine\Util;
 
 use ArbkomEKvW\Evangtermine\Domain\Model\EtKeys;
+use TYPO3\CMS\Extbase\Utility\DebuggerUtility;
 
 /***************************************************************
  *
@@ -76,14 +77,13 @@ class SettingsUtility
 
     /**
      * fetch etkey params from Request
-     * @param unknown $requestParams
+     * @param array $requestParams
      * @param EtKeys $etks
      */
-    public function fetchParamsFromRequest($requestParams, EtKeys $etks)
+    public function fetchParamsFromRequest(array $requestParams, EtKeys $etks)
     {
         foreach ($requestParams as $key => $value) {
             $targetMethod = 'set' . ucfirst($key);
-
             if (method_exists($etks, $targetMethod)) {
                 $etks->{$targetMethod}($value);
             }

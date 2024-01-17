@@ -1,0 +1,3 @@
+page.includeJSFooter {
+  evangterminePager = EXT:evangtermine/Resources/Public/JavaScript/pager.min.js
+}

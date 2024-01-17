@@ -14,6 +14,7 @@
 namespace ArbkomEKvW\Evangtermine\Domain\Model;
 
 use TYPO3\CMS\Extbase\DomainObject\AbstractValueObject;
+use TYPO3\CMS\Extbase\Utility\DebuggerUtility;
 
 /***************************************************************
  *
@@ -49,7 +50,7 @@ class EtKeys extends AbstractValueObject
      * array of allowed keys
      * @var array
      */
-    private $allowedKeys = [
+    private array $allowedKeys = [
             'vid',
             'region',
             'aid',
@@ -81,202 +82,220 @@ class EtKeys extends AbstractValueObject
             'yesno2',
             'until',
             'encoding',
-            'ID',
+            'redius',
     ];
 
     /**
      * veranstalter id
      * @var string
      */
-    protected $vid;
+    protected string $vid;
 
     /**
      * region
      * @var string
      */
-    protected $region;
+    protected string $region;
+
+    /**
+     * regions
+     * @var string
+     */
+    protected string $regions;
 
     /**
      * aid (group admin)
      * @var string
      */
-    protected $aid;
+    protected string $aid;
 
     /**
      * kk
      * @var string
      */
-    protected $kk;
+    protected string $kk;
 
     /**
      *eventtype
      * @var string
      */
-    protected $eventtype;
+    protected string $eventtype;
 
     /**
      * highlight
      * @var string
      */
-    protected $highlight;
+    protected string $highlight;
 
     /**
      * people
      * @var string
      */
-    protected $people;
+    protected string $people;
 
     /**
      * person
      * @var string
      */
-    protected $person;
+    protected string $person;
 
     /**
      * place
      * @var string
      */
-    protected $place;
+    protected string $place = '';
+
+    /**
+     * places
+     * @var string
+     */
+    protected string $places;
 
     /**
      * bf
      * @var string
      */
-    protected $bf;
+    protected string $bf;
 
     /**
      * inputmask
      * @var string
      */
-    protected $ipm;
+    protected string $ipm;
 
     /**
      * channel
      * @var string
      */
-    protected $cha;
+    protected string $cha;
 
     /**
      * lang
      * @var string
      */
-    protected $lang;
+    protected string $lang;
 
     /**
      * itemsPerPage
      * @var string
      */
-    protected $itemsPerPage;
+    protected string $itemsPerPage;
 
     /**
      * pageID
      * @var string
      */
-    protected $pageID;
+    protected string $pageID;
 
     /**
      * searchword
      * @var string
      */
-    protected $q;
+    protected string $q;
 
     /**
      * day
      * @var string
      */
-    protected $d;
+    protected string $d;
 
     /**
      * month
      * @var string
      */
-    protected $month;
+    protected string $month;
 
     /**
      * date
      * @var string
      */
-    protected $date;
+    protected string $date;
 
     /**
      * year
      * @var string
      */
-    protected $year;
+    protected string $year;
 
     /**
      * start
      * @var string
      */
-    protected $start;
+    protected string $start;
 
     /**
      * end
      * @var string
      */
-    protected $end;
+    protected string $end;
 
     /**
      * dest
      * @var string
      */
-    protected $dest;
+    protected string $dest;
 
     /**
      * own
      * @var string
      */
-    protected $own;
+    protected string $own;
 
     /**
      * menue1
      * @var string
      */
-    protected $menue1;
+    protected string $menue1;
 
     /**
      * menue2
      * @var string
      */
-    protected $menue2;
+    protected string $menue2;
 
     /**
      * zip
      * @var string
      */
-    protected $zip;
+    protected string $zip = '';
 
     /**
      * yesno1
      * @var string
      */
-    protected $yesno1;
+    protected string $yesno1;
 
     /**
      * yesno2
      * @var string
      */
-    protected $yesno2;
+    protected string $yesno2;
 
     /**
      * until
      * @var string
      */
-    protected $until;
+    protected string $until;
 
     /**
      * encoding
      * @var string
      */
-    protected $encoding;
+    protected string $encoding;
 
     /**
      * ID param for a single event
      * @var string
      */
-    protected $ID;
+    protected string $ID;
 
-    public function getVid()
+    /**
+     * radius
+     * @var int
+     */
+    protected int $radius = 0;
+
+    public function getVid(): string
     {
         return $this->vid;
     }
@@ -286,7 +305,7 @@ class EtKeys extends AbstractValueObject
         $this->vid = $vid;
     }
 
-    public function getRegion()
+    public function getRegion(): string
     {
         return $this->region;
     }
@@ -296,67 +315,17 @@ class EtKeys extends AbstractValueObject
         $this->region = $region;
     }
 
-    public function getAid()
+    public function getRegions(): string
     {
-        return $this->aid;
+        return $this->regions;
     }
 
-    public function setAid($aid)
+    public function setRegions($regions)
     {
-        $this->aid = $aid;
+        $this->regions = $regions;
     }
 
-    public function getKk()
-    {
-        return $this->kk;
-    }
-
-    public function setKk($kk)
-    {
-        $this->kk = $kk;
-    }
-
-    public function getEventtype()
-    {
-        return $this->eventtype;
-    }
-
-    public function setEventtype($eventtype)
-    {
-        $this->eventtype = $eventtype;
-    }
-
-    public function getHighlight()
-    {
-        return $this->highlight;
-    }
-
-    public function setHighlight($highlight)
-    {
-        $this->highlight = $highlight;
-    }
-
-    public function getPeople()
-    {
-        return $this->people;
-    }
-
-    public function setPeople($people)
-    {
-        $this->people = $people;
-    }
-
-    public function getPerson()
-    {
-        return $this->person;
-    }
-
-    public function setPerson($person)
-    {
-        $this->person = $person;
-    }
-
-    public function getPlace()
+    public function getPlace(): string
     {
         return $this->place;
     }
@@ -366,7 +335,77 @@ class EtKeys extends AbstractValueObject
         $this->place = $place;
     }
 
-    public function getBf()
+    public function getPlaces(): string
+    {
+        return $this->places;
+    }
+
+    public function setPlaces($places)
+    {
+        $this->places = $places;
+    }
+
+    public function getAid(): string
+    {
+        return $this->aid;
+    }
+
+    public function setAid($aid)
+    {
+        $this->aid = $aid;
+    }
+
+    public function getKk(): string
+    {
+        return $this->kk;
+    }
+
+    public function setKk($kk)
+    {
+        $this->kk = $kk;
+    }
+
+    public function getEventtype(): string
+    {
+        return $this->eventtype;
+    }
+
+    public function setEventtype($eventtype)
+    {
+        $this->eventtype = $eventtype;
+    }
+
+    public function getHighlight(): string
+    {
+        return $this->highlight;
+    }
+
+    public function setHighlight($highlight)
+    {
+        $this->highlight = $highlight;
+    }
+
+    public function getPeople(): string
+    {
+        return $this->people;
+    }
+
+    public function setPeople($people)
+    {
+        $this->people = $people;
+    }
+
+    public function getPerson(): string
+    {
+        return $this->person;
+    }
+
+    public function setPerson($person)
+    {
+        $this->person = $person;
+    }
+
+    public function getBf(): string
     {
         return $this->bf;
     }
@@ -376,7 +415,7 @@ class EtKeys extends AbstractValueObject
         $this->bf = $bf;
     }
 
-    public function getIpm()
+    public function getIpm(): string
     {
         return $this->ipm;
     }
@@ -386,7 +425,7 @@ class EtKeys extends AbstractValueObject
         $this->ipm = $ipm;
     }
 
-    public function getCha()
+    public function getCha(): string
     {
         return $this->cha;
     }
@@ -396,7 +435,7 @@ class EtKeys extends AbstractValueObject
         $this->cha = $cha;
     }
 
-    public function getLang()
+    public function getLang(): string
     {
         return $this->lang;
     }
@@ -406,7 +445,7 @@ class EtKeys extends AbstractValueObject
         $this->lang = $lang;
     }
 
-    public function getItemsPerPage()
+    public function getItemsPerPage(): string
     {
         return $this->itemsPerPage;
     }
@@ -416,7 +455,7 @@ class EtKeys extends AbstractValueObject
         $this->itemsPerPage = $itemsPerPage;
     }
 
-    public function getPageID()
+    public function getPageID(): string
     {
         return $this->pageID;
     }
@@ -426,7 +465,7 @@ class EtKeys extends AbstractValueObject
         $this->pageID = $pageID;
     }
 
-    public function getQ()
+    public function getQ(): string
     {
         return $this->q;
     }
@@ -436,7 +475,7 @@ class EtKeys extends AbstractValueObject
         $this->q = $q;
     }
 
-    public function getD()
+    public function getD(): string
     {
         return $this->d;
     }
@@ -446,7 +485,7 @@ class EtKeys extends AbstractValueObject
         $this->d = $d;
     }
 
-    public function getMonth()
+    public function getMonth(): string
     {
         return $this->month;
     }
@@ -456,7 +495,7 @@ class EtKeys extends AbstractValueObject
         $this->month = $month;
     }
 
-    public function getDate()
+    public function getDate(): string
     {
         return $this->date;
     }
@@ -466,13 +505,15 @@ class EtKeys extends AbstractValueObject
         $this->date = $date;
         if ($date != '') {
             // keep params 'd' and 'month' in sync with 'date'
-            $dateTokens = explode('.', $date);
-            $this->setD($dateTokens[0]);
-            $this->setMonth($dateTokens[1] . '.' . substr($dateTokens[2], -2));
+            $dateTokens = explode('-', $date);
+            if (!empty($dateTokens[0]) && !empty($dateTokens[1]) && !empty($dateTokens[2])) {
+                $this->setD($dateTokens[2]);
+                $this->setMonth($dateTokens[1] . '.' . substr($dateTokens[0], -2));
+            }
         }
     }
 
-    public function getYear()
+    public function getYear(): string
     {
         return $this->year;
     }
@@ -482,7 +523,7 @@ class EtKeys extends AbstractValueObject
         $this->year = $year;
     }
 
-    public function getStart()
+    public function getStart(): string
     {
         return $this->start;
     }
@@ -492,7 +533,7 @@ class EtKeys extends AbstractValueObject
         $this->start = $start;
     }
 
-    public function getEnd()
+    public function getEnd(): string
     {
         return $this->end;
     }
@@ -502,7 +543,7 @@ class EtKeys extends AbstractValueObject
         $this->end = $end;
     }
 
-    public function getDest()
+    public function getDest(): string
     {
         return $this->dest;
     }
@@ -512,7 +553,7 @@ class EtKeys extends AbstractValueObject
         $this->dest = $dest;
     }
 
-    public function getOwn()
+    public function getOwn(): string
     {
         return $this->own;
     }
@@ -522,7 +563,7 @@ class EtKeys extends AbstractValueObject
         $this->own = $own;
     }
 
-    public function getMenue1()
+    public function getMenue1(): string
     {
         return $this->menue1;
     }
@@ -532,7 +573,7 @@ class EtKeys extends AbstractValueObject
         $this->menue1 = $menue1;
     }
 
-    public function getMenue2()
+    public function getMenue2(): string
     {
         return $this->menue2;
     }
@@ -542,7 +583,7 @@ class EtKeys extends AbstractValueObject
         $this->menue2 = $menue2;
     }
 
-    public function getZip()
+    public function getZip(): string
     {
         return $this->zip;
     }
@@ -552,7 +593,7 @@ class EtKeys extends AbstractValueObject
         $this->zip = $zip;
     }
 
-    public function getYesno1()
+    public function getYesno1(): string
     {
         return $this->yesno1;
     }
@@ -562,7 +603,7 @@ class EtKeys extends AbstractValueObject
         $this->yesno1 = $yesno1;
     }
 
-    public function getYesno2()
+    public function getYesno2(): string
     {
         return $this->yesno2;
     }
@@ -572,7 +613,7 @@ class EtKeys extends AbstractValueObject
         $this->yesno2 = $yesno2;
     }
 
-    public function getUntil()
+    public function getUntil(): string
     {
         return $this->until;
     }
@@ -582,7 +623,7 @@ class EtKeys extends AbstractValueObject
         $this->until = $until;
     }
 
-    public function getEncoding()
+    public function getEncoding(): string
     {
         return $this->encoding;
     }
@@ -592,7 +633,7 @@ class EtKeys extends AbstractValueObject
         $this->encoding = $encoding;
     }
 
-    public function getID()
+    public function getID(): string
     {
         return $this->ID;
     }
@@ -602,15 +643,35 @@ class EtKeys extends AbstractValueObject
         $this->ID = $ID;
     }
 
-    public function getItemsPerPageList()
+    public function getRadius(): int
+    {
+        return $this->radius;
+    }
+
+    public function setRadius($radius): void
+    {
+        $this->radius = (int)$radius;
+    }
+
+    public function getAllowedKeys(): array
+    {
+        return $this->allowedKeys;
+    }
+
+    public function setAllowedKeys(array $allowedKeys): void
+    {
+        $this->allowedKeys = $allowedKeys;
+    }
+
+    public function getItemsPerPageList(): array
     {
         return [
-                '5' => '5',
-                '10' => '10',
-                '20' => '20',
-                '30' => '30',
-                '50' => '50',
-                '100' => '100',
+            '5' => '5',
+            '10' => '10',
+            '20' => '20',
+            '30' => '30',
+            '50' => '50',
+            '100' => '100',
         ];
     }
 
@@ -618,7 +679,7 @@ class EtKeys extends AbstractValueObject
      * (non-PHPdoc)
      * @see \TYPO3\CMS\Extbase\DomainObject\AbstractValueObject::getValue()
      */
-    public function getValue()
+    public function getValue(): string
     {
         foreach (get_object_vars($this) as $key => $value) {
             if (in_array($key, $this->allowedKeys) && $value !== null) {
@@ -671,7 +732,7 @@ class EtKeys extends AbstractValueObject
      * set all values from json string
      * @param string $jsString
      */
-    public function initFromJson($jsString)
+    public function initFromJson(string $jsString)
     {
         $values = (array)json_decode($jsString);
 

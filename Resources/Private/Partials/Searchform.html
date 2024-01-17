@@ -1,44 +1,79 @@
-<div id="et_filter_container">
+<html xmlns:f="http://typo3.org/ns/TYPO3/Fluid/ViewHelpers"
+      xmlns="http://www.w3.org/1999/xhtml"
+      lang="en"
+      f:schemaLocation="https://fluidtypo3.org/schemas/fluid-master.xsd"
+      data-namespace-typo3-fluid="true">
 
-	<f:form method="post" action="list" controller="Eventcontainer" object="{etkeys}" name="etkeysForm">
-		<div class="et_filter_headline">Auswahl:</div>
+<div class="et_filter_headline">Auswahl:</div>
 
-		<div class="et_filter_main">
-			<div class="et_filter_block_left">
-				<div class="et_filter_row_left">
-					<f:form.select property="highlight" id="highlight" size="1" options="{high: 'Nur Highlights', all: 'Alle Veranstaltungen'}" />
-				</div>
-				<div class="et_filter_row_left">
-					<f:form.select property="eventtype" id="eventtype" size="1"	options="{categoryList}" />
-				</div>
-				<div class="et_filter_row_left">
-					<f:form.select property="people" id="people" size="1"
-							options="{groupList}" />
-				</div>
-			</div>
-			<div class="et_filter_block_right">
-				<div class="et_filter_row_right">
-					Suchbegriff:
-					<f:form.textfield property="q" id="q" size="20" /> 
-				</div>
-				<div class="et_filter_row_right">
-					Datum:
-					<f:form.textfield property="date" id="date" class="hasDatePicker" size="10" maxlength="10" />
-				</div>
-				<div class="et_filter_row_right">
-					Anzeigen:
-					<f:form.select property="itemsPerPage" id="itemsPerPage" size="1"	options="{etkeys.itemsPerPageList}" /> 
-					pro Seite von {events.metaData.totalItems}
-				</div>
-			</div>
-		</div>
-		<div class="et_filter_subrow">
-			<f:form.hidden property="pageID" value="1" />
-			<f:form.hidden property="pluginUid" value="{pluginUid}" />
-			
-			<f:form.button class="et_submit" name="sf_search" value="1">Suche</f:form.button>
-			<f:form.button class="et_reset" name="sf_reset" value="1">Zurücksetzen</f:form.button>
-		</div>
-
-	</f:form>
+<div class="et_filter_main">
+    <div class="et_filter_block_left">
+        <div class="et_filter_row_left">
+            <f:form.select property="highlight" id="highlight" size="1" options="{high: 'Nur Highlights', all: 'Alle Veranstaltungen'}" />
+        </div>
+        <div class="et_filter_row_left">
+            <f:form.select property="eventtype" id="eventtype" size="1"	options="{categoryList}" />
+        </div>
+        <div class="et_filter_row_left">
+            <f:form.select property="people" id="people" size="1"
+                    options="{groupList}" />
+        </div>
+        <div class="et_filter_row_left">
+            <f:form.select property="region" id="regions" size="1"
+                           options="{regionList}" />
+        </div>
+        <div class="et_filter_row_left">
+            <f:form.select property="place" id="places" size="1"
+                           options="{placeList}" />
+        </div>
+        <div class="et_filter_row_left">
+            PLZ:
+            <f:form.textfield property="zip" id="zip" size="10" maxlength="10" />
+        </div>
+        <div class="et_filter_row_left">
+            Umkreis in km
+            <f:form.textfield property="radius"
+                              id="radius"
+                              size="10"
+                              maxlength="10"
+                              type="number"
+                              additionalAttributes="{min:0}" />
+        </div>
+    </div>
+    <div class="et_filter_block_right">
+        <div class="et_filter_row_right">
+            Suchbegriff:
+            <f:if condition="{etkeys.q} == 'none'">
+                <f:then>
+                    <f:form.textfield property="q" id="q" size="20" value=""/>
+                </f:then>
+                <f:else>
+                    <f:form.textfield property="q" id="q" size="20" value="{etkeys.q}"/>
+                </f:else>
+            </f:if>
+        </div>
+        <div class="et_filter_row_right">
+            Datum:
+            <f:form.textfield property="date"
+                              type="date"
+                              id="date"
+                              class="hasDatePicker"
+                              size="10"
+                              maxlength="10"
+            />
+        </div>
+        <div class="et_filter_row_right">
+            Anzeigen:
+            <f:form.select property="itemsPerPage" id="itemsPerPage" size="1" options="{etkeys.itemsPerPageList}" />
+            pro Seite von {nrOfEvents}
+        </div>
+    </div>
 </div>
+<div class="et_filter_subrow">
+    <f:form.hidden property="pageID" value="1" class="pageid" />
+    <f:form.hidden property="pluginUid" value="{pluginUid}" />
+
+    <f:form.button class="et_submit" name="sf_search" value="1">Suche</f:form.button>
+    <f:form.button class="et_reset" name="sf_reset" value="1">Zurücksetzen</f:form.button>
+</div>
+</html>

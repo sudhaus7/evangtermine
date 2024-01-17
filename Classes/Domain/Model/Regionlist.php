@@ -43,27 +43,12 @@ use TYPO3\CMS\Core\Utility\GeneralUtility;
 use TYPO3\CMS\Extbase\DomainObject\AbstractEntity;
 
 /**
- * Categorylist
+ * Regionlist
  */
-class Categorylist extends AbstractEntity
+class Regionlist extends Categorylist
 {
-    protected array $itemList;
-
-    public function __construct($typeMethod = 'getCategories')
+    public function __construct()
     {
-        $this->itemList = [];
-        $categoryUtil = GeneralUtility::makeInstance(CategoryUtil::class);
-        $categoryUtil->$typeMethod($this->itemList);
-
-        $newlist = [];
-        foreach ($this->itemList['items'] as $item) {
-            $newlist[(string)($item[1])] = $item[0];
-        }
-        $this->itemList['items'] = $newlist;
-    }
-
-    public function getItemslist()
-    {
-        return $this->itemList['items'];
+        parent::__construct('getRegions');
     }
 }

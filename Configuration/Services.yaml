@@ -1,0 +1,14 @@
+services:
+  _defaults:
+    autowire: true
+    autoconfigure: true
+    public: false
+  ArbkomEKvW\Evangtermine\:
+    resource: '../Classes/*'
+    exclude:
+      - '../Classes/Domain/Model/*'
+  ArbkomEKvW\Evangtermine\Command\ImportEventsCommand:
+    tags:
+      - name: 'console.command'
+        command: 'evangtermine:importevents'
+        description: ''

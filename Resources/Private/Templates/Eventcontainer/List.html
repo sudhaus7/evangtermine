@@ -1,48 +1,80 @@
-{namespace et=ArbkomEKvW\Evangtermine\ViewHelpers}
+<html xmlns:f="http://typo3.org/ns/TYPO3/Fluid/ViewHelpers"
+      xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:et="http://typo3.org/ns/ArbkomEKvW/Evangtermine/ViewHelpers"
+      lang="en"
+      f:schemaLocation="https://fluidtypo3.org/schemas/fluid-master.xsd"
+      data-namespace-typo3-fluid="true">
 
 <f:layout name="Default" />
 
 <f:section name="main">
-    <f:render partial="Searchform" arguments="{_all}" />
-	
-	<f:render partial="Pager" arguments="{pgr: pagerdata}" />
-	
-	<f:comment>Haupt-Schleife für Events</f:comment>
-	<f:for each="{events.items}" as="event" iteration="iterator">
+    <div id="et_filter_container">
 
-        <f:if condition="{event.monthbar}!='0'">
-            {et:tag(name: "div", class: "monthbar", node: event.monthbar)}
-        </f:if>
-			
-		<f:if condition="{iterator.isOdd}">
-			<f:then><div class="et_content_row odd"></f:then>
-			<f:else><div class="et_content_row even"></f:else>
-		</f:if>
-			<div class="et_content_date"><span class="et_tag">{event.DATUM2}<br>{event.LITURG_BEZ}</span></div>
-			<div class="et_content_title">
-			<f:if condition="{settings.opmode_detailpage}">
-			<f:then>
-				<f:link.typolink parameter="{settings.opmode_detailpage}" class="et_link_title" additionalParams="&tx_evangtermine_detail[ID]={event.ID}&tx_evangtermine_detail[action]=show&tx_evangtermine_detail[controller]=Eventcontainer">{event._event_TITLE}</f:link.typolink>
-			</f:then>
-			<f:else>
-				<f:link.typolink parameter="{pageId}" class="et_link_title" additionalParams="&tx_evangtermine_list[ID]={event.ID}&tx_evangtermine_list[action]=show&tx_evangtermine_list[controller]=Eventcontainer">{event._event_TITLE}</f:link.typolink>
-			</f:else>
-			</f:if>
-				<f:if condition="{et:str(on:event._event_SHORT_DESCRIPTION)}">
-				<br>{et:tag(class: "et_description", node: event._event_SHORT_DESCRIPTION)}
-				</f:if>
-				
-				<br><f:if condition="{et:str(on:event._place_NAME)} != 'Ohne Ort'">
-						<span class="et_city">{event._place_CITY}: </span>
-						{et:tag(class: "et_placename", node: event._place_NAME)}
-					</f:if>
-                        {et:tag(class: "et_personname", node: event._person_NAME)}
-                        {et:tag(class: "et_content_user", node: event._user_REALNAME)}
-			</div>
-		</div>
-		
-	</f:for>
-	<f:comment>Ende Haupt-Schleife für Events</f:comment>
-	
-	<f:render partial="Pager" arguments="{pgr: pagerdata}" />
+        <f:form method="post" action="list" controller="Eventcontainer" object="{etkeys}" name="etkeysForm">
+            <f:render partial="Searchform" arguments="{_all}" />
+
+            <f:render partial="Pager" arguments="{pgr: pagerdata}" />
+
+            <f:comment><!-- Haupt-Schleife für Events --></f:comment>
+            <f:for each="{events}" as="event" iteration="iterator">
+                <f:if condition="{event.monthbar}">
+                    <div class="monthbar">{event.monthbar}</div>
+                </f:if>
+
+                <f:if condition="{iterator.isOdd}">
+                    <f:then><div class="et_content_row odd"><f:render section="event" arguments="{_all}"/></div></f:then>
+                    <f:else><div class="et_content_row even"><f:render section="event" arguments="{_all}"/></div></f:else>
+                </f:if>
+
+            </f:for>
+            <f:comment><!-- Ende Haupt-Schleife für Events --></f:comment>
+
+            <f:render partial="Pager" arguments="{pgr: pagerdata}" />
+        </f:form>
+    </div>
 </f:section>
+
+<f:section name="event">
+    <div class="et_content_date"><span class="et_tag">{event.datum2}<br>{event.liturgBez}</span></div>
+    <div class="et_content_title">
+        <f:if condition="{settings.opmode_detailpage}">
+            <f:then>
+                <f:link.action action="show"
+                               pageUid="{settings.opmode_detailpage}"
+                               controller="Eventcontainer"
+                               pluginName="List"
+                               arguments="{uid:event.uid}"
+                               class="et_link_title"
+                >
+                    {event.title}
+                </f:link.action>
+            </f:then>
+            <f:else>
+                <f:link.action action="show"
+                               pageUid="{pageId}"
+                               controller="Eventcontainer"
+                               pluginName="List"
+                               arguments="{uid:event.uid}"
+                               class="et_link_title"
+                >
+                    {event.title}
+                </f:link.action>
+            </f:else>
+        </f:if>
+        <f:if condition="{event.shortDescription}">
+            <br><span class="et_description">{event.shortDescription}</span>
+        </f:if>
+        <br>
+        <f:if condition="{event.placeName} && {event.placeName} != 'Ohne Ort'">
+            <span class="et_city">{event.placeCity}: </span>
+            <span class="et_placename">{event.placeName}</span>
+        </f:if>
+        <f:if condition="{event.personName}">
+            <span class="et_personname">{event.personName}</span>
+        </f:if>
+        <f:if condition="{event.userRealname}">
+            <span class="et_content_user">{event.userRealname}</span>
+        </f:if>
+    </div>
+</f:section>
+</html>

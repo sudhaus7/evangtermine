@@ -45,6 +45,6 @@ class Grouplist extends Categorylist
 {
     public function __construct()
     {
-        parent::__construct('getGroups', 'tx_evangtermine_grouplist');
+        parent::__construct('getGroups');
     }
 }

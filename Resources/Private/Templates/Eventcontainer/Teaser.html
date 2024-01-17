@@ -1,13 +1,17 @@
-{namespace et=ArbkomEKvW\Evangtermine\ViewHelpers}
-
+<html xmlns:f="http://typo3.org/ns/TYPO3/Fluid/ViewHelpers"
+      xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:et="http://typo3.org/ns/ArbkomEKvW/Evangtermine/ViewHelpers"
+      lang="en"
+      f:schemaLocation="https://fluidtypo3.org/schemas/fluid-master.xsd"
+      data-namespace-typo3-fluid="true">
 <f:layout name="Default" />
 
 <f:section name="main">
-<div id="et_container"> 
+<div id="et_container">
    <div id="et_content_container">
 
 	<f:for each="{events.items}" as="event">
-	
+
 	<div class="et_content_row et_even teaserrow highlight">
     	<div class="et_content_date teaserdate"><span class="et_tagzeit">{event.DATUM2}</span></div>
         <div class="et_content_title">
@@ -32,10 +36,11 @@
         	</span>
         </div>
     </div>
-	
+
 	</f:for>
-   
+
    </div>
 </div>
-	
+
 </f:section>
+</html>

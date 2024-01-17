@@ -57,6 +57,14 @@
 				<source>Target Audience (Multiple selections possible):</source>
 			</trans-unit>
 
+			<trans-unit id="feflexform.regions">
+				<source>Regions (Multiple selections possible):</source>
+			</trans-unit>
+
+			<trans-unit id="feflexform.places">
+				<source>Places (Multiple selections possible):</source>
+			</trans-unit>
+
 			<trans-unit id="feflexform.itemsPerPage">
 				<source>Events per Page:</source>
 			</trans-unit>

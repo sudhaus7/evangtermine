@@ -56,13 +56,13 @@ class Etpager
      * pager data for display in view
      * @var array
      */
-    protected $pgr;
+    protected array $pgr;
 
     /**
      * Build Pager datastructure
      * @param mixed $totalItems
      * @param mixed $itemsPerPage
-     * @param mixed $pageID
+     * @param $currentPage
      */
     public function up($totalItems, $itemsPerPage, $currentPage)
     {
@@ -79,7 +79,7 @@ class Etpager
         $this->pgr['pages'] =  ceil($totalItems / $itemsPerPage);
 
         // Current page
-        $this->pgr['current'] = isset($currentPage) ? $currentPage : 1;
+        $this->pgr['current'] = $currentPage ?? 1;
 
         $this->getPagerBarLimits();
         $this->getBrowserTriggers();
@@ -134,7 +134,7 @@ class Etpager
     /**
      * @return array
      */
-    public function getPgr()
+    public function getPgr(): array
     {
         return $this->pgr;
     }

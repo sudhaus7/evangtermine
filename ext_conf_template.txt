@@ -3,3 +3,6 @@ host = www.evangelische-termine.de
 
 # cat=basic; type=options[Cache nicht benutzen (ausführlicher)=Veranstalter/xml.php,Cache benutzen (schneller)=xml]; label=LLL:EXT:evangtermine/Resources/Private/Language/locallang.xlf:extconftemplate.labelMode
 mode = Veranstalter/xml.php
+
+# cat=basic; type=string; label=Speicherort der Bilder in der Dateiliste
+imageFolder = /evangtermine/

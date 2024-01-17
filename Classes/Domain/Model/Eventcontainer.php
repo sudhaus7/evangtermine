@@ -52,24 +52,23 @@ class Eventcontainer extends AbstractEntity implements EventcontainerInterface
      *
      * @var int
      */
-    private $numberOfItems = 0;
+    private int $numberOfItems = 0;
 
     /**
      * items array of SimpleXML objects
      *
      * @var array
      */
-    private $items = [];
+    private array $items = [];
 
     /**
      * content of the <meta> tag in XML result
      * @var SimpleXMLElement
      */
-    private $metaData;
+    private SimpleXMLElement $metaData;
 
     /**
      * detail-tag, only present in single view
-     * @var array
      */
     private $detail;
 
@@ -78,14 +77,14 @@ class Eventcontainer extends AbstractEntity implements EventcontainerInterface
      *
      * @return int
      */
-    public function getNumberOfItems()
+    public function getNumberOfItems(): int
     {
         return $this->numberOfItems;
     }
 
     /**
      * sets the number of items in result
-     * @param int
+     * @param int $numItems
      */
     public function setNumberOfItems($numItems)
     {
@@ -96,7 +95,7 @@ class Eventcontainer extends AbstractEntity implements EventcontainerInterface
      * returns items array
      * @return array $items
      */
-    public function getItems()
+    public function getItems(): array
     {
         return $this->items;
     }
@@ -111,7 +110,7 @@ class Eventcontainer extends AbstractEntity implements EventcontainerInterface
         $this->items = $items;
     }
 
-    public function getMetaData()
+    public function getMetaData(): SimpleXMLElement
     {
         return $this->metaData;
     }
@@ -121,14 +120,20 @@ class Eventcontainer extends AbstractEntity implements EventcontainerInterface
         $this->metaData = $metaData;
     }
 
-    public function setDetail($detail)
-    {
-        $this->detail = $detail;
-    }
-
+    /**
+     * @return mixed
+     */
     public function getDetail()
     {
         return $this->detail;
+    }
+
+    /**
+     * @param mixed $detail
+     */
+    public function setDetail($detail): void
+    {
+        $this->detail = $detail;
     }
 
     /**

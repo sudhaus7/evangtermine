@@ -1,14 +1,17 @@
-{namespace et=ArbkomEKvW\Evangtermine\ViewHelpers}
-
+<html xmlns:f="http://typo3.org/ns/TYPO3/Fluid/ViewHelpers"
+      xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:et="http://typo3.org/ns/ArbkomEKvW/Evangtermine/ViewHelpers"
+      lang="en"
+      f:schemaLocation="https://fluidtypo3.org/schemas/fluid-master.xsd"
+      data-namespace-typo3-fluid="true">
 <f:layout name="Default" />
 
 <f:section name="main">
-<f:if condition="{event.ID}">
+    <f:debug title="el">{event}</f:debug>
+<f:if condition="{event.id}">
 	<f:then>
 
-	<div id="et_container">
-
-		<div id="et_content_container">
+		<div id="et_content_container-{data.uid}">
 			<div id="et_detail_header">
 				<div class="et_content_row et_headlinks">
 					<div class="et_detail_backlink">
@@ -34,7 +37,7 @@
 				<h1 id="et_detail_title">{event._event_TITLE}</h1>
 				<div id="et_detail_date">{event.DATUM2}</div>
 			</div>
-			
+
 			<f:if condition="{et:str(on:event._place_NAME)} != 'Ohne Ort'">
 				<div class="et_content_row" id="et_field_PLACE_ID">
 					<div class="et_content_detaillabel">Ort</div>
@@ -44,12 +47,12 @@
 							<br><et:tag node="{event._place_STREET_NR}" />
 							<br><et:tag node="{event._place_ZIP}" /> <et:tag node="{event._place_CITY}" />
 						</f:if>
-						<f:comment>
+						<f:comment><!--
 						<f:if condition="{et:str(on:event._place_INFO)}">
 							<br>
 							<f:cObject typoscriptObjectPath="plugin.tx_evangtermine.tslibs.renderFunc"><et:tag node="{event._place_INFO}" /></f:cObject>
 						</f:if>
-						</f:comment>
+						--></f:comment>
 						<f:if condition="{et:str(on:event._place_IMAGE)} && !{et:str(on:event._event_IMAGE)}">
 							<br>
 							<img src="{event._place_THUMBNAIL}" id="et_place_image_th" style="display: inline;">
@@ -58,7 +61,7 @@
 					</div>
 				</div>
 			</f:if>
-			
+
 			<f:alias map="{etlist: {
 							_event_SHORT_DESCRIPTION: event._event_SHORT_DESCRIPTION,
 							_event_EVENTTYPE: event._event_EVENTTYPE,
@@ -74,7 +77,7 @@
 							_event_TEXTBOX_1: event._event_TEXTBOX_1,
 							_event_TEXTBOX_2: event._event_TEXTBOX_2,
 							_event_TEXTBOX_3: event._event_TEXTBOX_3
-							}}">		
+							}}">
 
 				<f:for each="{etlist}" as="evt" key="key">
 					<f:if condition="{et:str(on:evt)}">
@@ -87,7 +90,7 @@
 					</f:if>
 				</f:for>
 			</f:alias>
-			
+
 			<f:if condition="{et:str(on:event._person_NAME)}">
 				<div class="et_content_row" id="et_person_NAME">
 					<div class="et_content_detaillabel">Ansprechpartner</div>
@@ -104,8 +107,8 @@
 					</div>
 				</div>
 			</f:if>
-			
-			<!-- Registration with old feedback form (deprecated) -->
+
+            <f:comment><!-- Registration with old feedback form (deprecated) --></f:comment>
 			<f:if condition="{et:str(on:event._event_FEEDBACK_ID)}">
 				<div class="et_content_row" id="et_event_FEEDBACK_ID">
 					<div class="et_content_detaillabel"><et:attr on="{event._event_FEEDBACK_ID}" name="Label" /></div>
@@ -118,7 +121,7 @@
 				</div>
 			</f:if>
 
-			<!-- Registration with new web form -->
+            <f:comment><!-- Registration with new web form --></f:comment>
 			<f:if condition="{et:str(on:event._poll_ID)}">
 				<div class="et_content_row" id="et_webform_LINKNAME">
 					<div class="et_content_detaillabel">&nbsp;</div>
@@ -127,7 +130,7 @@
 					</div>
 				</div>
 			</f:if>
-			
+
 			<f:if condition="{et:str(on:event._place_NAME)} != 'Ohne Ort'">
 				<div class="et_content_row" id="et_detail_position">
 						<div class="et_content_detaillabel"></div>
@@ -144,18 +147,18 @@
 					<f:if condition="{et:str(on:event._user_IMAGE)}"><img alt="{event._user_REALNAME}" title="{event._user_REALNAME}" src="{event._user_IMAGE}"></f:if>
 					<et:tag name="span" node="{event._user_REALNAME}"/>
 					<f:cObject typoscriptObjectPath="plugin.tx_evangtermine.tslibs.renderFunc">
-					
+
 						<f:if condition="{et:str(on:event._user_DESCRIPTION)}"><et:tag node="{event._user_DESCRIPTION}"/></f:if>
 						<et:tag node="{event._user_STREET_NR}"/>
 						<et:tag node="{event._user_ZIP}"/>	<et:tag node="{event._user_CITY}"/>
-						
+
 						<f:if condition="{et:str(on:event._user_EMAIL)}">mailto:{event._user_EMAIL}</f:if>
-						
+
 						<f:if condition="{et:str(on:event._user_CONTACT)}">{event._user_CONTACT}</f:if>
 					</f:cObject>
 				</div>
 			</div>
- 
+
 		</div>
 	</div>
 	</f:then>
@@ -164,3 +167,4 @@
 	</f:else>
 </f:if>
 </f:section>
+</html>

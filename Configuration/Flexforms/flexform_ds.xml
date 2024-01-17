@@ -21,6 +21,16 @@
                             </config>
                         </TCEforms>
                     </settings.etkey_vid>
+                    <settings.etkey_q>
+                        <TCEforms>
+                            <label>LLL:EXT:evangtermine/Resources/Private/Language/locallang.xlf:feflexform.et_q</label>
+                            <config>
+                                <type>input</type>
+                                <size>20</size>
+                                <eval>trim</eval>
+                            </config>
+                        </TCEforms>
+                    </settings.etkey_q>
                     <settings.etkey_highlight>
                         <TCEforms>
                             <label>LLL:EXT:evangtermine/Resources/Private/Language/locallang.xlf:feflexform.highlight</label>
@@ -40,16 +50,6 @@
                             </config>
                         </TCEforms>
                     </settings.etkey_highlight>
-                    <settings.etkey_q>
-                        <TCEforms>
-                            <label>LLL:EXT:evangtermine/Resources/Private/Language/locallang.xlf:feflexform.et_q</label>
-                            <config>
-                                <type>input</type>
-                                <size>20</size>
-                                <eval>trim</eval>
-                            </config>
-                        </TCEforms>
-                    </settings.etkey_q>
                     <settings.etkey_eventtype>
                         <TCEforms>
                             <label>LLL:EXT:evangtermine/Resources/Private/Language/locallang.xlf:feflexform.eventtype</label>
@@ -76,6 +76,30 @@
                             </config>
                         </TCEforms>
                     </settings.etkey_people>
+                    <settings.etkey_regions>
+                        <TCEforms>
+                            <label>LLL:EXT:evangtermine/Resources/Private/Language/locallang.xlf:feflexform.regions</label>
+                            <config>
+                                <type>select</type>
+                                <renderType>selectSingleBox</renderType>
+                                <size>6</size>
+                                <itemsProcFunc>ArbkomEKvW\Evangtermine\Util\CategoryUtil->getRegions</itemsProcFunc>
+                                <default>all</default>
+                            </config>
+                        </TCEforms>
+                    </settings.etkey_regions>
+                    <settings.etkey_places>
+                        <TCEforms>
+                            <label>LLL:EXT:evangtermine/Resources/Private/Language/locallang.xlf:feflexform.places</label>
+                            <config>
+                                <type>select</type>
+                                <renderType>selectSingleBox</renderType>
+                                <size>6</size>
+                                <itemsProcFunc>ArbkomEKvW\Evangtermine\Util\CategoryUtil->getPlaces</itemsProcFunc>
+                                <default>all</default>
+                            </config>
+                        </TCEforms>
+                    </settings.etkey_places>
                     <settings.etkey_itemsPerPage>
                         <TCEforms>
                             <label>LLL:EXT:evangtermine/Resources/Private/Language/locallang.xlf:feflexform.itemsPerPage</label>

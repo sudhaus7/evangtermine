@@ -60,10 +60,10 @@ class TagViewHelper extends AbstractViewHelper
     /**
      * @return string
      */
-    public function render()
+    public function render(): string
     {
         // If wrong object or object empty, return empty string
-        if ((get_class($this->arguments['node']) != 'SimpleXMLElement') || ($this->arguments['node'] == '') || ($this->arguments['node'] == false)) {
+        if ((get_class($this->arguments['node']) != 'SimpleXMLElement') || ($this->arguments['node'] == '') || !$this->arguments['node']) {
             return '';
         }
 
@@ -75,8 +75,6 @@ class TagViewHelper extends AbstractViewHelper
         }
 
         // build tag
-        $markup = sprintf('<%s%s>%s</%s>', $this->arguments['name'], $class, $this->arguments['node'], $this->arguments['name']);
-
-        return $markup;
+        return sprintf('<%s%s>%s</%s>', $this->arguments['name'], $class, $this->arguments['node'], $this->arguments['name']);
     }
 }
