@@ -29,19 +29,26 @@ class EventRepository extends Repository
 
     /**
      * @throws InvalidNumberOfConstraintsException
+     * @throws UnexpectedTypeException
      */
     public function findByEtKeys(EtKeys $etKeys): array
     {
-        if (!empty($etKeys->getQ()) && $etKeys->getQ() != 'none') {
-            $eventsWithSearchWord = $this->filterWithSearchWord($etKeys);
-        }
-
         $query = $this->createQuery();
+
         $settings = $query->getQuerySettings();
         $settings->setRespectStoragePage(false);
         $query->setQuerySettings($settings);
 
         $queryConstraints = $this->setConstraints($query, $etKeys);
+
+        // if search word
+        $searchWordConstraint = [];
+        if (!empty($etKeys->getQ()) && $etKeys->getQ() != 'none') {
+            $eventsWithSearchWord = $this->filterWithSearchWord($etKeys);
+            $searchWordConstraint = $this->setSearchWordConstraint($query, $eventsWithSearchWord);
+        }
+        $queryConstraints = array_merge($queryConstraints, $searchWordConstraint);
+
         if (!empty($queryConstraints)) {
             $query->matching($query->logicalAnd(...$queryConstraints));
         }
@@ -52,8 +59,6 @@ class EventRepository extends Repository
         $events = $query->execute();
 
         $events = $this->findWithinDistance($etKeys, $events);
-
-        //return $this->filterWithSearchWord($etKeys, $events);
         return $events->toArray();
     }
 
@@ -76,29 +81,6 @@ class EventRepository extends Repository
 
     public function filterWithSearchWord(EtKeys $etKeys): array
     {
-        /*$placesForApiQuery = [];
-        / * * @var Event $event * /
-        foreach ($events as $event) {
-            $placesForApiQuery[$event->getPlaceId()] = $event->getPlaceId();
-        }
-
-        $personsForApiQuery = [];
-        $personsForApiQuery[0] = 0;
-        $personsForApiQuery[999] = '';
-        / ** @var Event $event * /
-        foreach ($events as $event) {
-            $peopleOfEventArray = explode('|', $event->getPeople());
-            foreach ($peopleOfEventArray as $id) {
-                if (!empty($id)) {
-                    $personsForApiQuery[$id] = $id;
-                }
-            }
-        }
-
-        $etKeysForApiQuery = $etKeys;
-        $etKeysForApiQuery->setPlaces(implode(',', $placesForApiQuery));
-        $etKeysForApiQuery->setPeople(implode(',', $personsForApiQuery));*/
-
         $etKeysForApiQuery = $etKeys;
         $etKeysForApiQuery->setItemsPerPage(99999);
         $eventContainerRepository = GeneralUtility::makeInstance(EventcontainerRepository::class);
@@ -108,11 +90,6 @@ class EventRepository extends Repository
         foreach ($result->getItems() as $item) {
             $id = ((array)$item->ID)[0];
             $eventsWithSearchWord[] = $id;
-            /*foreach ($events as $event) {
-                if ($event->getId() == $id) {
-                    $eventsWithSearchWord[] = $event;
-                }
-            }*/
         }
         return $eventsWithSearchWord;
     }
@@ -164,6 +141,16 @@ class EventRepository extends Repository
         $queryConstraints = array_merge($queryConstraints, $this->setRegionConstraint($query, $etKeys));
         $queryConstraints = array_merge($queryConstraints, $this->setPlaceConstraint($query, $etKeys));
         return array_merge($queryConstraints, $this->setTimeConstraint($query, $etKeys));
+    }
+
+    /**
+     * @throws UnexpectedTypeException
+     */
+    public function setSearchWordConstraint(Query $query, array $ids): array
+    {
+        $queryConstraints = [];
+        $queryConstraints[] = $query->in('id', $ids);
+        return $queryConstraints;
     }
 
     public function setHighlightConstraint(Query $query, EtKeys $etKeys): array

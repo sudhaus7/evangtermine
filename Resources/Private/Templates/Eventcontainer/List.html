@@ -10,7 +10,11 @@
 <f:section name="main">
     <div id="et_filter_container">
 
-        <f:form method="post" action="list" controller="Eventcontainer" object="{etkeys}" name="etkeysForm">
+        <f:form method="post"
+                action="list"
+                controller="Eventcontainer"
+                object="{etkeys}"
+                name="etkeysForm">
             <f:render partial="Searchform" arguments="{_all}" />
 
             <f:render partial="Pager" arguments="{pgr: pagerdata}" />

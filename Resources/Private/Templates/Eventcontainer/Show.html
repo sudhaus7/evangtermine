@@ -7,160 +7,168 @@
 <f:layout name="Default" />
 
 <f:section name="main">
-    <f:debug title="el">{event}</f:debug>
 <f:if condition="{event.id}">
 	<f:then>
+        <div id="et_container">
+            <div id="et_content_container-{data.uid}">
+                <div id="et_detail_header-{data.uid}">
+                    <div class="et_content_row et_headlinks">
+                        <div class="et_detail_backlink">
+                            <a href="javascript:history.back()" style="background-image:url(//{eventhost}/bundles/vket/images/backlinkbg.png);">Zurück</a>
+                        </div>
+                        <div class="et_sharefunctions">
+                            <a target="_blank" href="//{eventhost}/ical-{event.id}"><img align="absmiddle" border="0" title="als Kalender-Ereignisdatei downloaden" alt="als Kalender-Ereignisdatei downloaden" src="{f:uri.resource(path:'Icons/kalender-24.gif')}"></a>&nbsp;
+                            <a target="_blank" href="//{eventhost}/einladung-{event.id}"><img align="absmiddle" border="0" title="als E-Mail verschicken" alt="als E-Mail verschicken" src="{f:uri.resource(path:'Icons/e-mail-senden-24.gif')}"></a>&nbsp;
+                            <a target="_blank"	href="//{eventhost}/teilen-auf-facebook-{event.id}"><img align="absmiddle" border="0" title="Auf Facebook posten" alt="Auf Facebook posten"	src="{f:uri.resource(path:'Icons/facebook-24.gif')}"></a>&nbsp;
+                            <a target="_blank" href="//{eventhost}/teilen-auf-twitter-{event.id}"><img align="absmiddle" border="0" title="twittern" alt="twittern" src="{f:uri.resource(path:'Icons/twitter-24.gif')}"></a>&nbsp;
+                            <a href="javascript:window.print();"><img align="absmiddle"
+                                                                      border="0"
+                                                                      title="drucken"
+                                                                      alt="drucken"
+                                                                      src="{f:uri.resource(path:'EXT:evangtermine/Resources/Public/Icons/drucken-24.gif')}"></a>
+                        </div>
+                    </div>
+                    <f:if condition="{event.image}">
+                        <div class="et_event_image">
+                            <f:media file="{event.image}" alt="{event.title}" title="{event.title}"/>
+                            <f:if condition="{event.caption}">
+                                <br>
+                                <span class="et_event_caption">{event.caption}</span>
+                            </f:if>
+                        </div>
+                    </f:if>
+                    <h1 id="et_detail_title">{event.title}</h1>
+                    <div id="et_detail_date">{event.datum2}</div>
+                </div>
 
-		<div id="et_content_container-{data.uid}">
-			<div id="et_detail_header">
-				<div class="et_content_row et_headlinks">
-					<div class="et_detail_backlink">
-						<a href="javascript:history.back()" style="background-image:url(//{eventhost}/bundles/vket/images/backlinkbg.png);">Zurück</a>
-					</div>
-					<div class="et_sharefunctions">
-						<a target="_blank" href="//{eventhost}/ical-{event.ID}"><img align="absmiddle" border="0" title="als Kalender-Ereignisdatei downloaden" alt="als Kalender-Ereignisdatei downloaden" src="{f:uri.resource(path:'Icons/kalender-24.gif')}"></a>&nbsp;
-						<a target="_blank" href="//{eventhost}/einladung-{event.ID}"><img align="absmiddle" border="0" title="als E-Mail verschicken" alt="als E-Mail verschicken" src="{f:uri.resource(path:'Icons/e-mail-senden-24.gif')}"></a>&nbsp;
-						<a target="_blank"	href="//{eventhost}/teilen-auf-facebook-{event.ID}"><img align="absmiddle" border="0" title="Auf Facebook posten" alt="Auf Facebook posten"	src="{f:uri.resource(path:'Icons/facebook-24.gif')}"></a>&nbsp;
-						<a target="_blank" href="//{eventhost}/teilen-auf-twitter-{event.ID}"><img align="absmiddle" border="0" title="twittern" alt="twittern" src="{f:uri.resource(path:'Icons/twitter-24.gif')}"></a>&nbsp;
-						<a href="javascript:window.print();"><img align="absmiddle"	border="0" title="drucken" alt="drucken" src="{f:uri.resource(path:'Icons/drucken-24.gif')}"></a>
-					</div>
-				</div>
-				<f:if condition="{et:str(on:event._event_IMAGE)}">
-					<div class="et_event_image">
-						<img src="{event._event_IMAGE}" alt="{event._event_TITLE}" title="{event._event_TITLE}" />
-						<f:if condition="{et:str(on:event._event_CAPTION)}">
-							<br>
-							<span class="et_event_caption">{event._event_CAPTION}</span>
-					</f:if>
-					</div>
-				</f:if>
-				<h1 id="et_detail_title">{event._event_TITLE}</h1>
-				<div id="et_detail_date">{event.DATUM2}</div>
-			</div>
+                <f:if condition="{event.placeName} && {event.placeName} != 'Ohne Ort'">
+                    <div class="et_content_row" id="et_field_PLACE_ID">
+                        <div class="et_content_detaillabel">Ort</div>
+                        <div class="et_content_detailvalue">
+                            <f:if condition="{event.placeName}">
+                                <span class="et_place_NAME">{event.placeName}</span>
+                            </f:if>
+                            <f:if condition="{event.placeStreetNr}">
+                                <br><span class="et_place_STREET_NR">{event.placeStreetNr}</span>
+                                <br><span class="et_place_ZIP">{event.placeZip}</span><span class="et_place_CITY">{event.placeCity}</span>
+                            </f:if>
+                            <f:comment><!--
+                            <f:if condition="{et:str(on:event._place_INFO)}">
+                                <br>
+                                <f:cObject typoscriptObjectPath="plugin.tx_evangtermine.tslibs.renderFunc"><et:tag node="{event._place_INFO}" /></f:cObject>
+                            </f:if>
+                            --></f:comment>
+                            <f:if condition="{event.placeImage} && !{event.image}">
+                                <br>
+                                <f:media file="{event.placeImage}" id="et_place_image" style="display: none;"/>
+                            </f:if>
+                        </div>
+                    </div>
+                </f:if>
 
-			<f:if condition="{et:str(on:event._place_NAME)} != 'Ohne Ort'">
-				<div class="et_content_row" id="et_field_PLACE_ID">
-					<div class="et_content_detaillabel">Ort</div>
-					<div class="et_content_detailvalue">
-						<et:tag node="{event._place_NAME}" />
-						<f:if condition="{et:str(on:event._place_STREET_NR)}">
-							<br><et:tag node="{event._place_STREET_NR}" />
-							<br><et:tag node="{event._place_ZIP}" /> <et:tag node="{event._place_CITY}" />
-						</f:if>
-						<f:comment><!--
-						<f:if condition="{et:str(on:event._place_INFO)}">
-							<br>
-							<f:cObject typoscriptObjectPath="plugin.tx_evangtermine.tslibs.renderFunc"><et:tag node="{event._place_INFO}" /></f:cObject>
-						</f:if>
-						--></f:comment>
-						<f:if condition="{et:str(on:event._place_IMAGE)} && !{et:str(on:event._event_IMAGE)}">
-							<br>
-							<img src="{event._place_THUMBNAIL}" id="et_place_image_th" style="display: inline;">
-							<img src="{event._place_IMAGE}" id="et_place_image" style="display: none;">
-						</f:if>
-					</div>
-				</div>
-			</f:if>
+                <f:alias map="{etlist: {
+                                _event_SHORT_DESCRIPTION: event.shortDescription,
+                                _event_EVENTTYPE: event.categories,
+                                _event_PEOPLE: event.people,
+                                _LONG_DESCRIPTION: event.longDescription,
+                                _event_LINK: event.link,
+                                _event_EMAIL: event.email,
+                                _event_TEXTLINE_1: event.textline1,
+                                _event_TEXTLINE_2: event.textline2,
+                                _event_TEXTLINE_3: event.textline3,
+                                _event_TEXTLINE_4: event.textline4,
+                                _event_TEXTLINE_5: event.textline5,
+                                _event_TEXTLINE_6: event.textline6,
+                                _event_TEXTLINE_7: event.textline7,
+                                _event_TEXTLINE_8: event.textline8,
+                                _event_TEXTBOX_1: event.textbox1,
+                                _event_TEXTBOX_2: event.textbox2,
+                                _event_TEXTBOX_3: event.textbox3
+                                }}">
 
-			<f:alias map="{etlist: {
-							_event_SHORT_DESCRIPTION: event._event_SHORT_DESCRIPTION,
-							_event_EVENTTYPE: event._event_EVENTTYPE,
-							_event_PEOPLE: event._event_PEOPLE,
-							_LONG_DESCRIPTION: event._event_LONG_DESCRIPTION,
-							_event_LINK: event._event_LINK,
-							_event_EMAIL: event._event_EMAIL,
-							_event_TEXTLINE_1: event._event_TEXTLINE_1,
-							_event_TEXTLINE_2: event._event_TEXTLINE_2,
-							_event_TEXTLINE_3: event._event_TEXTLINE_3,
-							_event_TEXTLINE_4: event._event_TEXTLINE_4,
-							_event_TEXTLINE_5: event._event_TEXTLINE_5,
-							_event_TEXTBOX_1: event._event_TEXTBOX_1,
-							_event_TEXTBOX_2: event._event_TEXTBOX_2,
-							_event_TEXTBOX_3: event._event_TEXTBOX_3
-							}}">
+                    <f:for each="{etlist}" as="evt" key="key">
+                        <f:if condition="{evt}">
+                            <div class="et_content_row" id="et{key}">
+                                <div class="et_content_detaillabel">
+                                    <et:label key="{key}" />
+                                </div>
+                                <div class="et_content_detailvalue">
+                                    <f:cObject typoscriptObjectPath="plugin.tx_evangtermine.tslibs.renderFunc"><span class="et{key}">{evt}</span></f:cObject>
+                                </div>
+                            </div>
+                        </f:if>
+                    </f:for>
+                </f:alias>
 
-				<f:for each="{etlist}" as="evt" key="key">
-					<f:if condition="{et:str(on:evt)}">
-						<div class="et_content_row" id="et{key}">
-							<div class="et_content_detaillabel"><et:attr on="{evt}" name="Label" /></div>
-							<div class="et_content_detailvalue">
-								<f:cObject typoscriptObjectPath="plugin.tx_evangtermine.tslibs.renderFunc"><et:tag node="{evt}" /></f:cObject>
-							</div>
-						</div>
-					</f:if>
-				</f:for>
-			</f:alias>
+                <f:if condition="{event.personName}">
+                    <div class="et_content_row" id="et_person_NAME">
+                        <div class="et_content_detaillabel">Ansprechpartner</div>
+                        <div class="et_content_detailvalue">
+                            <span class="et_person_NAME">{event.personName}</span>
+                            <f:cObject typoscriptObjectPath="plugin.tx_evangtermine.tslibs.renderFunc">
+                                <f:if condition="{event.personEmail}">
+                                    mailto:<f:link.email email="{event.personEmail}">{event.personEmail}</f:link.email>
+                                </f:if>
+                                <f:if condition="{event.personContact}">
+                                    <span class="et_person_CONTACT">{event.personContact}</span>
+                                </f:if>
+                            </f:cObject>
+                        </div>
+                    </div>
+                </f:if>
 
-			<f:if condition="{et:str(on:event._person_NAME)}">
-				<div class="et_content_row" id="et_person_NAME">
-					<div class="et_content_detaillabel">Ansprechpartner</div>
-					<div class="et_content_detailvalue">
-					<et:tag node="{event._person_NAME}" />
-					<f:cObject typoscriptObjectPath="plugin.tx_evangtermine.tslibs.renderFunc">
-						<f:if condition="{et:str(on:event._person_EMAIL)}">
-							mailto:{event._person_EMAIL}
-						</f:if>
-						<f:if condition="{et:str(on:event._person_CONTACT)}">
-							<et:tag node="{event._person_CONTACT}" />
-						</f:if>
-					</f:cObject>
-					</div>
-				</div>
-			</f:if>
+                <f:comment><!-- Registration with old feedback form (deprecated) --></f:comment>
+                <f:if condition="{event.feedbackId}">
+                    <div class="et_content_row" id="et_event_FEEDBACK_ID">
+                        <div class="et_content_detaillabel">Rückmeldeformular</div>
+                        <div class="et_content_detailvalue">
+                            <a href="javascript:;" OnClick="window.open('//{eventhost}/rueckmeldeformular{event.feedbackId}-{event.id}', 'Rückmeldeformular','toolbar=no,location=no,status=no,menubar=no,scrollbars=yes,resizable=yes,width=850,height=650,top=10,left=200');" class="feedbacklink et_link" >für die Veranstaltung anmelden</a>
+                            <f:comment><!--
+                            <f:if condition="{et:str(on:meta.avail)}">
+                                (noch {et:str(on:meta.avail)} verfügbare Plätze)
+                            </f:if>
+                            --></f:comment>
+                        </div>
+                    </div>
+                </f:if>
 
-            <f:comment><!-- Registration with old feedback form (deprecated) --></f:comment>
-			<f:if condition="{et:str(on:event._event_FEEDBACK_ID)}">
-				<div class="et_content_row" id="et_event_FEEDBACK_ID">
-					<div class="et_content_detaillabel"><et:attr on="{event._event_FEEDBACK_ID}" name="Label" /></div>
-					<div class="et_content_detailvalue">
-						<a href="javascript:;" OnClick="window.open('//{eventhost}/rueckmeldeformular{event._event_FEEDBACK_ID}-{event.ID}', 'Rückmeldeformular','toolbar=no,location=no,status=no,menubar=no,scrollbars=yes,resizable=yes,width=850,height=650,top=10,left=200');" class="feedbacklink et_link" >für die Veranstaltung anmelden</a>
-						<f:if condition="{et:str(on:meta.avail)}">
-							(noch {et:str(on:meta.avail)} verfügbare Plätze)
-						</f:if>
-					</div>
-				</div>
-			</f:if>
+                <f:comment><!-- Registration with new web form --></f:comment>
+                <f:if condition="{event.pollId}">
+                    <div class="et_content_row" id="et_webform_LINKNAME">
+                        <div class="et_content_detaillabel">&nbsp;</div>
+                        <div class="et_content_detailvalue">
+                            <a href="//{eventhost}/webformular/input/liste/{event.pollId}" target="_blank">{event.webformLinkname}</a>
+                        </div>
+                    </div>
+                </f:if>
 
-            <f:comment><!-- Registration with new web form --></f:comment>
-			<f:if condition="{et:str(on:event._poll_ID)}">
-				<div class="et_content_row" id="et_webform_LINKNAME">
-					<div class="et_content_detaillabel">&nbsp;</div>
-					<div class="et_content_detailvalue">
-						<a href="//{eventhost}/webformular/input/liste/{event._poll_ID}" target="_blank">{event._webform_LINKNAME}</a>
-					</div>
-				</div>
-			</f:if>
+                <f:if condition="{event.placeName} && {event.placeName} != 'Ohne Ort'">
+                    <div class="et_content_row" id="et_detail_position">
+                            <div class="et_content_detaillabel"></div>
+                            <div class="et_content_detailvalue">
+                                <a	onclick="window.open('//{eventhost}/veranstaltungsort_{event.placeId}','Karte','scrollbars=yes,resizable=yes,width=600,height=500'); return false;"
+                                    title="Auf Karte anzeigen" href="//{eventhost}/veranstaltungsort_{event.placeId}" target="_blank">Ort auf Karte anzeigen</a>
+                            </div>
+                    </div>
+                </f:if>
 
-			<f:if condition="{et:str(on:event._place_NAME)} != 'Ohne Ort'">
-				<div class="et_content_row" id="et_detail_position">
-						<div class="et_content_detaillabel"></div>
-						<div class="et_content_detailvalue">
-							<a	onclick="window.open('//{eventhost}/veranstaltungsort_{event._place_ID}','Karte','scrollbars=yes,resizable=yes,width=600,height=500'); return false;"
-								title="Auf Karte anzeigen" href="//{eventhost}/veranstaltungsort_{event._place_ID}" target="_blank">Ort auf Karte anzeigen</a>
-						</div>
-				</div>
-			</f:if>
+                <div class="et_content_row et_user">
+                    <div class="et_content_detaillabel">Veranstalter</div>
+                    <div class="et_content_detailvalue">
+                        <f:if condition="{event.userImage}"><f:media file="{event.userImage}" alt="{event.userRealname}" title="{event.userRealname}"/></f:if>
+                        <span class="et_user_REALNAME">{event.userRealname}</span><br>
+                        <f:if condition="{event.userDescription}"><span class="et_user_DESCRIPTION">{event.userDescription}</span><br></f:if>
+                        <span class="et_user_STREET_NR">{event.userStreetNr}</span><br>
+                        <span class="et_user_ZIP">{event.userZip}</span> <span class="et_user_CITY">{event.userCity}</span><br>
 
-			<div class="et_content_row et_user">
-				<div class="et_content_detaillabel">Veranstalter</div>
-				<div class="et_content_detailvalue">
-					<f:if condition="{et:str(on:event._user_IMAGE)}"><img alt="{event._user_REALNAME}" title="{event._user_REALNAME}" src="{event._user_IMAGE}"></f:if>
-					<et:tag name="span" node="{event._user_REALNAME}"/>
-					<f:cObject typoscriptObjectPath="plugin.tx_evangtermine.tslibs.renderFunc">
+                        <f:if condition="{event.userEmail}">mailto:<f:link.email email="{event.userEmail}">{event.userEmail}</f:link.email></f:if><br>
 
-						<f:if condition="{et:str(on:event._user_DESCRIPTION)}"><et:tag node="{event._user_DESCRIPTION}"/></f:if>
-						<et:tag node="{event._user_STREET_NR}"/>
-						<et:tag node="{event._user_ZIP}"/>	<et:tag node="{event._user_CITY}"/>
+                        <f:if condition="{event.userContact}">{event.userContact}</f:if>
+                    </div>
+                </div>
 
-						<f:if condition="{et:str(on:event._user_EMAIL)}">mailto:{event._user_EMAIL}</f:if>
-
-						<f:if condition="{et:str(on:event._user_CONTACT)}">{event._user_CONTACT}</f:if>
-					</f:cObject>
-				</div>
-			</div>
-
+            </div>
 		</div>
-	</div>
 	</f:then>
 	<f:else>
 		<p>Diese Veranstaltung existiert nicht.</p>

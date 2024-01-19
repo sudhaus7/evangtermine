@@ -89,55 +89,55 @@ class EtKeys extends AbstractValueObject
      * veranstalter id
      * @var string
      */
-    protected string $vid;
+    protected string $vid = '';
 
     /**
      * region
      * @var string
      */
-    protected string $region;
+    protected string $region = '';
 
     /**
      * regions
      * @var string
      */
-    protected string $regions;
+    protected string $regions = '';
 
     /**
      * aid (group admin)
      * @var string
      */
-    protected string $aid;
+    protected string $aid = '';
 
     /**
      * kk
      * @var string
      */
-    protected string $kk;
+    protected string $kk = '';
 
     /**
      *eventtype
      * @var string
      */
-    protected string $eventtype;
+    protected string $eventtype = '';
 
     /**
      * highlight
      * @var string
      */
-    protected string $highlight;
+    protected string $highlight = '';
 
     /**
      * people
      * @var string
      */
-    protected string $people;
+    protected string $people = '';
 
     /**
      * person
      * @var string
      */
-    protected string $person;
+    protected string $person = '';
 
     /**
      * place
@@ -149,109 +149,109 @@ class EtKeys extends AbstractValueObject
      * places
      * @var string
      */
-    protected string $places;
+    protected string $places = '';
 
     /**
      * bf
      * @var string
      */
-    protected string $bf;
+    protected string $bf = '';
 
     /**
      * inputmask
      * @var string
      */
-    protected string $ipm;
+    protected string $ipm = '';
 
     /**
      * channel
      * @var string
      */
-    protected string $cha;
+    protected string $cha = '';
 
     /**
      * lang
      * @var string
      */
-    protected string $lang;
+    protected string $lang = '';
 
     /**
      * itemsPerPage
      * @var string
      */
-    protected string $itemsPerPage;
+    protected string $itemsPerPage = '';
 
     /**
      * pageID
      * @var string
      */
-    protected string $pageID;
+    protected string $pageID = '';
 
     /**
      * searchword
      * @var string
      */
-    protected string $q;
+    protected string $q = '';
 
     /**
      * day
      * @var string
      */
-    protected string $d;
+    protected string $d = '';
 
     /**
      * month
      * @var string
      */
-    protected string $month;
+    protected string $month = '';
 
     /**
      * date
      * @var string
      */
-    protected string $date;
+    protected string $date = '';
 
     /**
      * year
      * @var string
      */
-    protected string $year;
+    protected string $year = '';
 
     /**
      * start
      * @var string
      */
-    protected string $start;
+    protected string $start = '';
 
     /**
      * end
      * @var string
      */
-    protected string $end;
+    protected string $end = '';
 
     /**
      * dest
      * @var string
      */
-    protected string $dest;
+    protected string $dest = '';
 
     /**
      * own
      * @var string
      */
-    protected string $own;
+    protected string $own = '';
 
     /**
      * menue1
      * @var string
      */
-    protected string $menue1;
+    protected string $menue1 = '';
 
     /**
      * menue2
      * @var string
      */
-    protected string $menue2;
+    protected string $menue2 = '';
 
     /**
      * zip
@@ -263,31 +263,31 @@ class EtKeys extends AbstractValueObject
      * yesno1
      * @var string
      */
-    protected string $yesno1;
+    protected string $yesno1 = '';
 
     /**
      * yesno2
      * @var string
      */
-    protected string $yesno2;
+    protected string $yesno2 = '';
 
     /**
      * until
      * @var string
      */
-    protected string $until;
+    protected string $until = '';
 
     /**
      * encoding
      * @var string
      */
-    protected string $encoding;
+    protected string $encoding = '';
 
     /**
      * ID param for a single event
      * @var string
      */
-    protected string $ID;
+    protected string $ID = '';
 
     /**
      * radius
