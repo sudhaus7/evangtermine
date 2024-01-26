@@ -182,6 +182,12 @@ class EtKeys extends AbstractValueObject
     protected string $itemsPerPage = '';
 
     /**
+     * hideOngoingEvents
+     * @var string
+     */
+    protected string $hideOngoingEvents = '';
+
+    /**
      * pageID
      * @var string
      */
@@ -453,6 +459,16 @@ class EtKeys extends AbstractValueObject
     public function setItemsPerPage($itemsPerPage)
     {
         $this->itemsPerPage = $itemsPerPage;
+    }
+
+    public function getHideOngoingEvents(): string
+    {
+        return $this->hideOngoingEvents;
+    }
+
+    public function setHideOngoingEvents(string $hideOngoingEvents): void
+    {
+        $this->hideOngoingEvents = $hideOngoingEvents;
     }
 
     public function getPageID(): string

@@ -163,7 +163,9 @@
 
                         <f:if condition="{event.userEmail}">mailto:<f:link.email email="{event.userEmail}">{event.userEmail}</f:link.email></f:if><br>
 
-                        <f:if condition="{event.userContact}">{event.userContact}</f:if>
+                        <f:if condition="{event.userContact}">
+                            <f:format.nl2br>{event.userContact}</f:format.nl2br>
+                        </f:if>
                     </div>
                 </div>
 

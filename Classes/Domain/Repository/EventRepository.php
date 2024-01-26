@@ -28,18 +28,21 @@ class EventRepository extends Repository
     const LON_IN_KM = 73;
 
     /**
-     * @throws InvalidNumberOfConstraintsException
      * @throws UnexpectedTypeException
+     * @throws InvalidNumberOfConstraintsException
      */
-    public function findByEtKeys(EtKeys $etKeys): array
+    public function prepareFindByEtKeysQuery(EtKeys $etKeys): QueryInterface
     {
+        $eventUids = $this->findWithinDistance($etKeys);
+        $eventUids = $this->hideOngoingEvents($etKeys, $eventUids);
+
         $query = $this->createQuery();
 
         $settings = $query->getQuerySettings();
         $settings->setRespectStoragePage(false);
         $query->setQuerySettings($settings);
 
-        $queryConstraints = $this->setConstraints($query, $etKeys);
+        $queryConstraints = $this->setConstraints($query, $etKeys, $eventUids);
 
         // if search word
         $searchWordConstraint = [];
@@ -52,30 +55,27 @@ class EventRepository extends Repository
         if (!empty($queryConstraints)) {
             $query->matching($query->logicalAnd(...$queryConstraints));
         }
+        $queryParser = \TYPO3\CMS\Core\Utility\GeneralUtility::makeInstance(\TYPO3\CMS\Extbase\Persistence\Generic\Storage\Typo3DbQueryParser::class);
+        file_put_contents('/tmp/qqu.txt', print_r($queryParser->convertQueryToDoctrineQueryBuilder($query)->getSQL(), 'true'));
+        file_put_contents('/tmp/qqu2.txt', print_r($queryParser->convertQueryToDoctrineQueryBuilder($query)->getParameters(), 'true'));
+        //\TYPO3\CMS\Extbase\Utility\DebuggerUtility::var_dump($queryParser->convertQueryToDoctrineQueryBuilder($query)->getParameters(), 'Parameter');
 
-        // get events
+        return $query;
+    }
+
+    public function findByEtKeys(QueryInterface $query, EtKeys $etKeys): array
+    {
         $query->setLimit((int)$etKeys->getItemsPerPage());
         $query->setOffset((int)$etKeys->getItemsPerPage() * ((int)$etKeys->getPageID() - 1));
+        // get events
         $events = $query->execute();
-
-        $events = $this->findWithinDistance($etKeys, $events);
         return $events->toArray();
     }
 
-    /**
-     * @throws InvalidNumberOfConstraintsException
-     */
-    public function getNumberOfEventsByEtKeys(EtKeys $etKeys): int
+    public function getNumberOfEventsByEtKeys(QueryInterface $query): int
     {
-        $query = $this->createQuery();
-        $settings = $query->getQuerySettings();
-        $settings->setRespectStoragePage(false);
-        $query->setQuerySettings($settings);
-
-        $queryConstraints = $this->setConstraints($query, $etKeys);
-        if (!empty($queryConstraints)) {
-            $query->matching($query->logicalAnd(...$queryConstraints));
-        }
+        $query->setLimit(99999);
+        $query->setOffset(0);
         return $query->execute()->count();
     }
 
@@ -94,26 +94,21 @@ class EventRepository extends Repository
         return $eventsWithSearchWord;
     }
 
-    public function findWithinDistance(EtKeys $etKeys, QueryResultInterface $events): QueryResultInterface
+    public function findWithinDistance(EtKeys $etKeys): array
     {
         $zip = $etKeys->getZip();
         $radius = $etKeys->getRadius();
-        if (empty($zip) || empty($radius) || empty($events->toArray())) {
-            return $events;
+
+        $query = $this->createQuery();
+        if (empty($zip) || empty($radius)) {
+            return $query->execute(true);
         }
 
-        $uids = [];
-        /** @var Event $event */
-        foreach ($events as $event) {
-            $uids[] = $event->getUid();
-        }
         $osmService = GeneralUtility::makeInstance(OsmService::class);
         list($lat, $lon) = $osmService->determineCoordinates($zip);
 
-        $query = $this->createQuery();
-        $query->statement('SELECT * FROM tx_evangtermine_domain_model_event
-            WHERE uid in (' . implode(",", $uids) . ')
-            AND (
+        $statement = 'SELECT uid FROM tx_evangtermine_domain_model_event
+            WHERE (
                 power((' . $lat . ' - tx_evangtermine_domain_model_event.lat) * ' . EventRepository::LAT_IN_KM . ', 2)
               + power((' . $lon . ' - tx_evangtermine_domain_model_event.lon) * ' . EventRepository::LON_IN_KM . ', 2)
               < power(' . $radius . ', 2)
@@ -124,17 +119,20 @@ class EventRepository extends Repository
                 power((' . $lat . ' - tx_evangtermine_domain_model_event.lat) * ' . EventRepository::LAT_IN_KM . ', 2)
               + power((' . $lon . ' - tx_evangtermine_domain_model_event.lon) * ' . EventRepository::LON_IN_KM . ', 2),
                 tx_evangtermine_domain_model_event.place_zip
-        ');
-        return $query->execute();
+        ';
+        $query->statement($statement);
+        // only return array of uids
+        return $query->execute(true);
     }
 
     /**
      * @throws InvalidNumberOfConstraintsException
+     * @throws UnexpectedTypeException
      */
-    public function setConstraints(QueryInterface $query, EtKeys $etKeys): array
+    public function setConstraints(QueryInterface $query, EtKeys $etKeys, array $eventUids): array
     {
         $queryConstraints = [];
-
+        $queryConstraints = array_merge($queryConstraints, $this->setUidConstraint($query, $eventUids));
         $queryConstraints = array_merge($queryConstraints, $this->setHighlightConstraint($query, $etKeys));
         $queryConstraints = array_merge($queryConstraints, $this->setCategoryConstraint($query, $etKeys));
         $queryConstraints = array_merge($queryConstraints, $this->setPeopleConstraint($query, $etKeys));
@@ -153,6 +151,20 @@ class EventRepository extends Repository
         return $queryConstraints;
     }
 
+    /**
+     * @throws UnexpectedTypeException
+     */
+    public function setUidConstraint(Query $query, array $eventUids): array
+    {
+        $queryConstraints = [];
+        $uids = [];
+        foreach ($eventUids as $eventUid) {
+            $uids[] = $eventUid['uid'];
+        }
+        $queryConstraints[] = $query->in('uid', $uids);
+        return $queryConstraints;
+    }
+
     public function setHighlightConstraint(Query $query, EtKeys $etKeys): array
     {
         $queryConstraints = [];
@@ -164,6 +176,9 @@ class EventRepository extends Repository
         return $queryConstraints;
     }
 
+    /**
+     * @throws InvalidNumberOfConstraintsException
+     */
     public function setCategoryConstraint(Query $query, EtKeys $etKeys): array
     {
         $queryConstraints = [];
@@ -171,10 +186,18 @@ class EventRepository extends Repository
         if (empty($category) || $category == 'all') {
             return $queryConstraints;
         }
-        $queryConstraints[] = $query->like('categories', '%|' . $category . '|%');
+        $queryConstraints[] = $query->logicalOr(
+            $query->equals('categories', $category),
+            $query->like('categories', '%,' . $category . ',%'),
+            $query->like('categories', $category . ',%'),
+            $query->like('categories', '%,' . $category),
+        );
         return $queryConstraints;
     }
 
+    /**
+     * @throws InvalidNumberOfConstraintsException
+     */
     public function setPeopleConstraint(Query $query, EtKeys $etKeys): array
     {
         $queryConstraints = [];
@@ -182,7 +205,12 @@ class EventRepository extends Repository
         if (empty($person) || $person == 'all') {
             return $queryConstraints;
         }
-        $queryConstraints[] = $query->like('people', '%|' . $person . '|%');
+        $queryConstraints[] = $query->logicalOr(
+            $query->equals('people', $person),
+            $query->like('people', '%,' . $person . ',%'),
+            $query->like('people', $person . ',%'),
+            $query->like('people', '%,' . $person),
+        );
         return $queryConstraints;
     }
 
@@ -267,6 +295,30 @@ class EventRepository extends Repository
         return $queryConstraints;
     }
 
+    protected function hideOngoingEvents(EtKeys $etKeys, array $eventUids): array
+    {
+        if (
+            empty($eventUids) ||
+            empty($etKeys->getHideOngoingEvents())
+        ) {
+            return $eventUids;
+        }
+        $uids = [];
+        foreach ($eventUids as $eventUid) {
+            $uids[] = $eventUid['uid'];
+        }
+
+        $time = 60 * 60 * 24 * 7 * $etKeys->getHideOngoingEvents();
+        $query = $this->createQuery();
+        $query->statement('Select uid from tx_evangtermine_domain_model_event
+            WHERE uid in (' . implode(",", $uids) . ')
+            AND (
+                (tx_evangtermine_domain_model_event.end/1 - tx_evangtermine_domain_model_event.start/1) < ' . $time . '
+            )
+        ');
+        return $query->execute(true);
+    }
+
     /**
      * @throws Exception
      * @throws DBALException
@@ -329,10 +381,39 @@ class EventRepository extends Repository
     {
         $regions = [];
         $regions['all'] = 'Alle Regionen';
+        $regions['alleBezirke'] = 'Alle Kirchenbezirke';
+        $regions['alleKreise'] = 'Alle Kirchenkreise';
+
 
         if (!empty($settings['etkey_regions'] ?? '') && ($settings['etkey_regions'] ?? '') !== 'all') {
-            foreach (explode(',', $settings['etkey_regions']) as $region) {
+            $regionsFromSettings = explode(',', $settings['etkey_regions']);
+            $regions = [];
+            foreach ($regionsFromSettings as $region) {
                 $regions[$region] = $region;
+            }
+
+            if (!empty($regions['all'])) {
+                unset($regions['all']);
+                unset($regions['alleBezirke']);
+                unset($regions['alleKreise']);
+                $regions = array_merge(['all' => 'Alle Regionen'], $regions);
+            } else {
+                if (!empty($regions['alleBezirke'])) {
+                    unset($regions['alleBezirke']);
+                    if (empty($regions['alleKreise'])) {
+                        $regions = array_merge(['all' => 'Alle Kirchenbezirke'], $regions);
+                    } else {
+                        unset($regions['alleKreise']);
+                        $regions = array_merge(['all' => 'Alle Regionen'], $regions);
+                    }
+                } else {
+                    if (empty($regions['alleKreise'])) {
+                        $regions = array_merge(['all' => 'Alle Regionen'], $regions);
+                    } else {
+                        unset($regions['alleKreise']);
+                        $regions = array_merge(['all' => 'Alle Kirchenkreise'], $regions);
+                    }
+                }
             }
             return $regions;
         }

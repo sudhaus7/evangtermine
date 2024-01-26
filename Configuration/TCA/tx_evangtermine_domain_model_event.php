@@ -561,6 +561,7 @@ return [
                     ['Highlight', 2],
                     ['regionales Highlight', 3],
                 ],
+                'readOnly' => 1,
             ]
         ],
         'event_coursetype' => [
@@ -1161,7 +1162,7 @@ return [
                     ],
                 ],
                 'fallbackCharacter' => '-',
-                'eval' => 'uniqueInPid',
+                'eval' => 'unique',
                 'prependSlash' => true,
             ],
         ],

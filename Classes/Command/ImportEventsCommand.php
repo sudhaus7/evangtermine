@@ -19,7 +19,6 @@ use ArbkomEKvW\Evangtermine\Domain\Model\Categorylist;
 use ArbkomEKvW\Evangtermine\Domain\Model\Eventcontainer;
 use ArbkomEKvW\Evangtermine\Domain\Model\Grouplist;
 use ArbkomEKvW\Evangtermine\Util\FieldMapping;
-use ArbkomEKvW\Evangtermine\Util\Fields;
 use ArbkomEKvW\Evangtermine\Util\UrlUtility;
 use Doctrine\DBAL\DBALException;
 use Doctrine\DBAL\Driver\Exception;
@@ -32,11 +31,15 @@ use TYPO3\CMS\Core\Configuration\Exception\ExtensionConfigurationPathDoesNotExis
 use TYPO3\CMS\Core\Configuration\ExtensionConfiguration;
 use TYPO3\CMS\Core\Database\ConnectionPool;
 use TYPO3\CMS\Core\DataHandling\DataHandler;
+use TYPO3\CMS\Core\DataHandling\Model\RecordStateFactory;
+use TYPO3\CMS\Core\DataHandling\SlugHelper;
+use TYPO3\CMS\Core\Exception\SiteNotFoundException;
 use TYPO3\CMS\Core\Http\RequestFactory;
 use TYPO3\CMS\Core\Resource\DuplicationBehavior;
 use TYPO3\CMS\Core\Resource\Exception\ExistingTargetFolderException;
 use TYPO3\CMS\Core\Resource\Exception\InsufficientFolderAccessPermissionsException;
 use TYPO3\CMS\Core\Resource\Exception\InsufficientFolderWritePermissionsException;
+use TYPO3\CMS\Core\Resource\File;
 use TYPO3\CMS\Core\Resource\ResourceStorage;
 use TYPO3\CMS\Core\Resource\StorageRepository;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
@@ -50,6 +53,7 @@ class ImportEventsCommand extends Command
     protected DataHandler $dataHandler;
     protected StorageRepository $storageRepository;
     protected ResourceStorage $storage;
+    protected SlugHelper $slugHelper;
     protected array $extConfig;
     protected string $imageFolder;
 
@@ -70,6 +74,12 @@ class ImportEventsCommand extends Command
         $this->dataHandler = GeneralUtility::makeInstance(DataHandler::class);
         $this->storageRepository = GeneralUtility::makeInstance(StorageRepository::class);
         $this->storage = $this->storageRepository->getDefaultStorage();
+        $this->slugHelper = GeneralUtility::makeInstance(
+            SlugHelper::class,
+            'tx_evangtermine_domain_model_event',
+            'slug',
+            $GLOBALS['TCA']['tx_evangtermine_domain_model_event']['columns']['slug']['config']
+        );
         $this->extConfig  = GeneralUtility::makeInstance(ExtensionConfiguration::class)->get('evangtermine');
         $this->imageFolder = $this->extConfig['imageFolder'];
         // create image folder if not there yet
@@ -92,6 +102,7 @@ class ImportEventsCommand extends Command
      * @return int
      * @throws DBALException
      * @throws Exception
+     * @throws InsufficientFolderAccessPermissionsException
      */
     public function execute(InputInterface $input, OutputInterface $output): int
     {
@@ -104,6 +115,8 @@ class ImportEventsCommand extends Command
      * @param OutputInterface $output
      * @throws DBALException
      * @throws Exception
+     * @throws InsufficientFolderAccessPermissionsException
+     * @throws SiteNotFoundException
      */
     protected function importAllEvents(OutputInterface $output)
     {
@@ -160,7 +173,7 @@ class ImportEventsCommand extends Command
             }
 
             $queryBuilder = $this->connectionPool->getQueryBuilderForTable('tx_evangtermine_domain_model_event');
-            $count = $queryBuilder->count('uid')
+            $uid = $queryBuilder->select('uid')
                 ->from('tx_evangtermine_domain_model_event')
                 ->where(
                     $queryBuilder->expr()->eq('id', $queryBuilder->createNamedParameter($event['id']))
@@ -168,7 +181,9 @@ class ImportEventsCommand extends Command
                 ->executeQuery()
                 ->fetchOne();
 
-            if ($count > 0) {
+            if (!empty($uid)) {
+                $event['slug'] = $this->createSlug($event, (int)$uid);
+
                 $queryBuilder = $this->connectionPool->getQueryBuilderForTable('tx_evangtermine_domain_model_event');
                 $queryBuilder->update('tx_evangtermine_domain_model_event')
                     ->where(
@@ -183,6 +198,7 @@ class ImportEventsCommand extends Command
                 $queryBuilder->executeStatement();
 
             } else {
+                $event['slug'] = $this->createSlug($event, 'id' . mt_rand());
                 $this->connectionPool->getConnectionForTable('tx_evangtermine_domain_model_event')
                     ->insert(
                         'tx_evangtermine_domain_model_event',
@@ -196,7 +212,21 @@ class ImportEventsCommand extends Command
 
             $progressBar->advance();
         }
+
+        $this->deleteImages();
+
         $progressBar->finish();
+    }
+
+    /**
+     * @throws SiteNotFoundException
+     */
+    protected function createSlug(array $event, $uid)
+    {
+        $state = RecordStateFactory::forName('tx_evangtermine_domain_model_event')
+            ->fromArray($event, $event['pid'], $uid);
+        $slug = $this->slugHelper->generate($event, $event['pid']);
+        return $this->slugHelper->buildSlugForUniqueInTable($slug, $state);
     }
 
     protected function getItems()
@@ -307,7 +337,9 @@ class ImportEventsCommand extends Command
                 $categoryIds[] = '|' . $categoryId . '|';
             }
         }
-        return implode('', $categoryIds);
+        $categoriesString = implode('', $categoryIds);
+        $categoriesString = str_replace('||', ',', $categoriesString);
+        return str_replace('|', '', $categoriesString);
     }
 
     protected function setPeople(string $people): string
@@ -321,7 +353,49 @@ class ImportEventsCommand extends Command
                 $peopleIds[] = '|' . $personId . '|';
             }
         }
-        return implode('', $peopleIds);
+        $peopleString = implode('', $peopleIds);
+        $peopleString = str_replace('||', ',', $peopleString);
+        return str_replace('|', '', $peopleString);
+    }
+
+    /**
+     * @throws InsufficientFolderAccessPermissionsException
+     * @throws Exception
+     * @throws DBALException
+     */
+    protected function deleteImages()
+    {
+        $folder = $this->storage->getFolder($this->extConfig['imageFolder']);
+        $files = $this->storage->getFilesInFolder($folder);
+
+        /** @var File $file */
+        foreach ($files as $file) {
+            $uid = $file->getUid();
+            if (empty($uid)) {
+                continue;
+            }
+
+            $queryBuilder = $this->connectionPool->getQueryBuilderForTable('tx_evangtermine_domain_model_event');
+            $queryBuilder->select('tx_evangtermine_domain_model_event.*')
+                ->from('tx_evangtermine_domain_model_event')
+                ->join(
+                    'tx_evangtermine_domain_model_event',
+                    'sys_file_reference',
+                    'sys_file_reference',
+                    $queryBuilder->expr()->eq('sys_file_reference.uid_foreign', $queryBuilder->quoteIdentifier('tx_evangtermine_domain_model_event.uid'))
+                )
+                ->where(
+                    $queryBuilder->expr()->eq('sys_file_reference.uid_local', $queryBuilder->createNamedParameter($uid)),
+                    $queryBuilder->expr()->eq('sys_file_reference.tablenames', $queryBuilder->createNamedParameter('tx_evangtermine_domain_model_event'))
+                );
+
+            $statement = $queryBuilder->executeQuery();
+            $result = $statement->fetchAssociative();
+
+            if (!$result) {
+                $file->delete();
+            }
+        }
     }
 
     /**

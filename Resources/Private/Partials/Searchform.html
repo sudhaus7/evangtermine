@@ -8,62 +8,89 @@
 
 <div class="et_filter_main">
     <div class="et_filter_block_left">
-        <div class="et_filter_row_left">
-            <f:form.select property="highlight" id="highlight" size="1" options="{high: 'Nur Highlights', all: 'Alle Veranstaltungen'}" />
-        </div>
-        <div class="et_filter_row_left">
-            <f:form.select property="eventtype" id="eventtype" size="1"	options="{categoryList}" />
-        </div>
-        <div class="et_filter_row_left">
-            <f:form.select property="people" id="people" size="1" options="{groupList}" />
-        </div>
-        <div class="et_filter_row_left">
-            <f:form.select property="region" id="regions" size="1" options="{regionList}" />
-        </div>
-        <div class="et_filter_row_left">
-            <f:form.select property="place" id="places" size="1" options="{placeList}" />
-        </div>
-        <div class="et_filter_row_left">
-            PLZ:
-            <f:form.textfield property="zip" id="zip" size="10" maxlength="10" />
-        </div>
-        <div class="et_filter_row_left">
-            Umkreis in km
-            <f:form.textfield property="radius"
-                              id="radius"
-                              size="10"
-                              maxlength="10"
-                              type="number"
-                              additionalAttributes="{min:0}" />
-        </div>
+        <f:if condition="{settings.hide_highlights} == 0">
+            <div class="et_filter_row_left">
+                <f:form.select property="highlight" id="highlight" size="1" options="{high: 'Nur Highlights', all: 'Alle Veranstaltungen'}" />
+            </div>
+        </f:if>
+        <f:if condition="{settings.hide_categories} == 0">
+            <div class="et_filter_row_left">
+                <f:form.select property="eventtype" id="eventtype" size="1"	options="{categoryList}" />
+            </div>
+        </f:if>
+        <f:if condition="{settings.hide_target_audience} == 0">
+            <div class="et_filter_row_left">
+                <f:form.select property="people" id="people" size="1" options="{groupList}" />
+            </div>
+        </f:if>
+        <f:if condition="{settings.hide_regions} == 0">
+            <div class="et_filter_row_left">
+                <f:form.select property="region" id="regions" size="1" options="{regionList}" />
+            </div>
+        </f:if>
+        <f:if condition="{settings.hide_places} == 0">
+            <div class="et_filter_row_left">
+                <f:form.select property="place" id="places" size="1" options="{placeList}" />
+            </div>
+        </f:if>
+        <f:if condition="{settings.hide_zip_search} == 0">
+            <div class="et_filter_row_left">
+                PLZ:
+                <f:form.textfield property="zip" id="zip" size="10" maxlength="10" />
+            </div>
+            <div class="et_filter_row_left">
+                Umkreis in km
+                <f:form.select property="radius"
+                               id="radius"
+                               size="1"
+                               options="{0: '{f:translate(key: \'feflexform.nothingSelected\', extensionName: \'Evangtermine\')}', 10: '10', 20: '20', 50: '50', 100: '100'}" />
+            </div>
+        </f:if>
     </div>
     <div class="et_filter_block_right">
-        <div class="et_filter_row_right">
-            Suchbegriff:
-            <f:if condition="{etkeys.q} == 'none'">
-                <f:then>
-                    <f:form.textfield property="q" id="q" size="20" value=""/>
-                </f:then>
-                <f:else>
-                    <f:form.textfield property="q" id="q" size="20" value="{etkeys.q}"/>
-                </f:else>
-            </f:if>
-        </div>
-        <div class="et_filter_row_right">
-            Datum:
-            <f:form.textfield property="date"
-                              type="date"
-                              id="date"
-                              class="hasDatePicker"
-                              size="10"
-                              maxlength="10"
-            />
-        </div>
-        <div class="et_filter_row_right">
-            Anzeigen:
-            <f:form.select property="itemsPerPage" id="itemsPerPage" size="1" options="{etkeys.itemsPerPageList}" />
-            pro Seite von {nrOfEvents}
-        </div>
+        <f:if condition="{settings.hide_searchword} == 0">
+            <div class="et_filter_row_right">
+                Suchbegriff:
+                <f:if condition="{etkeys.q} == 'none'">
+                    <f:then>
+                        <f:form.textfield property="q" id="q" size="20" value=""/>
+                    </f:then>
+                    <f:else>
+                        <f:form.textfield property="q" id="q" size="20" value="{etkeys.q}"/>
+                    </f:else>
+                </f:if>
+            </div>
+        </f:if>
+        <f:if condition="{settings.hide_date} == 0">
+            <div class="et_filter_row_right">
+                Datum:
+                <f:form.textfield property="date"
+                                  type="date"
+                                  id="date"
+                                  class="hasDatePicker"
+                                  size="10"
+                                  maxlength="10"
+                />
+            </div>
+        </f:if>
+        <f:if condition="{settings.hide_hideOngoingEvents} == 0">
+            <div class="et_filter_row_right">
+                <label for="hideOngoingEvents"><f:translate key="feflexform.hideEvents" extensionName="Evangtermine"/></label>
+                <f:form.select property="hideOngoingEvents"
+                               id="hideOngoingEvents"
+                               size="1"
+                               options="{0: '{f:translate(key: \'feflexform.nothingSelected\', extensionName: \'Evangtermine\')}', 1: '{f:translate(key: \'feflexform.1weekLong\', extensionName: \'Evangtermine\')}', 2: '{f:translate(key: \'feflexform.2weeksLong\', extensionName: \'Evangtermine\')}', 6: '{f:translate(key: \'feflexform.6weeksLong\', extensionName: \'Evangtermine\')}', 12: '{f:translate(key: \'feflexform.12weeksLong\', extensionName: \'Evangtermine\')}'}"
+                               value="{settings.hideOngoingEvents}"
+                />
+            </div>
+        </f:if>
+        <f:if condition="{settings.hide_itemsPerPage} == 0">
+            <div class="et_filter_row_right">
+                Anzeigen:
+                <f:form.select property="itemsPerPage" id="itemsPerPage" size="1" options="{etkeys.itemsPerPageList}" />
+                pro Seite von {nrOfEvents}
+            </div>
+        </f:if>
     </div>
 </div>
 <div class="et_filter_subrow">

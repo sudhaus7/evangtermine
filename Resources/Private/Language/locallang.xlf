@@ -29,6 +29,10 @@
 				<source>Mode</source>
 			</trans-unit>
 
+			<trans-unit id="pluginsheet.searchform">
+				<source>Search form settings</source>
+			</trans-unit>
+
 			<trans-unit id="feflexform.vid">
 				<source>Organizer ID:</source>
 			</trans-unit>
@@ -95,6 +99,90 @@
 
 			<trans-unit id="feflexform.detailpage">
 				<source>Page for Detail View:</source>
+			</trans-unit>
+
+			<trans-unit id="feflexform.hideHighlights">
+				<source>Hide "Events" filter:</source>
+			</trans-unit>
+
+			<trans-unit id="feflexform.hideCategories">
+				<source>Hide "Categories" filter:</source>
+			</trans-unit>
+
+			<trans-unit id="feflexform.hideTargetAudience">
+				<source>Hide "Target Audience" filter:</source>
+			</trans-unit>
+
+			<trans-unit id="feflexform.hideRegions">
+				<source>Hide "Regions" filter:</source>
+			</trans-unit>
+
+			<trans-unit id="feflexform.hidePlaces">
+				<source>Hide "Places" filter:</source>
+			</trans-unit>
+
+			<trans-unit id="feflexform.hideZipSearch">
+				<source>Hide Area search:</source>
+			</trans-unit>
+
+			<trans-unit id="feflexform.hideSearchword">
+				<source>Hide "Search term" input field:</source>
+			</trans-unit>
+
+			<trans-unit id="feflexform.hideDate">
+				<source>Hide "Date" filter:</source>
+			</trans-unit>
+
+			<trans-unit id="feflexform.hide_hideOngoingEvents">
+				<source>Hide "Hide ongoing events" filter:</source>
+			</trans-unit>
+
+			<trans-unit id="feflexform.hideItemsPerPage">
+				<source>Hide selection of displayed events per page:</source>
+			</trans-unit>
+
+			<trans-unit id="feflexform.hideOngoingEvents">
+				<source>Hide events that started more than ... ago:</source>
+			</trans-unit>
+
+			<trans-unit id="feflexform.hideEvents">
+				<source>Hide events</source>
+			</trans-unit>
+
+			<trans-unit id="feflexform.nothingSelected">
+				<source>Nothing selected</source>
+			</trans-unit>
+
+			<trans-unit id="feflexform.1week">
+				<source>1 week</source>
+			</trans-unit>
+
+			<trans-unit id="feflexform.2weeks">
+				<source>2 weeks</source>
+			</trans-unit>
+
+			<trans-unit id="feflexform.6weeks">
+				<source>6 weeks</source>
+			</trans-unit>
+
+			<trans-unit id="feflexform.12weeks">
+				<source>12 weeks</source>
+			</trans-unit>
+
+			<trans-unit id="feflexform.1weekLong">
+				<source>that started more than 1 week ago</source>
+			</trans-unit>
+
+			<trans-unit id="feflexform.2weeksLong">
+				<source>that started more than 2 weeks ago</source>
+			</trans-unit>
+
+			<trans-unit id="feflexform.6weeksLong">
+				<source>that started more than 6 weeks ago</source>
+			</trans-unit>
+
+			<trans-unit id="feflexform.12weeksLong">
+				<source>that started more than 12 weeks ago</source>
 			</trans-unit>
 
 		</body>

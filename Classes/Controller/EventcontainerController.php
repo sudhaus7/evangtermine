@@ -40,9 +40,11 @@ namespace ArbkomEKvW\Evangtermine\Controller;
 
 use ArbkomEKvW\Evangtermine\Domain\Model\Categorylist;
 use ArbkomEKvW\Evangtermine\Domain\Model\EtKeys;
+use ArbkomEKvW\Evangtermine\Domain\Model\Event;
 use ArbkomEKvW\Evangtermine\Domain\Model\Grouplist;
 use ArbkomEKvW\Evangtermine\Domain\Repository\EventcontainerRepository;
 use ArbkomEKvW\Evangtermine\Domain\Repository\EventRepository;
+use ArbkomEKvW\Evangtermine\Event\ModifyEvangTermineShowActionViewEvent;
 use ArbkomEKvW\Evangtermine\Util\Etpager;
 use ArbkomEKvW\Evangtermine\Util\ExtConf;
 use ArbkomEKvW\Evangtermine\Util\SettingsUtility;
@@ -56,6 +58,7 @@ use TYPO3\CMS\Core\Utility\GeneralUtility;
 use TYPO3\CMS\Extbase\Mvc\Controller\ActionController;
 use TYPO3\CMS\Extbase\Mvc\Exception\StopActionException;
 use TYPO3\CMS\Extbase\Persistence\Generic\Exception\InvalidNumberOfConstraintsException;
+use TYPO3\CMS\Extbase\Persistence\Generic\Exception\UnexpectedTypeException;
 use TYPO3\CMS\Extbase\Utility\DebuggerUtility;
 
 /**
@@ -147,7 +150,7 @@ class EventcontainerController extends ActionController
      * @throws Exception
      * @throws DBALException
      * @throws InvalidNumberOfConstraintsException
-     * @throws NoSuchCacheException
+     * @throws NoSuchCacheException|UnexpectedTypeException
      */
     public function listAction(): ResponseInterface
     {
@@ -163,20 +166,21 @@ class EventcontainerController extends ActionController
             // did user trigger form parameter reset?
             if (isset($requestArguments['sf_reset'])) {
                 $this->etkeys = $this->getNewFromSettings(); // do reset
-                $formArguments = [];
+                $requestArguments = [];
             } else {
                 $this->settingsUtility->fetchParamsFromRequest($formArguments, $this->etkeys);
             }
         }
 
-        $formArgumentsHash = sha1(\json_encode($formArguments));
+        $requestArgumentsHash = sha1(\json_encode($requestArguments));
         $cache = $this->cacheManager->getCache('evangtermine_event_list');
-        $cacheKey = 'argumentshash-' . $formArgumentsHash . '-' . $this->date->format('Ymd');
+        $cacheKey = 'argumentshash-' . $requestArgumentsHash . '-' . $this->date->format('Ymd');
         $content = $cache->get($cacheKey);
 
         if (empty($content)) {
-            $events = $this->eventRepository->findByEtKeys($this->etkeys);
-            $nrOfEvents = $this->eventRepository->getNumberOfEventsByEtKeys($this->etkeys);
+            $query = $this->eventRepository->prepareFindByEtKeysQuery($this->etkeys);
+            $events = $this->eventRepository->findByEtKeys($query, $this->etkeys);
+            $nrOfEvents = $this->eventRepository->getNumberOfEventsByEtKeys($query);
 
             // pager
             $this->pager->up(
@@ -200,35 +204,6 @@ class EventcontainerController extends ActionController
 
             $content = $this->view->render();
             $cache->set($cacheKey, $content);
-
-            /*
-            // retrieve XML
-            $evntContainer = $this->eventcontainerRepository->findByEtKeys($this->etkeys);
-            DebuggerUtility::var_dump($this->etkeys,'kks');
-    DebuggerUtility::var_dump($evntContainer,'sger');exit;
-            // fine tune and save parameters to session
-            if ($this->etkeys->getQ() == 'none') {
-                $this->etkeys->setQ('');
-            }
-
-            // Set up pager widget (no Widgets in Fluid ViewHelpers since TYPO3 v11!)
-            $this->pager->up(
-                $evntContainer->getMetaData()->totalItems,
-                $this->etkeys->getItemsPerPage(),
-                $this->etkeys->getPageID()
-            );
-
-            // hand model data to the view
-            $this->view->assignMultiple([
-                'events' => $evntContainer,
-                'etkeys' => $this->etkeys,
-                'pageId' => $GLOBALS['TSFE']->id,
-                'pluginUid' => $this->currentPluginUid,
-                'categoryList' => $this->categorylist->getItemslist(),
-                'groupList' => $this->grouplist->getItemslist(),
-                'pagerdata' => $this->pager->getPgr(),
-            ]);
-            */
         }
         return $this->htmlResponse($content);
     }
@@ -255,21 +230,21 @@ class EventcontainerController extends ActionController
      */
     public function showAction()
     {
-        $etkeys = GeneralUtility::makeInstance(EtKeys::class);
         $extconf = GeneralUtility::makeInstance(ExtConf::class);
         $uid = $this->request->getArguments()['uid'] ?? null;
         if (!empty($uid)) {
-
-            //$etkeys->setID($this->request->getArguments()['uid']);
-
-            // retrieve XML
-            //$evntContainer = $this->eventcontainerRepository->findByEtKeys($etkeys);
+            /** @var Event $event */
+            $event = $this->eventRepository->findByUid($uid);
 
             // hand model data to the view
-            $this->view->assign('event', $this->eventRepository->findByUid($uid));
-            /*$this->view->assign('meta', $evntContainer->getMetaData());*/
-            /*$this->view->assign('detailitems', $evntContainer->getDetail());*/
+            $this->view->assign('event', $event);
             $this->view->assign('eventhost', $extconf->getExtConfArray()['host']);
+
+            if (!empty($event)) {
+                $this->eventDispatcher->dispatch(
+                    new ModifyEvangTermineShowActionViewEvent($this->view, $event)
+                );
+            }
         } else {
             $this->addFlashMessage('Keine Event-ID übergeben', '', AbstractMessage::ERROR);
             $this->redirect('genericinfo');

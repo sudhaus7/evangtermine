@@ -171,8 +171,129 @@
                 			</config>
                 		</TCEforms>
                 	</settings.opmode_detailpage>
+                    <settings.hideOngoingEvents>
+                        <TCEforms>
+                            <label>LLL:EXT:evangtermine/Resources/Private/Language/locallang.xlf:feflexform.hideOngoingEvents</label>
+                            <config>
+                                <type>select</type>
+                                <renderType>selectSingle</renderType>
+                                <items type="array">
+                                    <numIndex index="0" type="array">
+                                        <numIndex index="0">LLL:EXT:evangtermine/Resources/Private/Language/locallang.xlf:feflexform.nothingSelected</numIndex>
+                                        <numIndex index="1">0</numIndex>
+                                    </numIndex>
+                                    <numIndex index="1" type="array">
+                                        <numIndex index="0">LLL:EXT:evangtermine/Resources/Private/Language/locallang.xlf:feflexform.1week</numIndex>
+                                        <numIndex index="1">1</numIndex>
+                                    </numIndex>
+                                    <numIndex index="2" type="array">
+                                        <numIndex index="0">LLL:EXT:evangtermine/Resources/Private/Language/locallang.xlf:feflexform.2weeks</numIndex>
+                                        <numIndex index="1">2</numIndex>
+                                    </numIndex>
+                                    <numIndex index="3" type="array">
+                                        <numIndex index="0">LLL:EXT:evangtermine/Resources/Private/Language/locallang.xlf:feflexform.6weeks</numIndex>
+                                        <numIndex index="1">6</numIndex>
+                                    </numIndex>
+                                    <numIndex index="4" type="array">
+                                        <numIndex index="0">LLL:EXT:evangtermine/Resources/Private/Language/locallang.xlf:feflexform.12weeks</numIndex>
+                                        <numIndex index="1">12</numIndex>
+                                    </numIndex>
+                                </items>
+                            </config>
+                        </TCEforms>
+                    </settings.hideOngoingEvents>
                 </el>
         	</ROOT>
         </opmode>
+        <form>
+            <ROOT>
+                <TCEforms>
+                    <sheetTitle>LLL:EXT:evangtermine/Resources/Private/Language/locallang.xlf:pluginsheet.searchform</sheetTitle>
+                </TCEforms>
+                <type>array</type>
+                <el>
+                    <settings.hide_highlights>
+                        <TCEforms>
+                            <label>LLL:EXT:evangtermine/Resources/Private/Language/locallang.xlf:feflexform.hideHighlights</label>
+                            <config>
+                                <type>check</type>
+                            </config>
+                        </TCEforms>
+                    </settings.hide_highlights>
+                    <settings.hide_categories>
+                        <TCEforms>
+                            <label>LLL:EXT:evangtermine/Resources/Private/Language/locallang.xlf:feflexform.hideCategories</label>
+                            <config>
+                                <type>check</type>
+                            </config>
+                        </TCEforms>
+                    </settings.hide_categories>
+                    <settings.hide_target_audience>
+                        <TCEforms>
+                            <label>LLL:EXT:evangtermine/Resources/Private/Language/locallang.xlf:feflexform.hideTargetAudience</label>
+                            <config>
+                                <type>check</type>
+                            </config>
+                        </TCEforms>
+                    </settings.hide_target_audience>
+                    <settings.hide_regions>
+                        <TCEforms>
+                            <label>LLL:EXT:evangtermine/Resources/Private/Language/locallang.xlf:feflexform.hideRegions</label>
+                            <config>
+                                <type>check</type>
+                            </config>
+                        </TCEforms>
+                    </settings.hide_regions>
+                    <settings.hide_places>
+                        <TCEforms>
+                            <label>LLL:EXT:evangtermine/Resources/Private/Language/locallang.xlf:feflexform.hidePlaces</label>
+                            <config>
+                                <type>check</type>
+                            </config>
+                        </TCEforms>
+                    </settings.hide_places>
+                    <settings.hide_zip_search>
+                        <TCEforms>
+                            <label>LLL:EXT:evangtermine/Resources/Private/Language/locallang.xlf:feflexform.hideZipSearch</label>
+                            <config>
+                                <type>check</type>
+                            </config>
+                        </TCEforms>
+                    </settings.hide_zip_search>
+                    <settings.hide_searchword>
+                        <TCEforms>
+                            <label>LLL:EXT:evangtermine/Resources/Private/Language/locallang.xlf:feflexform.hideSearchword</label>
+                            <config>
+                                <type>check</type>
+                            </config>
+                        </TCEforms>
+                    </settings.hide_searchword>
+                    <settings.hide_date>
+                        <TCEforms>
+                            <label>LLL:EXT:evangtermine/Resources/Private/Language/locallang.xlf:feflexform.hideDate</label>
+                            <config>
+                                <type>check</type>
+                            </config>
+                        </TCEforms>
+                    </settings.hide_date>
+                    <settings.hide_hideOngoingEvents>
+                        <TCEforms>
+                            <label>LLL:EXT:evangtermine/Resources/Private/Language/locallang.xlf:feflexform.hide_hideOngoingEvents</label>
+                            <config>
+                                <type>check</type>
+                            </config>
+                        </TCEforms>
+                    </settings.hide_hideOngoingEvents>
+                    <settings.hide_itemsPerPage>
+                        <TCEforms>
+                            <label>LLL:EXT:evangtermine/Resources/Private/Language/locallang.xlf:feflexform.hideItemsPerPage</label>
+                            <config>
+                                <type>check</type>
+                            </config>
+                        </TCEforms>
+                    </settings.hide_itemsPerPage>
+                </el>
+            </ROOT>
+        </form>
     </sheets>
 </T3DataStructure>
