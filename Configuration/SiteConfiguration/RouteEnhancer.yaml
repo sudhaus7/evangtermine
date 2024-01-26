@@ -16,34 +16,3 @@ routeEnhancers:
         tableName: 'tx_evangtermine_domain_model_event'
         routeFieldName: 'slug'
         routeValuePrefix: '/'
-  EvangtermineList:
-    type: Extbase
-    extension: Evangtermine
-    plugin: List
-    routes:
-      - routePath: '/'
-        _controller: 'Eventcontainer::list'
-    defaultController: 'Eventcontainer::list'
-  EvangtermineListWithParameters:
-    type: Extbase
-    extension: Evangtermine
-    plugin: List
-    routes:
-      - routePath: '/link/{highlight}/cat/{eventtype}/people/{people}'
-        _controller: 'Eventcontainer::list'
-    defaultController: 'Eventcontainer::list'
-    aspects:
-      highlight:
-        type: StaticValueMapper
-        map:
-          high: 'high'
-          all: 'all'
-      eventtype:
-        type: StaticRangeMapper
-        start: '0'
-        end: '10'
-      people:
-        type: StaticRangeMapper
-        start: '0'
-        end: '40'
-
