@@ -118,6 +118,121 @@
 				<target>Seite für Detailansicht:</target>
 			</trans-unit>
 
+			<trans-unit id="feflexform.hideHighlights">
+				<source>Hide "Events" filter:</source>
+				<target>Filter "Veranstaltungen" ausblenden</target>
+			</trans-unit>
+
+			<trans-unit id="feflexform.hideCategories">
+				<source>Hide "Categories" filter:</source>
+				<target>Filter "Kategorien" ausblenden:</target>
+			</trans-unit>
+
+			<trans-unit id="feflexform.hideTargetAudience">
+				<source>Hide "Target Audience" filter:</source>
+				<target>Filter "Zielgruppen" ausblenden:</target>
+			</trans-unit>
+
+			<trans-unit id="feflexform.hideRegions">
+				<source>Hide "Regions" filter:</source>
+				<target>Filter "Regionen" ausblenden:</target>
+			</trans-unit>
+
+			<trans-unit id="feflexform.hidePlaces">
+				<source>Hide "Places" filter:</source>
+				<target>Filter "Orte" ausblenden:</target>
+			</trans-unit>
+
+			<trans-unit id="feflexform.hideZipSearch">
+				<source>Hide Area search:</source>
+				<target>Umkreissuche ausblenden:</target>
+			</trans-unit>
+
+			<trans-unit id="feflexform.hideSearchword">
+				<source>Hide "Search term" input field:</source>
+				<target>Eingabefeld "Suchbegriff" ausblenden:</target>
+			</trans-unit>
+
+			<trans-unit id="feflexform.hideDate">
+				<source>Hide "Date" filter:</source>
+				<target>Filter "Datum" ausblenden:</target>
+			</trans-unit>
+
+			<trans-unit id="feflexform.hide_hideOngoingEvents">
+				<source>Hide date filter:</source>
+				<target>Datumsfilter ausblenden:</target>
+			</trans-unit>
+
+			<trans-unit id="feflexform.hideItemsPerPage">
+				<source>Hide selection of displayed events per page:</source>
+				<target>Auswahl der angezeigten Veranstaltungen pro Seite ausblenden:</target>
+			</trans-unit>
+
+			<trans-unit id="feflexform.hidePlaceNames">
+				<source>Hide place names in list and teaser view:</source>
+				<target>Ortsnamen in der Listen- und Teaseransicht ausblenden:</target>
+			</trans-unit>
+
+			<trans-unit id="feflexform.hideOngoingEvents">
+				<source>Hide events that started more than ... ago:</source>
+				<target>Veranstaltungen ausblenden, die vor mehr als ... anfingen:</target>
+			</trans-unit>
+
+			<trans-unit id="feflexform.hideEvents">
+				<source>Date filter</source>
+				<target>Datumsfilter</target>
+			</trans-unit>
+
+			<trans-unit id="feflexform.nothingSelected">
+				<source>Nothing selected</source>
+				<target>Nichts ausgewählt</target>
+			</trans-unit>
+
+			<trans-unit id="feflexform.1week">
+				<source>1 week</source>
+				<target>1 Woche</target>
+			</trans-unit>
+
+			<trans-unit id="feflexform.2weeks">
+				<source>2 weeks</source>
+				<target>2 weeks</target>
+			</trans-unit>
+
+			<trans-unit id="feflexform.6weeks">
+				<source>6 weeks</source>
+				<target>6 weeks</target>
+			</trans-unit>
+
+			<trans-unit id="feflexform.12weeks">
+				<source>12 weeks</source>
+				<target>12 weeks</target>
+			</trans-unit>
+
+			<trans-unit id="feflexform.1weekLong">
+				<source>that started more than 1 week ago</source>
+				<target>Veranstaltungen ausblenden, die vor mehr als 1 Woche anfingen</target>
+			</trans-unit>
+
+			<trans-unit id="feflexform.2weeksLong">
+				<source>that started more than 2 weeks ago</source>
+				<target>Veranstaltungen ausblenden, die vor mehr als 2 Wochen anfingen</target>
+			</trans-unit>
+
+			<trans-unit id="feflexform.6weeksLong">
+				<source>that started more than 6 weeks ago</source>
+				<target>Veranstaltungen ausblenden, die vor mehr als 6 Wochen anfingen</target>
+			</trans-unit>
+
+			<trans-unit id="feflexform.12weeksLong">
+				<source>that started more than 12 weeks ago</source>
+				<target>Veranstaltungen ausblenden, die vor mehr als 12 Wochen anfingen</target>
+			</trans-unit>
+
+			<trans-unit id="noEventsFound">
+				<source>No events found!</source>
+				<target>Keine Veranstaltungen gefunden!</target>
+			</trans-unit>
+
 		</body>
 
 	</file>

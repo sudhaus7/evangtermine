@@ -171,6 +171,14 @@
                 			</config>
                 		</TCEforms>
                 	</settings.opmode_detailpage>
+                    <settings.hide_place_names>
+                        <TCEforms>
+                            <label>LLL:EXT:evangtermine/Resources/Private/Language/locallang.xlf:feflexform.hidePlaceNames</label>
+                            <config>
+                                <type>check</type>
+                            </config>
+                        </TCEforms>
+                    </settings.hide_place_names>
                     <settings.hideOngoingEvents>
                         <TCEforms>
                             <label>LLL:EXT:evangtermine/Resources/Private/Language/locallang.xlf:feflexform.hideOngoingEvents</label>

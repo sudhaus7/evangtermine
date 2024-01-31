@@ -55,18 +55,14 @@ class EventRepository extends Repository
         if (!empty($queryConstraints)) {
             $query->matching($query->logicalAnd(...$queryConstraints));
         }
-        $queryParser = \TYPO3\CMS\Core\Utility\GeneralUtility::makeInstance(\TYPO3\CMS\Extbase\Persistence\Generic\Storage\Typo3DbQueryParser::class);
-        file_put_contents('/tmp/qqu.txt', print_r($queryParser->convertQueryToDoctrineQueryBuilder($query)->getSQL(), 'true'));
-        file_put_contents('/tmp/qqu2.txt', print_r($queryParser->convertQueryToDoctrineQueryBuilder($query)->getParameters(), 'true'));
-        //\TYPO3\CMS\Extbase\Utility\DebuggerUtility::var_dump($queryParser->convertQueryToDoctrineQueryBuilder($query)->getParameters(), 'Parameter');
-
         return $query;
     }
 
     public function findByEtKeys(QueryInterface $query, EtKeys $etKeys): array
     {
-        $query->setLimit((int)$etKeys->getItemsPerPage());
-        $query->setOffset((int)$etKeys->getItemsPerPage() * ((int)$etKeys->getPageID() - 1));
+        $itemsPerPage = (int)$etKeys->getItemsPerPage() ?: 20;
+        $query->setLimit($itemsPerPage);
+        $query->setOffset($itemsPerPage * ((int)$etKeys->getPageID() - 1));
         // get events
         $events = $query->execute();
         return $events->toArray();
@@ -222,6 +218,10 @@ class EventRepository extends Repository
         $queryConstraints = [];
 
         $regions = $etKeys->getRegions();
+        if ($regions == 'alleBezirke' || $regions == 'alleKreise') {
+            $etKeys->setRegions('all');
+            $regions = $etKeys->getRegions();
+        }
         if (!empty($regions) && $regions !== 'all') {
             $possibleRegions = [];
             foreach (explode(',', $regions) as $possibleRegion) {
@@ -384,7 +384,6 @@ class EventRepository extends Repository
         $regions['alleBezirke'] = 'Alle Kirchenbezirke';
         $regions['alleKreise'] = 'Alle Kirchenkreise';
 
-
         if (!empty($settings['etkey_regions'] ?? '') && ($settings['etkey_regions'] ?? '') !== 'all') {
             $regionsFromSettings = explode(',', $settings['etkey_regions']);
             $regions = [];
@@ -415,9 +414,32 @@ class EventRepository extends Repository
                     }
                 }
             }
-            return $regions;
+            if (
+                $settings['etkey_regions'] !== 'alleBezirke' &&
+                $settings['etkey_regions'] !== 'alleKreise'
+            ) {
+                return $regions;
+            }
+        } else {
+            if (TYPO3_MODE !== 'BE') {
+                unset($regions['alleBezirke']);
+                unset($regions['alleKreise']);
+            }
         }
 
+        $regionsFromDB = $this->getRegionsFromDB();
+        foreach ($regionsFromDB as $region) {
+            $regions[$region['region']] = $region['region'];
+        }
+        return $regions;
+    }
+
+    /**
+     * @throws Exception
+     * @throws DBALException
+     */
+    public function getRegionsFromDB(): array
+    {
         $connectionPool = GeneralUtility::makeInstance(ConnectionPool::class);
         $queryBuilder = $connectionPool->getQueryBuilderForTable('tx_evangtermine_domain_model_event');
         $queryBuilder->select('region')
@@ -429,10 +451,6 @@ class EventRepository extends Repository
         $queryBuilder->groupBy('region')
             ->orderBy('region');
         $statement = $queryBuilder->executeQuery();
-        $regionsFromDB = $statement->fetchAllAssociative();
-        foreach ($regionsFromDB as $region) {
-            $regions[$region['region']] = $region['region'];
-        }
-        return $regions;
+        return $statement->fetchAllAssociative();
     }
 }

@@ -209,26 +209,35 @@ class EventcontainerController extends ActionController
     }
 
     /**
-     * action teaser
+     * @throws NoSuchCacheException
+     * @throws InvalidNumberOfConstraintsException
+     * @throws UnexpectedTypeException
      */
-    public function teaserAction()
+    public function teaserAction(): ResponseInterface
     {
-        // teaser needs no session, just params from the settings array
-        $etkeysTs = $this->getNewFromSettings();
+        $this->etkeys = $this->getNewFromSettings();
 
-        // retrieve XML
-        $evntContainer = $this->eventcontainerRepository->findByEtKeys($etkeysTs);
+        $cache = $this->cacheManager->getCache('evangtermine_event_teaser');
+        $cacheKey = 'argumentshash-' . $this->date->format('Ymd');
+        $content = $cache->get($cacheKey);
 
-        // hand model data to the view
-        $this->view->assign('events', $evntContainer);
-        $this->view->assign('pageId', $GLOBALS['TSFE']->id);
+        if (empty($content)) {
+            $query = $this->eventRepository->prepareFindByEtKeysQuery($this->etkeys);
+            $events = $this->eventRepository->findByEtKeys($query, $this->etkeys);
+
+            $this->view->assign('events', $events);
+            $this->view->assign('pageId', $GLOBALS['TSFE']->id);
+            $content = $this->view->render();
+            $cache->set($cacheKey, $content);
+        }
+        return $this->htmlResponse($content);
     }
 
     /**
      * action show
      * @throws StopActionException
      */
-    public function showAction()
+    public function showAction(): ResponseInterface
     {
         $extconf = GeneralUtility::makeInstance(ExtConf::class);
         $uid = $this->request->getArguments()['uid'] ?? null;
@@ -249,12 +258,14 @@ class EventcontainerController extends ActionController
             $this->addFlashMessage('Keine Event-ID übergeben', '', AbstractMessage::ERROR);
             $this->redirect('genericinfo');
         }
+        return $this->htmlResponse();
     }
 
     /**
      * action genericinfo
      */
-    public function genericinfoAction()
+    public function genericinfoAction(): ResponseInterface
     {
+        return $this->htmlResponse();
     }
 }

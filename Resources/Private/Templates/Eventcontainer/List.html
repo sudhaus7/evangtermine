@@ -20,17 +20,23 @@
             <f:render partial="Pager" arguments="{pgr: pagerdata}" />
 
             <f:comment><!-- Haupt-Schleife für Events --></f:comment>
-            <f:for each="{events}" as="event" iteration="iterator">
-                <f:if condition="{event.monthbar}">
-                    <div class="monthbar">{event.monthbar}</div>
-                </f:if>
+            <f:if condition="{events}">
+                <f:then>
+                    <f:for each="{events}" as="event" iteration="iterator">
+                        <f:if condition="{event.monthbar}">
+                            <div class="monthbar">{event.monthbar}</div>
+                        </f:if>
 
-                <f:if condition="{iterator.isOdd}">
-                    <f:then><div class="et_content_row odd"><f:render section="event" arguments="{_all}"/></div></f:then>
-                    <f:else><div class="et_content_row even"><f:render section="event" arguments="{_all}"/></div></f:else>
-                </f:if>
-
-            </f:for>
+                        <f:if condition="{iterator.isOdd}">
+                            <f:then><div class="et_content_row odd"><f:render section="event" arguments="{_all}"/></div></f:then>
+                            <f:else><div class="et_content_row even"><f:render section="event" arguments="{_all}"/></div></f:else>
+                        </f:if>
+                    </f:for>
+                </f:then>
+                <f:else>
+                    <p><f:translate key="noEventsFound" extensionName="Evangtermine" /></p>
+                </f:else>
+            </f:if>
             <f:comment><!-- Ende Haupt-Schleife für Events --></f:comment>
 
             <f:render partial="Pager" arguments="{pgr: pagerdata}" />

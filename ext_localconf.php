@@ -42,20 +42,6 @@ $extensionkey = 'evangtermine';
 	)
 );
 
-$GLOBALS['TYPO3_CONF_VARS']['SYS']['routing']['aspects']['EventStaticValueMapper']
-    = ArbkomEKvW\Evangtermine\Routing\Aspect\EventStaticValueMapper::class;
-
-if (!isset($GLOBALS['TYPO3_CONF_VARS']['SYS']['caching']['cacheConfigurations']['evangtermine_eventstaticvaluemapper'])) {
-    $GLOBALS['TYPO3_CONF_VARS']['SYS']['caching']['cacheConfigurations']['evangtermine_eventstaticvaluemapper'] = [];
-}
-if (!isset($GLOBALS['TYPO3_CONF_VARS']['SYS']['caching']['cacheConfigurations']['evangtermine_eventstaticvaluemapper']['backend'])) {
-    $GLOBALS['TYPO3_CONF_VARS']['SYS']['caching']['cacheConfigurations']['evangtermine_eventstaticvaluemapper']['backend']
-        = \TYPO3\CMS\Core\Cache\Backend\Typo3DatabaseBackend::class;
-}
-if (!isset($GLOBALS['TYPO3_CONF_VARS']['SYS']['caching']['cacheConfigurations']['evangtermine_eventstaticvaluemapper']['frontend'])) {
-    $GLOBALS['TYPO3_CONF_VARS']['SYS']['caching']['cacheConfigurations']['evangtermine_eventstaticvaluemapper']['frontend']
-        = \TYPO3\CMS\Core\Cache\Frontend\VariableFrontend::class;
-}
 if (!isset($GLOBALS['TYPO3_CONF_VARS']['SYS']['caching']['cacheConfigurations']['evangtermine'])) {
     $GLOBALS['TYPO3_CONF_VARS']['SYS']['caching']['cacheConfigurations']['evangtermine'] = [];
 }
@@ -79,3 +65,20 @@ if (!isset($GLOBALS['TYPO3_CONF_VARS']['SYS']['caching']['cacheConfigurations'][
     $GLOBALS['TYPO3_CONF_VARS']['SYS']['caching']['cacheConfigurations']['evangtermine_event_list']['frontend']
         = \TYPO3\CMS\Core\Cache\Frontend\VariableFrontend::class;
 }
+
+if (!isset($GLOBALS['TYPO3_CONF_VARS']['SYS']['caching']['cacheConfigurations']['evangtermine_event_teaser'])) {
+    $GLOBALS['TYPO3_CONF_VARS']['SYS']['caching']['cacheConfigurations']['evangtermine_event_teaser'] = [];
+}
+if (!isset($GLOBALS['TYPO3_CONF_VARS']['SYS']['caching']['cacheConfigurations']['evangtermine_event_teaser']['backend'])) {
+    $GLOBALS['TYPO3_CONF_VARS']['SYS']['caching']['cacheConfigurations']['evangtermine_event_teaser']['backend']
+        = \TYPO3\CMS\Core\Cache\Backend\Typo3DatabaseBackend::class;
+}
+if (!isset($GLOBALS['TYPO3_CONF_VARS']['SYS']['caching']['cacheConfigurations']['evangtermine_event_teaser']['frontend'])) {
+    $GLOBALS['TYPO3_CONF_VARS']['SYS']['caching']['cacheConfigurations']['evangtermine_event_teaser']['frontend']
+        = \TYPO3\CMS\Core\Cache\Frontend\VariableFrontend::class;
+}
+
+$GLOBALS['TYPO3_CONF_VARS']['SYS']['routing']['aspects']['RegionStaticValueMapper']
+    = ArbkomEKvW\Evangtermine\Routing\Aspect\RegionStaticValueMapper::class;
+$GLOBALS['TYPO3_CONF_VARS']['SYS']['routing']['aspects']['PlaceStaticValueMapper']
+    = ArbkomEKvW\Evangtermine\Routing\Aspect\PlaceStaticValueMapper::class;

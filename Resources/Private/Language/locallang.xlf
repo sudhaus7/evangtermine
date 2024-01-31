@@ -134,11 +134,15 @@
 			</trans-unit>
 
 			<trans-unit id="feflexform.hide_hideOngoingEvents">
-				<source>Hide "Hide ongoing events" filter:</source>
+				<source>Hide date filter:</source>
 			</trans-unit>
 
 			<trans-unit id="feflexform.hideItemsPerPage">
 				<source>Hide selection of displayed events per page:</source>
+			</trans-unit>
+
+			<trans-unit id="feflexform.hidePlaceNames">
+				<source>Hide place names in list and teaser view:</source>
 			</trans-unit>
 
 			<trans-unit id="feflexform.hideOngoingEvents">
@@ -146,7 +150,7 @@
 			</trans-unit>
 
 			<trans-unit id="feflexform.hideEvents">
-				<source>Hide events</source>
+				<source>Date filter</source>
 			</trans-unit>
 
 			<trans-unit id="feflexform.nothingSelected">
@@ -170,19 +174,23 @@
 			</trans-unit>
 
 			<trans-unit id="feflexform.1weekLong">
-				<source>that started more than 1 week ago</source>
+				<source>Hide events that started more than 1 week ago</source>
 			</trans-unit>
 
 			<trans-unit id="feflexform.2weeksLong">
-				<source>that started more than 2 weeks ago</source>
+				<source>Hide events that started more than 2 weeks ago</source>
 			</trans-unit>
 
 			<trans-unit id="feflexform.6weeksLong">
-				<source>that started more than 6 weeks ago</source>
+				<source>Hide events that started more than 6 weeks ago</source>
 			</trans-unit>
 
 			<trans-unit id="feflexform.12weeksLong">
-				<source>that started more than 12 weeks ago</source>
+				<source>Hide events that started more than 12 weeks ago</source>
+			</trans-unit>
+
+			<trans-unit id="noEventsFound">
+				<source>No events found!</source>
 			</trans-unit>
 
 		</body>
