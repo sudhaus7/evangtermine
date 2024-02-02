@@ -38,9 +38,6 @@ namespace ArbkomEKvW\Evangtermine\Util;
  *  This copyright notice MUST APPEAR in all copies of the script!
  ***************************************************************/
 
-/**
- *
- */
 class FieldMapping
 {
     /**

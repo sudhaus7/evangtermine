@@ -48,7 +48,6 @@ use ArbkomEKvW\Evangtermine\Util\UrlUtility;
 use TYPO3\CMS\Core\SingletonInterface;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 use TYPO3\CMS\Extbase\Persistence\Repository;
-use TYPO3\CMS\Extbase\Utility\DebuggerUtility;
 
 /**
  * EventcontainerRepository

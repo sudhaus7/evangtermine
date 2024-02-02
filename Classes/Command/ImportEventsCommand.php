@@ -196,7 +196,6 @@ class ImportEventsCommand extends Command
                     $queryBuilder->set($key, $eventItem);
                 }
                 $queryBuilder->executeStatement();
-
             } else {
                 $event['slug'] = $this->createSlug($event, 'id' . mt_rand());
                 $this->connectionPool->getConnectionForTable('tx_evangtermine_domain_model_event')
@@ -306,7 +305,6 @@ class ImportEventsCommand extends Command
                         unlink($tmpFileName);
                     }
                 } catch (\Exception $e) {
-
                 }
             }
         }

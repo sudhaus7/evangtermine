@@ -24,7 +24,7 @@ return [
     ],
     'palettes' => [
         'general' => [
-            'showitem' => 'hidden,--linebreak--,id,--linebreak--,title,--linebreak--,subtitle,--linebreak--,liturg_bez,--linebreak--,email,link,--linebreak--,short_description,--linebreak--,long_description,--linebreak--,image,caption,--linebreak--,highlight,--linebreak--,people,--linebreak--,categories,--linebreak--feedback_id,--linebreak--,poll_id,webform_linkname,--linebreak--,event_modified,--linebreak--,channels,--linebreak--,slug'
+            'showitem' => 'hidden,--linebreak--,id,--linebreak--,title,--linebreak--,subtitle,--linebreak--,liturg_bez,--linebreak--,email,link,--linebreak--,short_description,--linebreak--,long_description,--linebreak--,image,caption,--linebreak--,highlight,--linebreak--,people,--linebreak--,categories,--linebreak--feedback_id,--linebreak--,poll_id,webform_linkname,--linebreak--,event_modified,--linebreak--,channels,--linebreak--,slug',
         ],
         'date' => [
             'showitem' => 'start,end,--linebreak--,mode,--linebreak--,datum1,datum2,--linebreak--,monthbar,allday',
@@ -33,7 +33,7 @@ return [
             'showitem' => 'place_id,--linebreak--,place_name,--linebreak--,place_street_nr,--linebreak--,place_zip,place_city,--linebreak--,region,--linebreak--,place_image,--linebreak--,place_image_caption,--linebreak--,place_info,place_hidden,--linebreak--,place_position,place_kat,--linebreak--,place_open,--linebreak--,place_equip,place_equiptext,--linebreak--,place_region',
         ],
         'event' => [
-            'showitem' => 'event_id,event_inputmask_id,--linebreak--,event_kat,event_kat2,--linebreak--,event_person_id,event_place_id,--linebreak--,event_subregion_id,--linebreak--,event_region2_id,event_region3_id,--linebreak--,event_profession_id,event_music_kat_id,--linebreak--,event_flag1,--linebreak--,event_number1,event_number2,event_number3,--linebreak--,event_menue1,event_menue2,--linebreak--,event_yesno1,event_yesno2,event_yesno3,--linebreak--,event_destination,event_status,--linebreak--,event_coursetype,event_care,--linebreak--,event_kollekte,event_statistik,--linebreak--,event_external_id,event_access,--linebreak--,event_lang,event_user_id,--linebreak--,event_koll_descr,--linebreak--,inputmask_name'
+            'showitem' => 'event_id,event_inputmask_id,--linebreak--,event_kat,event_kat2,--linebreak--,event_person_id,event_place_id,--linebreak--,event_subregion_id,--linebreak--,event_region2_id,event_region3_id,--linebreak--,event_profession_id,event_music_kat_id,--linebreak--,event_flag1,--linebreak--,event_number1,event_number2,event_number3,--linebreak--,event_menue1,event_menue2,--linebreak--,event_yesno1,event_yesno2,event_yesno3,--linebreak--,event_destination,event_status,--linebreak--,event_coursetype,event_care,--linebreak--,event_kollekte,event_statistik,--linebreak--,event_external_id,event_access,--linebreak--,event_lang,event_user_id,--linebreak--,event_koll_descr,--linebreak--,inputmask_name',
         ],
         'person' => [
             'showitem' => 'person_name,person_surname,--linebreak--,person_email,--linebreak--,person_contact,person_position',
@@ -91,7 +91,7 @@ return [
                 'type' => 'input',
                 'eval' => 'trim',
                 'readOnly' => true,
-            ]
+            ],
         ],
         'start' => [
             'exclude' => 1,
@@ -101,7 +101,7 @@ return [
                 'renderType' => 'inputDateTime',
                 'eval' => 'datetime',
                 'readOnly' => true,
-            ]
+            ],
         ],
         'end' => [
             'exclude' => 1,
@@ -111,7 +111,7 @@ return [
                 'renderType' => 'inputDateTime',
                 'eval' => 'datetime',
                 'readOnly' => true,
-            ]
+            ],
         ],
         'mode' => [
             'exclude' => 1,
@@ -120,7 +120,7 @@ return [
                 'type' => 'input',
                 'eval' => 'trim',
                 'readOnly' => true,
-            ]
+            ],
         ],
         'subtitle' => [
             'exclude' => 1,
@@ -129,7 +129,7 @@ return [
                 'type' => 'input',
                 'eval' => 'trim',
                 'readOnly' => true,
-            ]
+            ],
         ],
         'datum1' => [
             'exclude' => 1,
@@ -138,7 +138,7 @@ return [
                 'type' => 'input',
                 'eval' => 'trim',
                 'readOnly' => true,
-            ]
+            ],
         ],
         'datum2' => [
             'exclude' => 1,
@@ -147,7 +147,7 @@ return [
                 'type' => 'input',
                 'eval' => 'trim',
                 'readOnly' => true,
-            ]
+            ],
         ],
         'monthbar' => [
             'exclude' => 1,
@@ -156,7 +156,7 @@ return [
                 'type' => 'input',
                 'eval' => 'trim',
                 'readOnly' => true,
-            ]
+            ],
         ],
         'allday' => [
             'exclude' => 1,
@@ -164,7 +164,7 @@ return [
             'config' => [
                 'type' => 'check',
                 'readOnly' => true,
-            ]
+            ],
         ],
         'event_id' => [
             'exclude' => 1,
@@ -173,7 +173,7 @@ return [
                 'type' => 'input',
                 'eval' => 'trim,int',
                 'readOnly' => true,
-            ]
+            ],
         ],
         'event_inputmask_id' => [
             'exclude' => 1,
@@ -182,7 +182,7 @@ return [
                 'type' => 'input',
                 'eval' => 'trim,int',
                 'readOnly' => true,
-            ]
+            ],
         ],
         'title' => [
             'exclude' => 1,
@@ -191,7 +191,7 @@ return [
                 'type' => 'input',
                 'eval' => 'trim',
                 'readOnly' => true,
-            ]
+            ],
         ],
         'categories' => [
             'exclude' => 1,
@@ -201,7 +201,7 @@ return [
                 'size' => 30,
                 'eval' => 'trim',
                 'readOnly' => 1,
-            ]
+            ],
         ],
         'people' => [
             'exclude' => 1,
@@ -211,7 +211,7 @@ return [
                 'size' => 30,
                 'eval' => 'trim',
                 'readOnly' => 1,
-            ]
+            ],
         ],
         'short_description' => [
             'exclude' => 1,
@@ -240,7 +240,7 @@ return [
                 'type' => 'input',
                 'eval' => 'trim',
                 'readOnly' => true,
-            ]
+            ],
         ],
         'event_kat' => [
             'exclude' => 1,
@@ -249,7 +249,7 @@ return [
                 'type' => 'input',
                 'eval' => 'trim',
                 'readOnly' => true,
-            ]
+            ],
         ],
         'event_kat2' => [
             'exclude' => 1,
@@ -258,7 +258,7 @@ return [
                 'type' => 'input',
                 'eval' => 'trim',
                 'readOnly' => true,
-            ]
+            ],
         ],
         'email' => [
             'exclude' => 1,
@@ -267,7 +267,7 @@ return [
                 'type' => 'input',
                 'eval' => 'trim',
                 'readOnly' => true,
-            ]
+            ],
         ],
         'event_person_id' => [
             'exclude' => 1,
@@ -276,7 +276,7 @@ return [
                 'type' => 'input',
                 'eval' => 'trim,int',
                 'readOnly' => true,
-            ]
+            ],
         ],
         'event_place_id' => [
             'exclude' => 1,
@@ -285,7 +285,7 @@ return [
                 'type' => 'input',
                 'eval' => 'trim,int',
                 'readOnly' => true,
-            ]
+            ],
         ],
         'region' => [
             'exclude' => 1,
@@ -357,7 +357,7 @@ return [
                 'type' => 'input',
                 'eval' => 'trim',
                 'readOnly' => true,
-            ]
+            ],
         ],
         'textline2' => [
             'exclude' => 1,
@@ -366,7 +366,7 @@ return [
                 'type' => 'input',
                 'eval' => 'trim',
                 'readOnly' => true,
-            ]
+            ],
         ],
         'textline3' => [
             'exclude' => 1,
@@ -375,7 +375,7 @@ return [
                 'type' => 'input',
                 'eval' => 'trim',
                 'readOnly' => true,
-            ]
+            ],
         ],
         'textline4' => [
             'exclude' => 1,
@@ -384,7 +384,7 @@ return [
                 'type' => 'input',
                 'eval' => 'trim',
                 'readOnly' => true,
-            ]
+            ],
         ],
         'textline5' => [
             'exclude' => 1,
@@ -393,7 +393,7 @@ return [
                 'type' => 'input',
                 'eval' => 'trim',
                 'readOnly' => true,
-            ]
+            ],
         ],
         'textline6' => [
             'exclude' => 1,
@@ -402,7 +402,7 @@ return [
                 'type' => 'input',
                 'eval' => 'trim',
                 'readOnly' => true,
-            ]
+            ],
         ],
         'textline7' => [
             'exclude' => 1,
@@ -411,7 +411,7 @@ return [
                 'type' => 'input',
                 'eval' => 'trim',
                 'readOnly' => true,
-            ]
+            ],
         ],
         'textline8' => [
             'exclude' => 1,
@@ -420,7 +420,7 @@ return [
                 'type' => 'input',
                 'eval' => 'trim',
                 'readOnly' => true,
-            ]
+            ],
         ],
         'textbox1' => [
             'exclude' => 1,
@@ -429,7 +429,7 @@ return [
                 'type' => 'input',
                 'eval' => 'trim',
                 'readOnly' => true,
-            ]
+            ],
         ],
         'textbox2' => [
             'exclude' => 1,
@@ -438,7 +438,7 @@ return [
                 'type' => 'input',
                 'eval' => 'trim',
                 'readOnly' => true,
-            ]
+            ],
         ],
         'textbox3' => [
             'exclude' => 1,
@@ -447,7 +447,7 @@ return [
                 'type' => 'input',
                 'eval' => 'trim',
                 'readOnly' => true,
-            ]
+            ],
         ],
         'event_number1' => [
             'exclude' => 1,
@@ -456,7 +456,7 @@ return [
                 'type' => 'input',
                 'eval' => 'trim',
                 'readOnly' => true,
-            ]
+            ],
         ],
         'event_number2' => [
             'exclude' => 1,
@@ -465,7 +465,7 @@ return [
                 'type' => 'input',
                 'eval' => 'trim',
                 'readOnly' => true,
-            ]
+            ],
         ],
         'event_number3' => [
             'exclude' => 1,
@@ -474,7 +474,7 @@ return [
                 'type' => 'input',
                 'eval' => 'trim',
                 'readOnly' => true,
-            ]
+            ],
         ],
         'event_menue1' => [
             'exclude' => 1,
@@ -483,7 +483,7 @@ return [
                 'type' => 'input',
                 'eval' => 'trim',
                 'readOnly' => true,
-            ]
+            ],
         ],
         'event_menue2' => [
             'exclude' => 1,
@@ -492,7 +492,7 @@ return [
                 'type' => 'input',
                 'eval' => 'trim',
                 'readOnly' => true,
-            ]
+            ],
         ],
         'event_yesno1' => [
             'exclude' => 1,
@@ -501,7 +501,7 @@ return [
                 'type' => 'input',
                 'eval' => 'trim',
                 'readOnly' => true,
-            ]
+            ],
         ],
         'event_yesno2' => [
             'exclude' => 1,
@@ -510,7 +510,7 @@ return [
                 'type' => 'input',
                 'eval' => 'trim',
                 'readOnly' => true,
-            ]
+            ],
         ],
         'event_yesno3' => [
             'exclude' => 1,
@@ -519,7 +519,7 @@ return [
                 'type' => 'input',
                 'eval' => 'trim',
                 'readOnly' => true,
-            ]
+            ],
         ],
         'event_destination' => [
             'exclude' => 1,
@@ -528,7 +528,7 @@ return [
                 'type' => 'input',
                 'eval' => 'trim',
                 'readOnly' => true,
-            ]
+            ],
         ],
         'event_status' => [
             'exclude' => 1,
@@ -537,7 +537,7 @@ return [
                 'type' => 'input',
                 'eval' => 'trim',
                 'readOnly' => true,
-            ]
+            ],
         ],
         'feedback_id' => [
             'exclude' => 1,
@@ -547,7 +547,7 @@ return [
                 'size' => 30,
                 'eval' => 'trim',
                 'readOnly' => 1,
-            ]
+            ],
         ],
         'highlight' => [
             'exclude' => 1,
@@ -562,7 +562,7 @@ return [
                     ['regionales Highlight', 3],
                 ],
                 'readOnly' => 1,
-            ]
+            ],
         ],
         'event_coursetype' => [
             'exclude' => 1,
@@ -572,7 +572,7 @@ return [
                 'size' => 30,
                 'eval' => 'trim',
                 'readOnly' => 1,
-            ]
+            ],
         ],
         'event_care' => [
             'exclude' => 1,
@@ -582,7 +582,7 @@ return [
                 'size' => 30,
                 'eval' => 'trim',
                 'readOnly' => 1,
-            ]
+            ],
         ],
         'event_kollekte' => [
             'exclude' => 1,
@@ -592,7 +592,7 @@ return [
                 'size' => 30,
                 'eval' => 'trim',
                 'readOnly' => 1,
-            ]
+            ],
         ],
         'event_statistik' => [
             'exclude' => 1,
@@ -602,7 +602,7 @@ return [
                 'size' => 30,
                 'eval' => 'trim',
                 'readOnly' => 1,
-            ]
+            ],
         ],
         'event_external_id' => [
             'exclude' => 1,
@@ -612,7 +612,7 @@ return [
                 'size' => 30,
                 'eval' => 'trim',
                 'readOnly' => 1,
-            ]
+            ],
         ],
         'event_access' => [
             'exclude' => 1,
@@ -622,7 +622,7 @@ return [
                 'size' => 30,
                 'eval' => 'trim',
                 'readOnly' => 1,
-            ]
+            ],
         ],
         'event_lang' => [
             'exclude' => 1,
@@ -632,7 +632,7 @@ return [
                 'size' => 30,
                 'eval' => 'trim',
                 'readOnly' => 1,
-            ]
+            ],
         ],
         'event_user_id' => [
             'exclude' => 1,
@@ -642,7 +642,7 @@ return [
                 'size' => 30,
                 'eval' => 'trim,int',
                 'readOnly' => 1,
-            ]
+            ],
         ],
         'image' => [
             'exclude' => 1,
@@ -653,45 +653,45 @@ return [
                     'maxitems' => 1,
                     'minitems' => 0,
                     'appearance' => [
-                        'createNewRelationLinkTitle' => 'LLL:EXT:fwd_template/Resources/Private/Language/locallang_db.xlf:tx_fwd_template.addImage'
+                        'createNewRelationLinkTitle' => 'LLL:EXT:fwd_template/Resources/Private/Language/locallang_db.xlf:tx_fwd_template.addImage',
                     ],
                     'overrideChildTca' => [
                         'types' => [
                             '0' => [
                                 'showitem' => '
                                     --palette--;LLL:EXT:lang/locallang_tca.xlf:sys_file_reference.imageoverlayPalette;imageoverlayPalette,
-                                    --palette--;;filePalette'
+                                    --palette--;;filePalette',
                             ],
                             '1' => [
                                 'showitem' => '
                                     --palette--;LLL:EXT:lang/locallang_tca.xlf:sys_file_reference.imageoverlayPalette;imageoverlayPalette,
-                                    --palette--;;filePalette'
+                                    --palette--;;filePalette',
                             ],
                             '2' => [
                                 'showitem' => '
                                     --palette--;LLL:EXT:lang/locallang_tca.xlf:sys_file_reference.imageoverlayPalette;imageoverlayPalette,
-                                    --palette--;;filePalette'
+                                    --palette--;;filePalette',
                             ],
                             '3' => [
                                 'showitem' => '
                                     --palette--;LLL:EXT:lang/locallang_tca.xlf:sys_file_reference.imageoverlayPalette;imageoverlayPalette,
-                                    --palette--;;filePalette'
+                                    --palette--;;filePalette',
                             ],
                             '4' => [
                                 'showitem' => '
                                     --palette--;LLL:EXT:lang/locallang_tca.xlf:sys_file_reference.imageoverlayPalette;imageoverlayPalette,
-                                    --palette--;;filePalette'
+                                    --palette--;;filePalette',
                             ],
                             '5' => [
                                 'showitem' => '
                                     --palette--;LLL:EXT:lang/locallang_tca.xlf:sys_file_reference.imageoverlayPalette;imageoverlayPalette,
-                                    --palette--;;filePalette'
+                                    --palette--;;filePalette',
                             ],
-                        ]
-                    ]
+                        ],
+                    ],
                 ],
                 $GLOBALS['TYPO3_CONF_VARS']['GFX']['imagefile_ext']
-            )
+            ),
         ],
         'caption' => [
             'exclude' => 1,
@@ -700,7 +700,7 @@ return [
                 'type' => 'input',
                 'eval' => 'trim',
                 'readOnly' => true,
-            ]
+            ],
         ],
         'event_modified' => [
             'exclude' => 1,
@@ -709,7 +709,7 @@ return [
                 'type' => 'input',
                 'eval' => 'trim',
                 'readOnly' => true,
-            ]
+            ],
         ],
         'event_koll_descr' => [
             'exclude' => 1,
@@ -719,7 +719,7 @@ return [
                 'cols' => 60,
                 'rows' => 5,
                 'readOnly' => true,
-            ]
+            ],
         ],
         'poll_id' => [
             'exclude' => 1,
@@ -728,7 +728,7 @@ return [
                 'type' => 'input',
                 'eval' => 'trim',
                 'readOnly' => true,
-            ]
+            ],
         ],
         'webform_linkname' => [
             'exclude' => 1,
@@ -737,7 +737,7 @@ return [
                 'type' => 'input',
                 'eval' => 'trim',
                 'readOnly' => true,
-            ]
+            ],
         ],
         'inputmask_name' => [
             'exclude' => 1,
@@ -746,7 +746,7 @@ return [
                 'type' => 'input',
                 'eval' => 'trim',
                 'readOnly' => true,
-            ]
+            ],
         ],
         'place_id' => [
             'exclude' => 1,
@@ -822,45 +822,45 @@ return [
                     'maxitems' => 1,
                     'minitems' => 0,
                     'appearance' => [
-                        'createNewRelationLinkTitle' => 'LLL:EXT:fwd_template/Resources/Private/Language/locallang_db.xlf:tx_fwd_template.addImage'
+                        'createNewRelationLinkTitle' => 'LLL:EXT:fwd_template/Resources/Private/Language/locallang_db.xlf:tx_fwd_template.addImage',
                     ],
                     'overrideChildTca' => [
                         'types' => [
                             '0' => [
                                 'showitem' => '
                                     --palette--;LLL:EXT:lang/locallang_tca.xlf:sys_file_reference.imageoverlayPalette;imageoverlayPalette,
-                                    --palette--;;filePalette'
+                                    --palette--;;filePalette',
                             ],
                             '1' => [
                                 'showitem' => '
                                     --palette--;LLL:EXT:lang/locallang_tca.xlf:sys_file_reference.imageoverlayPalette;imageoverlayPalette,
-                                    --palette--;;filePalette'
+                                    --palette--;;filePalette',
                             ],
                             '2' => [
                                 'showitem' => '
                                     --palette--;LLL:EXT:lang/locallang_tca.xlf:sys_file_reference.imageoverlayPalette;imageoverlayPalette,
-                                    --palette--;;filePalette'
+                                    --palette--;;filePalette',
                             ],
                             '3' => [
                                 'showitem' => '
                                     --palette--;LLL:EXT:lang/locallang_tca.xlf:sys_file_reference.imageoverlayPalette;imageoverlayPalette,
-                                    --palette--;;filePalette'
+                                    --palette--;;filePalette',
                             ],
                             '4' => [
                                 'showitem' => '
                                     --palette--;LLL:EXT:lang/locallang_tca.xlf:sys_file_reference.imageoverlayPalette;imageoverlayPalette,
-                                    --palette--;;filePalette'
+                                    --palette--;;filePalette',
                             ],
                             '5' => [
                                 'showitem' => '
                                     --palette--;LLL:EXT:lang/locallang_tca.xlf:sys_file_reference.imageoverlayPalette;imageoverlayPalette,
-                                    --palette--;;filePalette'
+                                    --palette--;;filePalette',
                             ],
-                        ]
-                    ]
+                        ],
+                    ],
                 ],
                 $GLOBALS['TYPO3_CONF_VARS']['GFX']['imagefile_ext']
-            )
+            ),
         ],
         'place_image_caption' => [
             'exclude' => 1,
@@ -869,7 +869,7 @@ return [
                 'type' => 'input',
                 'eval' => 'trim',
                 'readOnly' => true,
-            ]
+            ],
         ],
         'place_position' => [
             'exclude' => 1,
@@ -878,7 +878,7 @@ return [
                 'type' => 'input',
                 'eval' => 'trim,int',
                 'readOnly' => true,
-            ]
+            ],
         ],
         'place_kat' => [
             'exclude' => 1,
@@ -887,7 +887,7 @@ return [
                 'type' => 'input',
                 'eval' => 'trim',
                 'readOnly' => true,
-            ]
+            ],
         ],
         'place_open' => [
             'exclude' => 1,
@@ -897,7 +897,7 @@ return [
                 'cols' => 60,
                 'rows' => 5,
                 'readOnly' => true,
-            ]
+            ],
         ],
         'place_equip' => [
             'exclude' => 1,
@@ -906,7 +906,7 @@ return [
                 'type' => 'input',
                 'eval' => 'trim',
                 'readOnly' => true,
-            ]
+            ],
         ],
         'place_equiptext' => [
             'exclude' => 1,
@@ -915,7 +915,7 @@ return [
                 'type' => 'input',
                 'eval' => 'trim',
                 'readOnly' => true,
-            ]
+            ],
         ],
         'place_region' => [
             'exclude' => 1,
@@ -924,7 +924,7 @@ return [
                 'type' => 'input',
                 'eval' => 'trim',
                 'readOnly' => true,
-            ]
+            ],
         ],
         'lat' => [
             'exclude' => 1,
@@ -934,7 +934,7 @@ return [
                 'size' => 30,
                 'eval' => 'trim',
                 'readOnly' => 1,
-            ]
+            ],
         ],
         'lon' => [
             'exclude' => 1,
@@ -944,7 +944,7 @@ return [
                 'size' => 30,
                 'eval' => 'trim',
                 'readOnly' => 1,
-            ]
+            ],
         ],
         'person_name' => [
             'exclude' => 1,
@@ -953,7 +953,7 @@ return [
                 'type' => 'input',
                 'eval' => 'trim',
                 'readOnly' => true,
-            ]
+            ],
         ],
         'person_email' => [
             'exclude' => 1,
@@ -962,7 +962,7 @@ return [
                 'type' => 'input',
                 'eval' => 'trim',
                 'readOnly' => true,
-            ]
+            ],
         ],
         'person_contact' => [
             'exclude' => 1,
@@ -971,7 +971,7 @@ return [
                 'type' => 'input',
                 'eval' => 'trim',
                 'readOnly' => true,
-            ]
+            ],
         ],
         'person_position' => [
             'exclude' => 1,
@@ -980,7 +980,7 @@ return [
                 'type' => 'input',
                 'eval' => 'trim,int',
                 'readOnly' => true,
-            ]
+            ],
         ],
         'person_surname' => [
             'exclude' => 1,
@@ -989,7 +989,7 @@ return [
                 'type' => 'input',
                 'eval' => 'trim',
                 'readOnly' => true,
-            ]
+            ],
         ],
         'user_id' => [
             'exclude' => 1,
@@ -998,7 +998,7 @@ return [
                 'type' => 'input',
                 'eval' => 'trim',
                 'readOnly' => true,
-            ]
+            ],
         ],
         'user_realname' => [
             'exclude' => 1,
@@ -1007,7 +1007,7 @@ return [
                 'type' => 'input',
                 'eval' => 'trim',
                 'readOnly' => true,
-            ]
+            ],
         ],
         'user_description' => [
             'exclude' => 1,
@@ -1016,7 +1016,7 @@ return [
                 'type' => 'input',
                 'eval' => 'trim',
                 'readOnly' => true,
-            ]
+            ],
         ],
         'user_street_nr' => [
             'exclude' => 1,
@@ -1025,7 +1025,7 @@ return [
                 'type' => 'input',
                 'eval' => 'trim',
                 'readOnly' => true,
-            ]
+            ],
         ],
         'user_zip' => [
             'exclude' => 1,
@@ -1034,7 +1034,7 @@ return [
                 'type' => 'input',
                 'eval' => 'trim',
                 'readOnly' => true,
-            ]
+            ],
         ],
         'user_city' => [
             'exclude' => 1,
@@ -1043,7 +1043,7 @@ return [
                 'type' => 'input',
                 'eval' => 'trim',
                 'readOnly' => true,
-            ]
+            ],
         ],
         'user_email' => [
             'exclude' => 1,
@@ -1052,7 +1052,7 @@ return [
                 'type' => 'input',
                 'eval' => 'trim',
                 'readOnly' => true,
-            ]
+            ],
         ],
         'user_url' => [
             'exclude' => 1,
@@ -1061,7 +1061,7 @@ return [
                 'type' => 'input',
                 'eval' => 'trim',
                 'readOnly' => true,
-            ]
+            ],
         ],
         'user_contact' => [
             'exclude' => 1,
@@ -1070,7 +1070,7 @@ return [
                 'type' => 'input',
                 'eval' => 'trim',
                 'readOnly' => true,
-            ]
+            ],
         ],
         'user_intdata' => [
             'exclude' => 1,
@@ -1079,7 +1079,7 @@ return [
                 'type' => 'input',
                 'eval' => 'trim',
                 'readOnly' => true,
-            ]
+            ],
         ],
         'user_image' => [
             'exclude' => 1,
@@ -1090,45 +1090,45 @@ return [
                     'maxitems' => 1,
                     'minitems' => 0,
                     'appearance' => [
-                        'createNewRelationLinkTitle' => 'LLL:EXT:fwd_template/Resources/Private/Language/locallang_db.xlf:tx_fwd_template.addImage'
+                        'createNewRelationLinkTitle' => 'LLL:EXT:fwd_template/Resources/Private/Language/locallang_db.xlf:tx_fwd_template.addImage',
                     ],
                     'overrideChildTca' => [
                         'types' => [
                             '0' => [
                                 'showitem' => '
                                     --palette--;LLL:EXT:lang/locallang_tca.xlf:sys_file_reference.imageoverlayPalette;imageoverlayPalette,
-                                    --palette--;;filePalette'
+                                    --palette--;;filePalette',
                             ],
                             '1' => [
                                 'showitem' => '
                                     --palette--;LLL:EXT:lang/locallang_tca.xlf:sys_file_reference.imageoverlayPalette;imageoverlayPalette,
-                                    --palette--;;filePalette'
+                                    --palette--;;filePalette',
                             ],
                             '2' => [
                                 'showitem' => '
                                     --palette--;LLL:EXT:lang/locallang_tca.xlf:sys_file_reference.imageoverlayPalette;imageoverlayPalette,
-                                    --palette--;;filePalette'
+                                    --palette--;;filePalette',
                             ],
                             '3' => [
                                 'showitem' => '
                                     --palette--;LLL:EXT:lang/locallang_tca.xlf:sys_file_reference.imageoverlayPalette;imageoverlayPalette,
-                                    --palette--;;filePalette'
+                                    --palette--;;filePalette',
                             ],
                             '4' => [
                                 'showitem' => '
                                     --palette--;LLL:EXT:lang/locallang_tca.xlf:sys_file_reference.imageoverlayPalette;imageoverlayPalette,
-                                    --palette--;;filePalette'
+                                    --palette--;;filePalette',
                             ],
                             '5' => [
                                 'showitem' => '
                                     --palette--;LLL:EXT:lang/locallang_tca.xlf:sys_file_reference.imageoverlayPalette;imageoverlayPalette,
-                                    --palette--;;filePalette'
+                                    --palette--;;filePalette',
                             ],
-                        ]
-                    ]
+                        ],
+                    ],
                 ],
                 $GLOBALS['TYPO3_CONF_VARS']['GFX']['imagefile_ext']
-            )
+            ),
         ],
         'liturg_bez' => [
             'exclude' => 1,
@@ -1137,7 +1137,7 @@ return [
                 'type' => 'input',
                 'eval' => 'trim',
                 'readOnly' => true,
-            ]
+            ],
         ],
         'channels' => [
             'exclude' => 1,
@@ -1146,7 +1146,7 @@ return [
                 'type' => 'input',
                 'eval' => 'trim',
                 'readOnly' => true,
-            ]
+            ],
         ],
         'slug' => [
             'label' => 'Slug',

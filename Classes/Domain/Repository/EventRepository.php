@@ -3,21 +3,17 @@
 namespace ArbkomEKvW\Evangtermine\Domain\Repository;
 
 use ArbkomEKvW\Evangtermine\Domain\Model\EtKeys;
-use ArbkomEKvW\Evangtermine\Domain\Model\Event;
 use ArbkomEKvW\Evangtermine\Services\OsmService;
 use Doctrine\DBAL\DBALException;
 use Doctrine\DBAL\Driver\Exception;
 use TYPO3\CMS\Core\Database\Connection;
 use TYPO3\CMS\Core\Database\ConnectionPool;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
-use TYPO3\CMS\Extbase\Persistence\Exception\InvalidQueryException;
 use TYPO3\CMS\Extbase\Persistence\Generic\Exception\InvalidNumberOfConstraintsException;
 use TYPO3\CMS\Extbase\Persistence\Generic\Exception\UnexpectedTypeException;
 use TYPO3\CMS\Extbase\Persistence\Generic\Query;
 use TYPO3\CMS\Extbase\Persistence\QueryInterface;
-use TYPO3\CMS\Extbase\Persistence\QueryResultInterface;
 use TYPO3\CMS\Extbase\Persistence\Repository;
-use TYPO3\CMS\Extbase\Utility\DebuggerUtility;
 
 /**
  * EventRepository
@@ -239,7 +235,6 @@ class EventRepository extends Repository
     }
 
     /**
-     *
      * @throws InvalidNumberOfConstraintsException
      */
     public function setPlaceConstraint(Query $query, EtKeys $etKeys): array
@@ -278,11 +273,11 @@ class EventRepository extends Repository
                 $queryConstraints[] = $query->logicalOr(
                     $query->logicalAnd(
                         $query->greaterThan('start', $timestampStart),
-                        $query->lessThan('start',$timestampEnd),
+                        $query->lessThan('start', $timestampEnd),
                     ),
                     $query->logicalAnd(
                         $query->lessThan('start', $timestampStart),
-                        $query->greaterThan('end',$timestampStart),
+                        $query->greaterThan('end', $timestampStart),
                     ),
                 );
             }
@@ -311,7 +306,7 @@ class EventRepository extends Repository
         $time = 60 * 60 * 24 * 7 * $etKeys->getHideOngoingEvents();
         $query = $this->createQuery();
         $query->statement('Select uid from tx_evangtermine_domain_model_event
-            WHERE uid in (' . implode(",", $uids) . ')
+            WHERE uid in (' . implode(',', $uids) . ')
             AND (
                 (tx_evangtermine_domain_model_event.end/1 - tx_evangtermine_domain_model_event.start/1) < ' . $time . '
             )
@@ -332,7 +327,7 @@ class EventRepository extends Repository
         $queryBuilder = $connectionPool->getQueryBuilderForTable('tx_evangtermine_domain_model_event');
 
         if (!empty($settings['etkey_places'] ?? '') && ($settings['etkey_places'] ?? '') !== 'all') {
-            $queryBuilder->select('place_id','place_zip','place_city')
+            $queryBuilder->select('place_id', 'place_zip', 'place_city')
                 ->from('tx_evangtermine_domain_model_event')
                 ->where(
                     $queryBuilder->expr()
@@ -352,7 +347,7 @@ class EventRepository extends Repository
             return $places;
         }
 
-        $statement = $queryBuilder->select('place_id','place_zip','place_city')
+        $statement = $queryBuilder->select('place_id', 'place_zip', 'place_city')
             ->from('tx_evangtermine_domain_model_event')
             ->where(
                 $queryBuilder->expr()->neq('place_zip', $queryBuilder->createNamedParameter('')),

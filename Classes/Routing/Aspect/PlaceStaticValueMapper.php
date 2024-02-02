@@ -8,7 +8,6 @@ use ArbkomEKvW\Evangtermine\Domain\Repository\EventRepository;
 use Doctrine\DBAL\DBALException;
 use Doctrine\DBAL\Driver\Exception;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
-use TYPO3\CMS\Extbase\Utility\DebuggerUtility;
 
 class PlaceStaticValueMapper extends AbstractStaticValueMapper
 {
@@ -29,5 +28,6 @@ class PlaceStaticValueMapper extends AbstractStaticValueMapper
             $place = $this->changeString($place);
             $this->map[$place] = $key;
         }
+        file_put_contents('/tmp/kse.txt', print_r($this->map, true));
     }
 }

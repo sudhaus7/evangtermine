@@ -14,7 +14,6 @@
 namespace ArbkomEKvW\Evangtermine\Domain\Model;
 
 use TYPO3\CMS\Extbase\DomainObject\AbstractValueObject;
-use TYPO3\CMS\Extbase\Utility\DebuggerUtility;
 
 /***************************************************************
  *

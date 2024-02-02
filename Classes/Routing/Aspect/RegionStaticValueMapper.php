@@ -25,7 +25,7 @@ class RegionStaticValueMapper extends AbstractStaticValueMapper
         foreach ($regionsFromDB as $key => $item) {
             $region = $item['region'];
             $region = $this->changeString($region);
-            $this->map[$region] = $key;
+            $this->map[$region] = $item['region'];
         }
     }
 }

@@ -15,7 +15,6 @@ namespace ArbkomEKvW\Evangtermine\ViewHelpers;
 
 use ArbkomEKvW\Evangtermine\Util\FieldMapping;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
-use TYPO3\CMS\Extbase\Utility\DebuggerUtility;
 use TYPO3Fluid\Fluid\Core\Rendering\RenderingContextInterface;
 use TYPO3Fluid\Fluid\Core\ViewHelper\AbstractViewHelper;
 

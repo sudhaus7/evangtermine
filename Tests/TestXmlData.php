@@ -2,9 +2,11 @@
 
 namespace ArbkomEKvW\Evangtermine\Tests;
 
-class TestXmlData {
-	static public function getTestXmlEmpty() {
-		$xmlTestBlob = <<<EOTXML
+class TestXmlData
+{
+    public static function getTestXmlEmpty()
+    {
+        $xmlTestBlob = <<<EOTXML
 <?xml version="1.0" encoding="UTF-8"?>
 <root>
 	<Export>
@@ -62,12 +64,13 @@ class TestXmlData {
 	</Export>
 </root>
 EOTXML;
-		
-return $xmlTestBlob;
-} // end of function getTestXmlEmpty()
 
-static public function getTestXmlFive() {
-		$xmlTestBlob = <<<EOTXML
+        return $xmlTestBlob;
+    } // end of function getTestXmlEmpty()
+
+    public static function getTestXmlFive()
+    {
+        $xmlTestBlob = <<<EOTXML
 <?xml version="1.0" encoding="UTF-8"?>
 <root>
 	<Export>
@@ -803,7 +806,7 @@ static public function getTestXmlFive() {
 	</Export>
 </root>
 EOTXML;
-		
-		return $xmlTestBlob;
-	} // end of function getTestXmlFive()
+
+        return $xmlTestBlob;
+    } // end of function getTestXmlFive()
 }

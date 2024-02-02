@@ -23,7 +23,8 @@ final class ModifyEvangTermineShowActionViewEvent
     protected ViewInterface $view;
     protected Event $event;
 
-    public function __construct(ViewInterface $view, Event $event) {
+    public function __construct(ViewInterface $view, Event $event)
+    {
         $this->view = $view;
         $this->event = $event;
     }

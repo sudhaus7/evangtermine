@@ -97,11 +97,11 @@ class Etpager
         if (($this->pgr['pages'] - self::pgrbSize) < $this->pgr['current']) {
             $this->pgr['pgrBarEnd'] = $this->pgr['pages'];
 
-        // current page is near beginning of pagelist
+            // current page is near beginning of pagelist
         } elseif (($this->pgr['current'] + self::pgrbBorderToCenter) <= self::pgrbSize) {
             $this->pgr['pgrBarEnd'] = self::pgrbSize;
 
-        // current page is somewhere in the middle
+            // current page is somewhere in the middle
         } else {
             $this->pgr['pgrBarEnd'] = $this->pgr['current'] + self::pgrbBorderToCenter;
         }

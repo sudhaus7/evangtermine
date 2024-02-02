@@ -1,7 +1,9 @@
 <?php
+
 namespace ArbkomEKvW\Evangtermine\Services;
 
-class OsmService {
+class OsmService
+{
     /**
      * @param string $address
      * @return array
@@ -12,7 +14,7 @@ class OsmService {
 
         $ch = curl_init();
         $userAgent = 'Mozilla/5.0 (Windows NT 6.1) AppleWebKit/537.2 (KHTML, like Gecko) Chrome/22.0.1216.0 Safari/537.2';
-        curl_setopt( $ch, CURLOPT_USERAGENT, $userAgent );
+        curl_setopt($ch, CURLOPT_USERAGENT, $userAgent);
         curl_setopt($ch, CURLOPT_REFERER, 'http://www.example.com/1');
         curl_setopt($ch, CURLOPT_URL, $url);
         curl_setopt($ch, CURLOPT_POST, 0);

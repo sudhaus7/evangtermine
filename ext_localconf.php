@@ -1,45 +1,45 @@
 <?php
-if (!defined('TYPO3_MODE')) {
-	die('Access denied.');
-}
 
+if (!defined('TYPO3_MODE')) {
+    die('Access denied.');
+}
 
 $extensionkey = 'evangtermine';
 
 \TYPO3\CMS\Extbase\Utility\ExtensionUtility::configurePlugin(
-	$extensionkey,
-	'List',
-	array(
-		ArbkomEKvW\Evangtermine\Controller\EventcontainerController::class => 'list, show, genericinfo'
-	),
-	// non-cacheable actions
-	array(
-		ArbkomEKvW\Evangtermine\Controller\EventcontainerController::class => 'list, show, genericinfo'
-	)
+    $extensionkey,
+    'List',
+    [
+        ArbkomEKvW\Evangtermine\Controller\EventcontainerController::class => 'list, show, genericinfo',
+    ],
+    // non-cacheable actions
+    [
+        ArbkomEKvW\Evangtermine\Controller\EventcontainerController::class => 'list, show, genericinfo',
+    ]
 );
 
 \TYPO3\CMS\Extbase\Utility\ExtensionUtility::configurePlugin(
-	$extensionkey,
-	'Detail',
-	array(
-		ArbkomEKvW\Evangtermine\Controller\EventcontainerController::class => 'show, genericinfo'
-	),
-	// non-cacheable actions
-	array(
-		ArbkomEKvW\Evangtermine\Controller\EventcontainerController::class => 'show, genericinfo'
-	)
+    $extensionkey,
+    'Detail',
+    [
+        ArbkomEKvW\Evangtermine\Controller\EventcontainerController::class => 'show, genericinfo',
+    ],
+    // non-cacheable actions
+    [
+        ArbkomEKvW\Evangtermine\Controller\EventcontainerController::class => 'show, genericinfo',
+    ]
 );
 
 \TYPO3\CMS\Extbase\Utility\ExtensionUtility::configurePlugin(
-	$extensionkey,
-	'Teaser',
-	array(
-		ArbkomEKvW\Evangtermine\Controller\EventcontainerController::class => 'teaser, show, genericinfo'
-	),
-	// non-cacheable actions
-	array(
-		ArbkomEKvW\Evangtermine\Controller\EventcontainerController::class => 'teaser, show, genericinfo'
-	)
+    $extensionkey,
+    'Teaser',
+    [
+        ArbkomEKvW\Evangtermine\Controller\EventcontainerController::class => 'teaser, show, genericinfo',
+    ],
+    // non-cacheable actions
+    [
+        ArbkomEKvW\Evangtermine\Controller\EventcontainerController::class => 'teaser, show, genericinfo',
+    ]
 );
 
 if (!isset($GLOBALS['TYPO3_CONF_VARS']['SYS']['caching']['cacheConfigurations']['evangtermine'])) {

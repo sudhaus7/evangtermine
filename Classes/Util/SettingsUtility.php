@@ -14,7 +14,6 @@
 namespace ArbkomEKvW\Evangtermine\Util;
 
 use ArbkomEKvW\Evangtermine\Domain\Model\EtKeys;
-use TYPO3\CMS\Extbase\Utility\DebuggerUtility;
 
 /***************************************************************
  *
