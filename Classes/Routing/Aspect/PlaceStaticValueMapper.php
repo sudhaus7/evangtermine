@@ -28,6 +28,5 @@ class PlaceStaticValueMapper extends AbstractStaticValueMapper
             $place = $this->changeString($place);
             $this->map[$place] = $key;
         }
-        file_put_contents('/tmp/kse.txt', print_r($this->map, true));
     }
 }
