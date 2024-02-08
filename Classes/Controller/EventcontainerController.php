@@ -178,8 +178,14 @@ class EventcontainerController extends ActionController
 
         if (empty($content)) {
             $query = $this->eventRepository->prepareFindByEtKeysQuery($this->etkeys);
-            $events = $this->eventRepository->findByEtKeys($query, $this->etkeys);
-            $nrOfEvents = $this->eventRepository->getNumberOfEventsByEtKeys($query);
+            $nrOfEvents = 0;
+            if (!empty($query)) {
+                try {
+                    $events = $this->eventRepository->findByEtKeys($query, $this->etkeys);
+                    $nrOfEvents = $this->eventRepository->getNumberOfEventsByEtKeys($query);
+                } catch (\Exception $exception) {
+                }
+            }
 
             // pager
             $this->pager->up(
@@ -189,7 +195,7 @@ class EventcontainerController extends ActionController
             );
 
             $this->view->assignMultiple([
-                'events' => $events,
+                'events' => $events ?? [],
                 'nrOfEvents' => $nrOfEvents,
                 'etkeys' => $this->etkeys,
                 'pageId' => $GLOBALS['TSFE']->id,

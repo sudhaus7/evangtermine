@@ -27,10 +27,14 @@ class EventRepository extends Repository
      * @throws UnexpectedTypeException
      * @throws InvalidNumberOfConstraintsException
      */
-    public function prepareFindByEtKeysQuery(EtKeys $etKeys): QueryInterface
+    public function prepareFindByEtKeysQuery(EtKeys $etKeys): ?QueryInterface
     {
         $eventUids = $this->findWithinDistance($etKeys);
         $eventUids = $this->hideOngoingEvents($etKeys, $eventUids);
+
+        if (empty($eventUids)) {
+            return null;
+        }
 
         $query = $this->createQuery();
 
