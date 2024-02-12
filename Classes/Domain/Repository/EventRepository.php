@@ -2,10 +2,15 @@
 
 namespace ArbkomEKvW\Evangtermine\Domain\Repository;
 
+use ArbkomEKvW\Evangtermine\Domain\Model\Categorylist;
 use ArbkomEKvW\Evangtermine\Domain\Model\EtKeys;
+use ArbkomEKvW\Evangtermine\Domain\Model\Grouplist;
 use ArbkomEKvW\Evangtermine\Services\OsmService;
+use ArbkomEKvW\Evangtermine\Util\SettingsUtility;
 use Doctrine\DBAL\DBALException;
 use Doctrine\DBAL\Driver\Exception;
+use TYPO3\CMS\Core\Cache\CacheManager;
+use TYPO3\CMS\Core\Cache\Exception\NoSuchCacheException;
 use TYPO3\CMS\Core\Database\Connection;
 use TYPO3\CMS\Core\Database\ConnectionPool;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
@@ -27,7 +32,7 @@ class EventRepository extends Repository
      * @throws UnexpectedTypeException
      * @throws InvalidNumberOfConstraintsException
      */
-    public function prepareFindByEtKeysQuery(EtKeys $etKeys): ?QueryInterface
+    public function prepareFindByEtKeysQuery(EtKeys $etKeys): ?array
     {
         $eventUids = $this->findWithinDistance($etKeys);
         $eventUids = $this->hideOngoingEvents($etKeys, $eventUids);
@@ -55,22 +60,22 @@ class EventRepository extends Repository
         if (!empty($queryConstraints)) {
             $query->matching($query->logicalAnd(...$queryConstraints));
         }
-        return $query;
+        return [$query, $queryConstraints];
     }
 
     public function findByEtKeys(QueryInterface $query, EtKeys $etKeys): array
     {
         $itemsPerPage = (int)$etKeys->getItemsPerPage() ?: 20;
         $query->setLimit($itemsPerPage);
-        $query->setOffset($itemsPerPage * ((int)$etKeys->getPageID() - 1));
+        $query->setOffset($itemsPerPage * ((int)($etKeys->getPageID() ?: 1) - 1));
         // get events
         $events = $query->execute();
         return $events->toArray();
     }
 
-    public function getNumberOfEventsByEtKeys(QueryInterface $query): int
+    public function getNumberOfEventsByEtKeys(QueryInterface $query, int $limit = 99999): int
     {
-        $query->setLimit(99999);
+        $query->setLimit($limit);
         $query->setOffset(0);
         return $query->execute()->count();
     }
@@ -319,10 +324,13 @@ class EventRepository extends Repository
     }
 
     /**
-     * @throws Exception
+     * @param array|null $settings
+     * @param array|null $uids
+     * @return array
      * @throws DBALException
+     * @throws Exception
      */
-    public function findAllPlaces(?array $settings = null): array
+    public function findAllPlaces(?array $settings = null, ?array $uids = null): array
     {
         $places = [];
         $places['all'] = 'Alle Orte';
@@ -343,15 +351,15 @@ class EventRepository extends Repository
                 ->groupBy('place_city')
                 ->orderBy('place_zip');
             $statement = $queryBuilder->executeQuery();
-            $regionsFromDB = $statement->fetchAllAssociative();
+            $placesFromDB = $statement->fetchAllAssociative();
 
-            foreach ($regionsFromDB as $place) {
+            foreach ($placesFromDB as $place) {
                 $places[$place['place_id']] = $place['place_zip'] . ' ' . $place['place_city'];
             }
             return $places;
         }
 
-        $statement = $queryBuilder->select('place_id', 'place_zip', 'place_city')
+        $queryBuilder->select('uid', 'place_id', 'place_zip', 'place_city')
             ->from('tx_evangtermine_domain_model_event')
             ->where(
                 $queryBuilder->expr()->neq('place_zip', $queryBuilder->createNamedParameter('')),
@@ -361,13 +369,58 @@ class EventRepository extends Repository
                 $queryBuilder->expr()->neq('place_zip', $queryBuilder->createNamedParameter('.')),
                 $queryBuilder->expr()->neq('place_city', $queryBuilder->createNamedParameter('.')),
                 $queryBuilder->expr()->neq('place_zip', $queryBuilder->createNamedParameter('00000')),
-            )
-            ->groupBy('place_city')
-            ->orderBy('place_zip')
-            ->executeQuery();
-        $regionsFromDB = $statement->fetchAllAssociative();
-        foreach ($regionsFromDB as $place) {
+            );
+        if (!empty($uids)) {
+            $queryBuilder->andWhere(
+                $queryBuilder->expr()->in('uid', $uids)
+            );
+        }
+        $queryBuilder->groupBy('place_city')
+            ->orderBy('place_zip');
+        $placesFromDB = $queryBuilder->executeQuery()->fetchAllAssociative();
+        foreach ($placesFromDB as $place) {
             $places[$place['place_id']] = $place['place_zip'] . ' ' . $place['place_city'];
+        }
+        return $places;
+    }
+
+    /**
+     * @throws InvalidNumberOfConstraintsException
+     * @throws UnexpectedTypeException
+     * @throws Exception
+     * @throws DBALException
+     * @throws NoSuchCacheException
+     */
+    public function findAllPlacesWithEtKeys(?array $settings = null): array
+    {
+        $cacheManager = GeneralUtility::makeInstance(CacheManager::class);
+        $dateString = (new \DateTime('today midnight'))->format('Ymd');
+        $cache = $cacheManager->getCache('evangtermine');
+        $cacheKey = 'places-with-events-' . $dateString;
+        $places = $cache->get($cacheKey);
+
+        if (empty($places)) {
+            $placesFromDb = $this->findAllPlaces($settings);
+
+            /** @var EtKeys $etKeys */
+            list($query, $queryConstraints, $clonedQuery, $clonedQueryConstraints)
+                = $this->prepareQuery($settings);
+            $places = [];
+            foreach ($placesFromDb as $placeId => $place) {
+                if ($placeId == 'all') {
+                    $places[$placeId] = $place;
+                    continue;
+                }
+                $queryConstraints[] = $query->equals('place_id', $placeId);
+                $query->matching($query->logicalAnd(...$queryConstraints));
+                $nrOfEvents = $this->getNumberOfEventsByEtKeys($query, 1);
+                if ($nrOfEvents > 0) {
+                    $places[$placeId] = $place;
+                }
+                $query = $clonedQuery;
+                $queryConstraints = $clonedQueryConstraints;
+            }
+            $cache->set($cacheKey, $places);
         }
         return $places;
     }
@@ -434,6 +487,48 @@ class EventRepository extends Repository
     }
 
     /**
+     * @param array|null $settings
+     * @return array
+     * @throws DBALException
+     * @throws Exception
+     * @throws InvalidNumberOfConstraintsException
+     * @throws NoSuchCacheException
+     * @throws UnexpectedTypeException
+     */
+    public function findAllRegionsWithEtKeys(?array $settings = null): array
+    {
+        $cacheManager = GeneralUtility::makeInstance(CacheManager::class);
+        $dateString = (new \DateTime('today midnight'))->format('Ymd');
+        $cache = $cacheManager->getCache('evangtermine');
+        $cacheKey = 'regions-with-events-' . $dateString;
+        $regions = $cache->get($cacheKey);
+
+        if (empty($regions)) {
+            $regionsFromDb = $this->findAllRegions($settings);
+            list($query, $queryConstraints, $clonedQuery, $clonedQueryConstraints)
+                = $this->prepareQuery($settings);
+
+            $regions = [];
+            foreach ($regionsFromDb as $key => $region) {
+                if ($key == 'all') {
+                    $regions[$key] = $region;
+                    continue;
+                }
+                $queryConstraints[] = $query->equals('region', $region);
+                $query->matching($query->logicalAnd(...$queryConstraints));
+                $nrOfEvents = $this->getNumberOfEventsByEtKeys($query, 1);
+                if ($nrOfEvents > 0) {
+                    $regions[$region] = $region;
+                }
+                $query = $clonedQuery;
+                $queryConstraints = $clonedQueryConstraints;
+            }
+            $cache->set($cacheKey, $regions);
+        }
+        return $regions;
+    }
+
+    /**
      * @throws Exception
      * @throws DBALException
      */
@@ -451,5 +546,120 @@ class EventRepository extends Repository
             ->orderBy('region');
         $statement = $queryBuilder->executeQuery();
         return $statement->fetchAllAssociative();
+    }
+
+    /**
+     * @param array|null $settings
+     * @return array
+     * @throws InvalidNumberOfConstraintsException
+     * @throws NoSuchCacheException
+     * @throws UnexpectedTypeException
+     */
+    public function findAllCategoriesWithEtKeys(?array $settings = null): array
+    {
+        $cacheManager = GeneralUtility::makeInstance(CacheManager::class);
+        $dateString = (new \DateTime('today midnight'))->format('Ymd');
+        $cache = $cacheManager->getCache('evangtermine');
+        $cacheKey = 'categories-with-events-' . $dateString;
+        $categories = $cache->get($cacheKey);
+
+        if (empty($categories)) {
+            $categoryList = GeneralUtility::makeInstance(Categorylist::class);
+            $categoriesFromItemlist = $categoryList->getItemslist();
+            list($query, $queryConstraints, $clonedQuery, $clonedQueryConstraints)
+                = $this->prepareQuery($settings);
+
+            $categories = [];
+            foreach ($categoriesFromItemlist as $key => $category) {
+                if ($key == 'all') {
+                    $categories[$key] = $category;
+                    continue;
+                }
+                $queryConstraints[] = $query->logicalOr(
+                    $query->equals('categories', $key),
+                    $query->like('categories', '%,' . $key . ',%'),
+                    $query->like('categories', $key . ',%'),
+                    $query->like('categories', '%,' . $key),
+                );
+                $query->matching($query->logicalAnd(...$queryConstraints));
+                $nrOfEvents = $this->getNumberOfEventsByEtKeys($query, 1);
+                if ($nrOfEvents > 0) {
+                    $categories[$key] = $category;
+                }
+                $query = $clonedQuery;
+                $queryConstraints = $clonedQueryConstraints;
+            }
+            $cache->set($cacheKey, $categories);
+        }
+        return $categories;
+    }
+
+    /**
+     * @param array|null $settings
+     * @return array
+     * @throws InvalidNumberOfConstraintsException
+     * @throws NoSuchCacheException
+     * @throws UnexpectedTypeException
+     */
+    public function findAllGroupsWithEtKeys(?array $settings = null): array
+    {
+        $cacheManager = GeneralUtility::makeInstance(CacheManager::class);
+        $dateString = (new \DateTime('today midnight'))->format('Ymd');
+        $cache = $cacheManager->getCache('evangtermine');
+        $cacheKey = 'groups-with-events-' . $dateString;
+        $groups = $cache->get($cacheKey);
+
+        if (empty($groups)) {
+            $grouplist = GeneralUtility::makeInstance(Grouplist::class);
+
+            $groupsFromItemslist = $grouplist->getItemslist();
+            list($query, $queryConstraints, $clonedQuery, $clonedQueryConstraints)
+                = $this->prepareQuery($settings);
+
+            $groups = [];
+            foreach ($groupsFromItemslist as $key => $group) {
+                if ($key == 0) {
+                    $groups[$key] = $group;
+                    continue;
+                }
+                $queryConstraints[] = $query->logicalOr(
+                    $query->equals('people', $key),
+                    $query->like('people', '%,' . $key . ',%'),
+                    $query->like('people', $key . ',%'),
+                    $query->like('people', '%,' . $key),
+                );
+                $query->matching($query->logicalAnd(...$queryConstraints));
+                $nrOfEvents = $this->getNumberOfEventsByEtKeys($query, 1);
+                if ($nrOfEvents > 0) {
+                    $groups[$key] = $group;
+                }
+                $query = $clonedQuery;
+                $queryConstraints = $clonedQueryConstraints;
+            }
+            $cache->set($cacheKey, $groups);
+        }
+        return $groups;
+    }
+
+    /**
+     * @param array|null $settings
+     * @return array
+     * @throws InvalidNumberOfConstraintsException
+     * @throws UnexpectedTypeException
+     */
+    protected function prepareQuery(?array $settings): array
+    {
+        /** @var EtKeys $etKeys */
+        $etKeys = GeneralUtility::makeInstance(EtKeys::class);
+        $etKeys->setResetValues();
+        $settingsUtility = GeneralUtility::makeInstance(SettingsUtility::class);
+        $settingsUtility->fetchParamsFromSettings($settings, $etKeys);
+
+        $etKeys->setItemsPerPage(1);
+        list($query, $queryConstraints) = $this->prepareFindByEtKeysQuery($etKeys);
+
+        $clonedQuery = clone $query;
+        $clonedQueryConstraints = $queryConstraints;
+        return array($query, $queryConstraints, $clonedQuery, $clonedQueryConstraints);
     }
 }

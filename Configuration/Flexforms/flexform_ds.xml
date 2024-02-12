@@ -47,6 +47,7 @@
                                         <numIndex index="1">all</numIndex>
                                     </numIndex>
                                 </items>
+                                <default>all</default>
                             </config>
                         </TCEforms>
                     </settings.etkey_highlight>

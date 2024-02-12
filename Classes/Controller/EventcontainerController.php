@@ -38,10 +38,8 @@ namespace ArbkomEKvW\Evangtermine\Controller;
  *  This copyright notice MUST APPEAR in all copies of the script!
  ***************************************************************/
 
-use ArbkomEKvW\Evangtermine\Domain\Model\Categorylist;
 use ArbkomEKvW\Evangtermine\Domain\Model\EtKeys;
 use ArbkomEKvW\Evangtermine\Domain\Model\Event;
-use ArbkomEKvW\Evangtermine\Domain\Model\Grouplist;
 use ArbkomEKvW\Evangtermine\Domain\Repository\EventcontainerRepository;
 use ArbkomEKvW\Evangtermine\Domain\Repository\EventRepository;
 use ArbkomEKvW\Evangtermine\Event\ModifyEvangTermineShowActionViewEvent;
@@ -77,10 +75,6 @@ class EventcontainerController extends ActionController
     private int $currentPluginUid;
 
     private SettingsUtility $settingsUtility;
-
-    private Categorylist $categorylist;
-
-    private Grouplist $grouplist;
 
     private EtKeys $etkeys;
 
@@ -119,8 +113,6 @@ class EventcontainerController extends ActionController
     protected function initializeAction()
     {
         $this->currentPluginUid = $this->configurationManager->getContentObject()->data['uid'];
-        $this->categorylist = GeneralUtility::makeInstance(Categorylist::class);
-        $this->grouplist = GeneralUtility::makeInstance(Grouplist::class);
         $this->etkeys = GeneralUtility::makeInstance(EtKeys::class);
         $this->pager = GeneralUtility::makeInstance(Etpager::class);
     }
@@ -177,7 +169,7 @@ class EventcontainerController extends ActionController
         $content = $cache->get($cacheKey);
 
         if (empty($content)) {
-            $query = $this->eventRepository->prepareFindByEtKeysQuery($this->etkeys);
+            list($query, $queryConstraints) = $this->eventRepository->prepareFindByEtKeysQuery($this->etkeys);
             $nrOfEvents = 0;
             if (!empty($query)) {
                 try {
@@ -200,10 +192,10 @@ class EventcontainerController extends ActionController
                 'etkeys' => $this->etkeys,
                 'pageId' => $GLOBALS['TSFE']->id,
                 'pluginUid' => $this->currentPluginUid,
-                'categoryList' => $this->categorylist->getItemslist(),
-                'groupList' => $this->grouplist->getItemslist(),
-                'placeList' => $this->eventRepository->findAllPlaces($this->settings),
-                'regionList' => $this->eventRepository->findAllRegions($this->settings),
+                'categoryList' => $this->eventRepository->findAllCategoriesWithEtKeys($this->settings),
+                'groupList' => $this->eventRepository->findAllGroupsWithEtKeys($this->settings),
+                'placeList' => $this->eventRepository->findAllPlacesWithEtKeys($this->settings),
+                'regionList' => $this->eventRepository->findAllRegionsWithEtKeys($this->settings),
                 'pagerdata' => $this->pager->getPgr(),
             ]);
 
@@ -227,7 +219,7 @@ class EventcontainerController extends ActionController
         $content = $cache->get($cacheKey);
 
         if (empty($content)) {
-            $query = $this->eventRepository->prepareFindByEtKeysQuery($this->etkeys);
+            list($query, $queryConstraints) = $this->eventRepository->prepareFindByEtKeysQuery($this->etkeys);
             $events = $this->eventRepository->findByEtKeys($query, $this->etkeys);
 
             $this->view->assign('events', $events);
