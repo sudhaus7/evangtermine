@@ -134,6 +134,7 @@ class EventRepository extends Repository
     {
         $queryConstraints = [];
         $queryConstraints = array_merge($queryConstraints, $this->setUidConstraint($query, $eventUids));
+        $queryConstraints = array_merge($queryConstraints, $this->setVid($query, $etKeys));
         $queryConstraints = array_merge($queryConstraints, $this->setHighlightConstraint($query, $etKeys));
         $queryConstraints = array_merge($queryConstraints, $this->setCategoryConstraint($query, $etKeys));
         $queryConstraints = array_merge($queryConstraints, $this->setPeopleConstraint($query, $etKeys));
@@ -163,6 +164,20 @@ class EventRepository extends Repository
             $uids[] = $eventUid['uid'];
         }
         $queryConstraints[] = $query->in('uid', $uids);
+        return $queryConstraints;
+    }
+
+    /**
+     * @throws UnexpectedTypeException
+     */
+    public function setVid(Query $query, EtKeys $etKeys): array
+    {
+        $queryConstraints = [];
+        $vids = explode(',', $etKeys->getVid());
+        if (empty($vids)) {
+            return $queryConstraints;
+        }
+        $queryConstraints[] = $query->in('event_user_id', $vids);
         return $queryConstraints;
     }
 

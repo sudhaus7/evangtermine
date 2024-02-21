@@ -103,6 +103,7 @@ class ImportEventsCommand extends Command
      * @throws DBALException
      * @throws Exception
      * @throws InsufficientFolderAccessPermissionsException
+     * @throws SiteNotFoundException
      */
     public function execute(InputInterface $input, OutputInterface $output): int
     {
