@@ -1,23 +1,22 @@
+const defaultValues = {
+  highlight: 'all',
+  eventtype: 'all',
+  people: '0',
+  region: 'all',
+  place: 'all',
+  zip: '',
+  radius: '0',
+  q: '',
+  date: '',
+  hideOngoingEvents: '0',
+  itemsPerPage: '20',
+  pageId: '1'
+};
+
 const replaceUrl = function () {
   const forms = document.getElementsByName('etkeysForm');
 
   if (forms.length === 1) {
-    const defaultValues = {
-      highlight: 'all',
-      eventtype: 'all',
-      people: '0',
-      region: 'all',
-      place: 'all',
-      zip: '',
-      radius: '0',
-      q: '',
-      date: '',
-      hideOngoingEvents: '0',
-      itemsPerPage: '20',
-      pageId: '1'
-    };
-
-
     forms.forEach(function (form) {
       const formData = new FormData(form);
       const urlChangeOption = getUrlChangeOption(formData.entries(), defaultValues);
@@ -38,7 +37,7 @@ const replaceUrl = function () {
   }
 };
 
-const getUrlChangeOption = function (entries, defaultValues) {
+const getChangedOptions = function(entries, defaultValues) {
   let changed = {
     highlight: false,
     eventtype: false,
@@ -93,6 +92,11 @@ const getUrlChangeOption = function (entries, defaultValues) {
       }
     }
   }
+  return changed;
+}
+
+const getUrlChangeOption = function (entries, defaultValues) {
+  let changed = getChangedOptions(entries, defaultValues);
   if (changed.zip || changed.radius || changed.q || changed.date || changed.hideOngoingEvents || changed.itemsPerPage) {
     return 'none';
   }
@@ -116,6 +120,7 @@ const urlForHighlightEventtypePeople = function (entries, urlPartToKeep) {
   const urlPartToKeepArray = urlPartToKeep.split('/highlight/');
   urlPartToKeep = urlPartToKeepArray[0];
 
+  let highlight, eventType, people;
   for (let pair of entries) {
     if (pair[0] === 'tx_evangtermine_list[etkeysForm][highlight]') {
       highlight = pair[1];
@@ -197,3 +202,28 @@ const changeString = function (string) {
 };
 
 replaceUrl();
+
+const scrollToResults = function () {
+  const forms = document.getElementsByName('etkeysForm');
+  for (let i = 0; i < forms.length; i++) {
+    const form = forms[i];
+    const formData = new FormData(form);
+    let changed = getChangedOptions(formData.entries(), defaultValues);
+    let formChanged = false;
+    for (const key of Object.keys(changed)) {
+      let value = changed[key];
+      if (value === true) {
+        formChanged = true;
+      }
+    }
+    if (formChanged) {
+      const offsetTop = form.querySelector('.et-event').offsetTop;
+      if (undefined !== offsetTop) {
+        setTimeout(function () {
+          window.scrollTo(0, offsetTop);
+        }, 300);
+      }
+    }
+  }
+}
+scrollToResults();

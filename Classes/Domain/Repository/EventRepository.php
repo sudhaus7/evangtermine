@@ -172,8 +172,12 @@ class EventRepository extends Repository
      */
     public function setVid(Query $query, EtKeys $etKeys): array
     {
+        $vidValue = $etKeys->getVid();
         $queryConstraints = [];
-        $vids = explode(',', $etKeys->getVid());
+        if ($vidValue == 'all') {
+            return $queryConstraints;
+        }
+        $vids = explode(',', $vidValue);
         if (empty($vids)) {
             return $queryConstraints;
         }
