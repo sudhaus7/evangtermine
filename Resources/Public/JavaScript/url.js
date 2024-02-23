@@ -219,8 +219,24 @@ const scrollToResults = function () {
 
     }
     if (storage === 'submitted') {
-      const offsetTop = form.querySelector('.et-event').offsetTop;
+      let offsetTop = form.querySelector('.et-event').offsetTop;
       if (undefined !== offsetTop) {
+        const fixedHeader = document.querySelector('header.fixed-header');
+        if (fixedHeader) {
+          const topToolbar = document.querySelector('.top-toolbar');
+          let topToolbarHeight = 0;
+          if (topToolbar) {
+            topToolbarHeight = topToolbar.offsetHeight;
+          }
+          const mainNavigationToolbar = document.querySelector('.main-navigation-toolbar');
+          let mainNavigationToolbarHeight = 0;
+          if (mainNavigationToolbar) {
+            mainNavigationToolbarHeight = mainNavigationToolbar.offsetHeight;
+          }
+          const main = document.querySelector('main');
+          const mainOffset = main.offsetTop;
+          offsetTop = offsetTop - mainOffset - topToolbarHeight - mainNavigationToolbarHeight;
+        }
         setTimeout(function () {
           window.scrollTo(0, offsetTop);
         }, 300);
