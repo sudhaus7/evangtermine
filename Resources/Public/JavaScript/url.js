@@ -207,22 +207,25 @@ const scrollToResults = function () {
   const forms = document.getElementsByName('etkeysForm');
   for (let i = 0; i < forms.length; i++) {
     const form = forms[i];
-    const formData = new FormData(form);
-    let changed = getChangedOptions(formData.entries(), defaultValues);
-    let formChanged = false;
-    for (const key of Object.keys(changed)) {
-      let value = changed[key];
-      if (value === true) {
-        formChanged = true;
-      }
+
+    form.addEventListener('submit', function () {
+      localStorage.setItem('evangtermine-form', 'submitted');
+    });
+
+    let storage = '';
+    try {
+      storage = localStorage.getItem('evangtermine-form');
+    } catch (e) {
+
     }
-    if (formChanged) {
+    if (storage === 'submitted') {
       const offsetTop = form.querySelector('.et-event').offsetTop;
       if (undefined !== offsetTop) {
         setTimeout(function () {
           window.scrollTo(0, offsetTop);
         }, 300);
       }
+      localStorage.removeItem('evangtermine-form');
     }
   }
 }
