@@ -56,6 +56,7 @@ use TYPO3\CMS\Extbase\Mvc\Controller\ActionController;
 use TYPO3\CMS\Extbase\Mvc\Exception\StopActionException;
 use TYPO3\CMS\Extbase\Persistence\Generic\Exception\InvalidNumberOfConstraintsException;
 use TYPO3\CMS\Extbase\Persistence\Generic\Exception\UnexpectedTypeException;
+use TYPO3\CMS\Extbase\Utility\DebuggerUtility;
 
 /**
  * EventcontainerController
@@ -164,7 +165,7 @@ class EventcontainerController extends ActionController
 
         $requestArgumentsHash = sha1(\json_encode($requestArguments));
         $cache = $this->cacheManager->getCache('evangtermine_event_list');
-        $cacheKey = 'argumentshash-' . $requestArgumentsHash . '-' . $this->date->format('Ymd');
+        $cacheKey = 'argumentshash-' . $requestArgumentsHash . '-' . $this->date->format('Ymd') . '-' . $this->currentPluginUid;
         $content = $cache->get($cacheKey);
 
         if (empty($content)) {
@@ -191,10 +192,10 @@ class EventcontainerController extends ActionController
                 'etkeys' => $this->etkeys,
                 'pageId' => $GLOBALS['TSFE']->id,
                 'pluginUid' => $this->currentPluginUid,
-                'categoryList' => $this->eventRepository->findAllCategoriesWithEtKeys($this->settings),
-                'groupList' => $this->eventRepository->findAllGroupsWithEtKeys($this->settings),
-                'placeList' => $this->eventRepository->findAllPlacesWithEtKeys($this->settings),
-                'regionList' => $this->eventRepository->findAllRegionsWithEtKeys($this->settings),
+                'categoryList' => $this->eventRepository->findAllCategoriesWithEtKeys($this->settings, $this->currentPluginUid),
+                'groupList' => $this->eventRepository->findAllGroupsWithEtKeys($this->settings, $this->currentPluginUid),
+                'placeList' => $this->eventRepository->findAllPlacesWithEtKeys($this->settings, $this->currentPluginUid),
+                'regionList' => $this->eventRepository->findAllRegionsWithEtKeys($this->settings, $this->currentPluginUid),
                 'pagerdata' => $this->pager->getPgr(),
             ]);
 
@@ -212,9 +213,10 @@ class EventcontainerController extends ActionController
     public function teaserAction()
     {
         $this->etkeys = $this->getNewFromSettings();
+        $data = $this->configurationManager->getContentObject()->data;
 
         $cache = $this->cacheManager->getCache('evangtermine_event_teaser');
-        $cacheKey = 'argumentshash-' . $this->date->format('Ymd');
+        $cacheKey = 'argumentshash-' . $this->date->format('Ymd') . '-' . $data['uid'];
         $content = $cache->get($cacheKey);
 
         if (empty($content)) {

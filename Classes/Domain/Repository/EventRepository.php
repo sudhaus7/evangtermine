@@ -404,18 +404,21 @@ class EventRepository extends Repository
     }
 
     /**
-     * @throws InvalidNumberOfConstraintsException
-     * @throws UnexpectedTypeException
-     * @throws Exception
+     * @param array|null $settings
+     * @param int $pluginUid
+     * @return array
      * @throws DBALException
+     * @throws Exception
+     * @throws InvalidNumberOfConstraintsException
      * @throws NoSuchCacheException
+     * @throws UnexpectedTypeException
      */
-    public function findAllPlacesWithEtKeys(?array $settings = null): array
+    public function findAllPlacesWithEtKeys(?array $settings = null, int $pluginUid = 0): array
     {
         $cacheManager = GeneralUtility::makeInstance(CacheManager::class);
         $dateString = (new \DateTime('today midnight'))->format('Ymd');
         $cache = $cacheManager->getCache('evangtermine');
-        $cacheKey = 'places-with-events-' . $dateString;
+        $cacheKey = 'places-with-events-' . $dateString . '-' . $pluginUid;;
         $places = $cache->get($cacheKey);
 
         if (empty($places)) {
@@ -510,6 +513,7 @@ class EventRepository extends Repository
 
     /**
      * @param array|null $settings
+     * @param int $pluginUid
      * @return array
      * @throws DBALException
      * @throws Exception
@@ -517,12 +521,12 @@ class EventRepository extends Repository
      * @throws NoSuchCacheException
      * @throws UnexpectedTypeException
      */
-    public function findAllRegionsWithEtKeys(?array $settings = null): array
+    public function findAllRegionsWithEtKeys(?array $settings = null, int $pluginUid = 0): array
     {
         $cacheManager = GeneralUtility::makeInstance(CacheManager::class);
         $dateString = (new \DateTime('today midnight'))->format('Ymd');
         $cache = $cacheManager->getCache('evangtermine');
-        $cacheKey = 'regions-with-events-' . $dateString;
+        $cacheKey = 'regions-with-events-' . $dateString . '-' . $pluginUid;;
         $regions = $cache->get($cacheKey);
 
         if (empty($regions)) {
@@ -575,17 +579,18 @@ class EventRepository extends Repository
 
     /**
      * @param array|null $settings
+     * @param int $pluginUid
      * @return array
      * @throws InvalidNumberOfConstraintsException
      * @throws NoSuchCacheException
      * @throws UnexpectedTypeException
      */
-    public function findAllCategoriesWithEtKeys(?array $settings = null): array
+    public function findAllCategoriesWithEtKeys(?array $settings = null, int $pluginUid = 0): array
     {
         $cacheManager = GeneralUtility::makeInstance(CacheManager::class);
         $dateString = (new \DateTime('today midnight'))->format('Ymd');
         $cache = $cacheManager->getCache('evangtermine');
-        $cacheKey = 'categories-with-events-' . $dateString;
+        $cacheKey = 'categories-with-events-' . $dateString . '-' . $pluginUid;
         $categories = $cache->get($cacheKey);
 
         if (empty($categories)) {
@@ -624,17 +629,18 @@ class EventRepository extends Repository
 
     /**
      * @param array|null $settings
+     * @param int $pluginUid
      * @return array
      * @throws InvalidNumberOfConstraintsException
      * @throws NoSuchCacheException
      * @throws UnexpectedTypeException
      */
-    public function findAllGroupsWithEtKeys(?array $settings = null): array
+    public function findAllGroupsWithEtKeys(?array $settings = null, int $pluginUid = 0): array
     {
         $cacheManager = GeneralUtility::makeInstance(CacheManager::class);
         $dateString = (new \DateTime('today midnight'))->format('Ymd');
         $cache = $cacheManager->getCache('evangtermine');
-        $cacheKey = 'groups-with-events-' . $dateString;
+        $cacheKey = 'groups-with-events-' . $dateString . '-' . $pluginUid;
         $groups = $cache->get($cacheKey);
 
         if (empty($groups)) {
