@@ -72,7 +72,15 @@ class ImportEventsCommand extends Command
         $this->categoryList = GeneralUtility::makeInstance(Categorylist::class)->getItemslist();
         $this->groupList = GeneralUtility::makeInstance(Grouplist::class)->getItemslist();
         $this->dataHandler = GeneralUtility::makeInstance(DataHandler::class);
-        $this->storageRepository = GeneralUtility::makeInstance(StorageRepository::class);
+        $this->extConfig  = GeneralUtility::makeInstance(ExtensionConfiguration::class)->get('evangtermine');
+        if (version_compare(TYPO3_version, '11.0.0', '<')) {
+            $this->storageRepository = GeneralUtility::makeInstance(\ArbkomEKvW\Evangtermine\Resource\StorageRepository::class);
+        } else {
+            $this->storageRepository = GeneralUtility::makeInstance(StorageRepository::class);
+        }
+        if (!method_exists($this->storageRepository, 'getDefaultStorage')) {
+            return;
+        }
         $this->storage = $this->storageRepository->getDefaultStorage();
         $this->slugHelper = GeneralUtility::makeInstance(
             SlugHelper::class,
@@ -80,7 +88,6 @@ class ImportEventsCommand extends Command
             'slug',
             $GLOBALS['TCA']['tx_evangtermine_domain_model_event']['columns']['slug']['config']
         );
-        $this->extConfig  = GeneralUtility::makeInstance(ExtensionConfiguration::class)->get('evangtermine');
         $this->imageFolder = $this->extConfig['imageFolder'];
         // create image folder if not there yet
         try {
@@ -130,9 +137,9 @@ class ImportEventsCommand extends Command
         foreach ($items as $item) {
             $item = (array)$item;
 
-            if (str_contains($item['END'], '0000-00-00')) {
+            if (strpos($item['END'], '0000-00-00') !== false) {
                 $startArray = explode(' ', $item['START']);
-                if (str_contains($item['END'], '0000-00-00 00:00:00')) {
+                if (strpos($item['END'], '0000-00-00 00:00:00') !== false) {
                     $item['END'] = null;
                 } else {
                     $endArray = explode(' ', $item['END']);
@@ -179,7 +186,7 @@ class ImportEventsCommand extends Command
                 ->where(
                     $queryBuilder->expr()->eq('id', $queryBuilder->createNamedParameter($event['id']))
                 )
-                ->executeQuery()
+                ->execute()
                 ->fetchOne();
 
             if (!empty($uid)) {
@@ -196,7 +203,7 @@ class ImportEventsCommand extends Command
                     }
                     $queryBuilder->set($key, $eventItem);
                 }
-                $queryBuilder->executeStatement();
+                $queryBuilder->execute();
             } else {
                 $event['slug'] = $this->createSlug($event, 'id' . mt_rand());
                 $this->connectionPool->getConnectionForTable('tx_evangtermine_domain_model_event')
@@ -257,11 +264,11 @@ class ImportEventsCommand extends Command
                 ->where(
                     $queryBuilder->expr()->eq('id', $queryBuilder->createNamedParameter($event['id']))
                 )
-                ->executeQuery();
+                ->execute();
             $eventFromDB = $statement->fetchAssociative();
 
             if ($eventFromDB[$eventField] == 0) {
-                if (str_starts_with($itemField, '//')) {
+                if (substr($itemField, 0, 2) === '//') {
                     $itemField = 'https:' . $itemField;
                 }
                 $options = [
@@ -278,7 +285,6 @@ class ImportEventsCommand extends Command
                         file_put_contents('/tmp/' . $imageName, print_r($contents, true));
 
                         $folder = $this->storage->getFolder($this->extConfig['imageFolder']);
-
                         $newFile = $this->storage->addFile(
                             $tmpFileName,
                             $folder,
@@ -286,24 +292,24 @@ class ImportEventsCommand extends Command
                             DuplicationBehavior::REPLACE
                         );
 
-                        $newId = 'NEW1234';
-                        $data = [];
-                        $data['sys_file_reference'][$newId] = [
-                            'uid_local' => $newFile->getUid(),
-                            'tablenames' => 'tx_evangtermine_domain_model_event',
-                            'uid_foreign' => $eventFromDB['uid'],
-                            'fieldname' => $eventField,
-                            'pid' => $eventFromDB['pid'],
-                        ];
-                        $data['tx_evangtermine_domain_model_event'][$eventFromDB['uid']] = [
-                            $eventField => $newId,
-                        ];
+                        $this->connectionPool->getConnectionForTable('sys_file_reference')
+                            ->insert(
+                                'sys_file_reference',
+                                [
+                                    'uid_local' => $newFile->getUid(),
+                                    'uid_foreign' => $eventFromDB['uid'],
+                                    'tablenames' => 'tx_evangtermine_domain_model_event',
+                                    'fieldname' => $eventField,
+                                    'pid' => $eventFromDB['pid'],
+                                ],
+                            );
 
-                        // Process the DataHandler data
-                        $this->dataHandler->start($data, []);
-                        $this->dataHandler->process_datamap();
-
-                        unlink($tmpFileName);
+                        $this->connectionPool->getConnectionForTable('tx_evangtermine_domain_model_event')
+                            ->update(
+                                'tx_evangtermine_domain_model_event',
+                                [$eventField => $newFile->getUid()],
+                                ['uid' => $eventFromDB['uid']]
+                            );
                     }
                 } catch (\Exception $e) {
                 }
@@ -388,7 +394,7 @@ class ImportEventsCommand extends Command
                     $queryBuilder->expr()->eq('sys_file_reference.tablenames', $queryBuilder->createNamedParameter('tx_evangtermine_domain_model_event'))
                 );
 
-            $statement = $queryBuilder->executeQuery();
+            $statement = $queryBuilder->execute();
             $result = $statement->fetchAssociative();
 
             if (!$result) {
@@ -415,7 +421,7 @@ class ImportEventsCommand extends Command
             ->where(
                 $queryBuilder->expr()->notIn('id', $ids)
             )
-            ->executeQuery();
+            ->execute();
         $events = $statement->fetchAllAssociative();
 
         foreach ($events as $event) {

@@ -98,19 +98,19 @@ class Etpager
             $this->pgr['pgrBarEnd'] = $this->pgr['pages'];
 
             // current page is near beginning of pagelist
-        } elseif (($this->pgr['current'] + self::pgrbBorderToCenter) <= self::pgrbSize) {
+        } elseif (((int)$this->pgr['current'] + self::pgrbBorderToCenter) <= self::pgrbSize) {
             $this->pgr['pgrBarEnd'] = self::pgrbSize;
 
             // current page is somewhere in the middle
         } else {
-            $this->pgr['pgrBarEnd'] = $this->pgr['current'] + self::pgrbBorderToCenter;
+            $this->pgr['pgrBarEnd'] = (int)$this->pgr['current'] + self::pgrbBorderToCenter;
         }
 
         // now the begin limit
         if (($this->pgr['pgrBarEnd'] - self::pgrbSteps) <= 1) {
             $this->pgr['pgrBarBegin'] = 1;
         } else {
-            $this->pgr['pgrBarBegin'] = $this->pgr['pgrBarEnd'] - self::pgrbSteps;
+            $this->pgr['pgrBarBegin'] = (int)$this->pgr['pgrBarEnd'] - self::pgrbSteps;
         }
     }
 
@@ -125,7 +125,7 @@ class Etpager
 
         if ($this->pgr['current'] < $this->pgr['pgrBarEnd']) {
             $this->pgr['rBrowser'] = 1;
-            $this->pgr['rBrowserNext'] = $this->pgr['current'] + 1;
+            $this->pgr['rBrowserNext'] = (int)$this->pgr['current'] + 1;
         } else {
             $this->pgr['rBrowser'] = 0;
         }

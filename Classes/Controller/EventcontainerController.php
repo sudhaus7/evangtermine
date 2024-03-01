@@ -48,7 +48,6 @@ use ArbkomEKvW\Evangtermine\Util\ExtConf;
 use ArbkomEKvW\Evangtermine\Util\SettingsUtility;
 use Doctrine\DBAL\DBALException;
 use Doctrine\DBAL\Driver\Exception;
-use Psr\Http\Message\ResponseInterface;
 use TYPO3\CMS\Core\Cache\CacheManager;
 use TYPO3\CMS\Core\Cache\Exception\NoSuchCacheException;
 use TYPO3\CMS\Core\Messaging\AbstractMessage;
@@ -143,7 +142,7 @@ class EventcontainerController extends ActionController
      * @throws InvalidNumberOfConstraintsException
      * @throws NoSuchCacheException|UnexpectedTypeException
      */
-    public function listAction(): ResponseInterface
+    public function listAction()
     {
         $requestArguments = $this->request->getArguments();
         $formArguments = $requestArguments['etkeysForm'] ?? [];
@@ -202,7 +201,7 @@ class EventcontainerController extends ActionController
             $content = $this->view->render();
             $cache->set($cacheKey, $content);
         }
-        return $this->htmlResponse($content);
+        return $content;
     }
 
     /**
@@ -210,7 +209,7 @@ class EventcontainerController extends ActionController
      * @throws InvalidNumberOfConstraintsException
      * @throws UnexpectedTypeException
      */
-    public function teaserAction(): ResponseInterface
+    public function teaserAction()
     {
         $this->etkeys = $this->getNewFromSettings();
 
@@ -227,14 +226,17 @@ class EventcontainerController extends ActionController
             $content = $this->view->render();
             $cache->set($cacheKey, $content);
         }
-        return $this->htmlResponse($content);
+        return $content;
     }
 
     /**
      * action show
+     * @throws InvalidNumberOfConstraintsException
+     * @throws NoSuchCacheException
      * @throws StopActionException
+     * @throws UnexpectedTypeException
      */
-    public function showAction(): ResponseInterface
+    public function showAction()
     {
         $extconf = GeneralUtility::makeInstance(ExtConf::class);
         $uid = $this->request->getArguments()['uid'] ?? null;
@@ -245,6 +247,8 @@ class EventcontainerController extends ActionController
             // hand model data to the view
             $this->view->assign('event', $event);
             $this->view->assign('eventhost', $extconf->getExtConfArray()['host']);
+            $this->view->assign('categoryList', $this->eventRepository->findAllCategoriesWithEtKeys($this->settings));
+            $this->view->assign('groupList', $this->eventRepository->findAllGroupsWithEtKeys($this->settings));
 
             if (!empty($event)) {
                 $this->eventDispatcher->dispatch(
@@ -255,14 +259,12 @@ class EventcontainerController extends ActionController
             $this->addFlashMessage('Keine Event-ID übergeben', '', AbstractMessage::ERROR);
             $this->redirect('genericinfo');
         }
-        return $this->htmlResponse();
     }
 
     /**
      * action genericinfo
      */
-    public function genericinfoAction(): ResponseInterface
+    public function genericinfoAction()
     {
-        return $this->htmlResponse();
     }
 }

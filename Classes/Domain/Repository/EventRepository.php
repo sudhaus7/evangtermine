@@ -369,7 +369,7 @@ class EventRepository extends Repository
                 )
                 ->groupBy('place_city')
                 ->orderBy('place_zip');
-            $statement = $queryBuilder->executeQuery();
+            $statement = $queryBuilder->execute();
             $placesFromDB = $statement->fetchAllAssociative();
 
             foreach ($placesFromDB as $place) {
@@ -396,7 +396,7 @@ class EventRepository extends Repository
         }
         $queryBuilder->groupBy('place_city')
             ->orderBy('place_zip');
-        $placesFromDB = $queryBuilder->executeQuery()->fetchAllAssociative();
+        $placesFromDB = $queryBuilder->execute()->fetchAllAssociative();
         foreach ($placesFromDB as $place) {
             $places[$place['place_id']] = $place['place_zip'] . ' ' . $place['place_city'];
         }
@@ -425,6 +425,9 @@ class EventRepository extends Repository
             list($query, $queryConstraints, $clonedQuery, $clonedQueryConstraints)
                 = $this->prepareQuery($settings);
             $places = [];
+            if (empty($query)) {
+                return $places;
+            }
             foreach ($placesFromDb as $placeId => $place) {
                 if ($placeId == 'all') {
                     $places[$placeId] = $place;
@@ -528,6 +531,9 @@ class EventRepository extends Repository
                 = $this->prepareQuery($settings);
 
             $regions = [];
+            if (empty($query)) {
+                return $regions;
+            }
             foreach ($regionsFromDb as $key => $region) {
                 if ($key == 'all') {
                     $regions[$key] = $region;
@@ -563,7 +569,7 @@ class EventRepository extends Repository
 
         $queryBuilder->groupBy('region')
             ->orderBy('region');
-        $statement = $queryBuilder->executeQuery();
+        $statement = $queryBuilder->execute();
         return $statement->fetchAllAssociative();
     }
 
@@ -589,6 +595,9 @@ class EventRepository extends Repository
                 = $this->prepareQuery($settings);
 
             $categories = [];
+            if (empty($query)) {
+                return $categories;
+            }
             foreach ($categoriesFromItemlist as $key => $category) {
                 if ($key == 'all') {
                     $categories[$key] = $category;
@@ -636,6 +645,9 @@ class EventRepository extends Repository
                 = $this->prepareQuery($settings);
 
             $groups = [];
+            if (empty($query)) {
+                return $groups;
+            }
             foreach ($groupsFromItemslist as $key => $group) {
                 if ($key == 0) {
                     $groups[$key] = $group;
@@ -677,8 +689,11 @@ class EventRepository extends Repository
         $etKeys->setItemsPerPage(1);
         list($query, $queryConstraints) = $this->prepareFindByEtKeysQuery($etKeys);
 
+        if (empty($query)) {
+            return [null, [], null, []];
+        }
         $clonedQuery = clone $query;
         $clonedQueryConstraints = $queryConstraints;
-        return array($query, $queryConstraints, $clonedQuery, $clonedQueryConstraints);
+        return [$query, $queryConstraints, $clonedQuery, $clonedQueryConstraints];
     }
 }
