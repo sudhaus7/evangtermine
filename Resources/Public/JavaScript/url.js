@@ -211,6 +211,13 @@ const scrollToResults = function () {
     form.addEventListener('submit', function () {
       localStorage.setItem('evangtermine-form', 'submitted');
     });
+    const paginationItems = form.querySelectorAll('.pagination li a');
+    for (let j = 0; j < paginationItems.length; j++) {
+      paginationItems[j].addEventListener('click', function () {
+        console.log('pewdfk')
+        localStorage.setItem('evangtermine-form', 'submitted');
+      });
+    }
 
     let storage = '';
     try {

@@ -82,10 +82,11 @@ class EventRepository extends Repository
 
     public function filterWithSearchWord(EtKeys $etKeys): array
     {
-        $etKeysForApiQuery = $etKeys;
+        $etKeysForApiQuery = clone $etKeys;
         $etKeysForApiQuery->setItemsPerPage(99999);
+        $etKeysForApiQuery->setPageID(1);
         $eventContainerRepository = GeneralUtility::makeInstance(EventcontainerRepository::class);
-        $result = $eventContainerRepository->findByEtKeys($etKeys);
+        $result = $eventContainerRepository->findByEtKeys($etKeysForApiQuery);
 
         $eventsWithSearchWord = [];
         foreach ($result->getItems() as $item) {
