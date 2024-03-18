@@ -104,3 +104,11 @@ CREATE TABLE tx_evangtermine_domain_model_event
 	channels varchar(255) DEFAULT '' NOT NULL,
 	slug varchar(255) DEFAULT '' NOT NULL
 );
+
+CREATE TABLE tx_evangtermine_domain_model_hash
+(
+	day int(11) unsigned DEFAULT 0 NOT NULL,
+	month int(11) unsigned DEFAULT 0 NOT NULL,
+	year int(11) unsigned DEFAULT 0 NOT NULL,
+	hash varchar(255) DEFAULT '' NOT NULL
+);
