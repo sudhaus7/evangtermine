@@ -56,6 +56,21 @@ class ImportEventsCommand extends Command
     protected SlugHelper $slugHelper;
     protected array $extConfig;
     protected string $imageFolder;
+    protected array $months = [];
+    protected array $monthsArray = [
+        1 => 'Januar',
+        2 => 'Februar',
+        3 => 'März',
+        4 => 'April',
+        5 => 'Mai',
+        6 => 'Juni',
+        7 => 'Juli',
+        8 => 'August',
+        9 => 'September',
+        10 => 'Oktober',
+        11 => 'November',
+        12 => 'Dezember'
+    ];
 
     /**
      * @throws ExistingTargetFolderException
@@ -128,9 +143,9 @@ class ImportEventsCommand extends Command
      */
     protected function importAllEvents(OutputInterface $output)
     {
-        $items = $this->getItems();
+        $items = $this->getItems($output);
 
-        $this->deleteEvents($items);
+        $this->deleteEvents();
 
         $progressBar = new ProgressBar($output, count($items));
 
@@ -236,11 +251,56 @@ class ImportEventsCommand extends Command
         return $this->slugHelper->buildSlugForUniqueInTable($slug, $state);
     }
 
-    protected function getItems()
+    /**
+     * @throws Exception
+     * @throws DBALException
+     */
+    protected function getItems(OutputInterface $output): array
     {
         $host = $this->extConfig['host'];
-        $url = 'https://' . $host . '/Veranstalter/xml.php?itemsPerPage=9999&highlight=all';
+        $urlForMetaData = 'https://' . $host . '/Veranstalter/xml.php?itemsPerPage=1&highlight=all';
+        $urlMainPart = 'https://' . $host . '/Veranstalter/xml.php?itemsPerPage=9999&highlight=all';
 
+        // URL abfragen, nur IPv4 Auflösung
+        $rawXml = UrlUtility::loadUrl($urlForMetaData);
+
+        // XML im Eventcontainer wandeln
+        $eventContainer = GeneralUtility::makeInstance(EventContainer::class);
+        $eventContainer->loadXML($rawXml);
+
+        $metaData = $eventContainer->getMetaData();
+        $this->months = (array)$metaData->months->month;
+
+        $progressBar = new ProgressBar($output, count($this->months));
+        $newItems = [];
+        foreach ($this->months as $month) {
+            if (is_string($month)) {
+                foreach ($this->monthsArray as $key => $monthsArrayItem) {
+                    if (str_contains($month, $monthsArrayItem)) {
+                        $monthArray = explode(' ', $month);
+                        $m = $key;
+                        $y = mb_substr($monthArray[1], -2);
+
+                        for ($d = 1; $d < 32; $d++) {
+                            $url = $urlMainPart . '&d=' . $d . '&month=' . $m . '.' . $y;
+                            $itemsFromDay = $this->getNewItems($url, $d, $m, $y);
+                            $newItems = array_merge($newItems, $itemsFromDay);
+                        }
+                    }
+                }
+            }
+            $progressBar->advance();
+        }
+        $progressBar->finish();
+        return $newItems;
+    }
+
+    /**
+     * @throws Exception
+     * @throws DBALException
+     */
+    protected function getNewItems(string $url, int $day, int $month, string $year)
+    {
         // URL abfragen, nur IPv4 Auflösung
         $rawXml = UrlUtility::loadUrl($url);
 
@@ -248,7 +308,47 @@ class ImportEventsCommand extends Command
         $eventContainer = GeneralUtility::makeInstance(EventContainer::class);
         $eventContainer->loadXML($rawXml);
 
-        return $eventContainer->getItems() ?? [];
+        $items = $eventContainer->getItems();
+
+        $hash = sha1(json_encode($items));
+
+        $queryBuilder = $this->connectionPool->getQueryBuilderForTable('tx_evangtermine_domain_model_hash');
+        $queryBuilder->select('*')
+            ->from('tx_evangtermine_domain_model_hash')
+            ->where(
+                $queryBuilder->expr()->eq('day', $queryBuilder->createNamedParameter($day)),
+                $queryBuilder->expr()->eq('month', $queryBuilder->createNamedParameter($month)),
+                $queryBuilder->expr()->eq('year', $queryBuilder->createNamedParameter($year)),
+            );
+        $record = $queryBuilder->executeQuery()->fetchAssociative();
+
+        if (empty($record)) {
+            $this->connectionPool
+                ->getConnectionForTable('tx_evangtermine_domain_model_hash')
+                ->insert(
+                    'tx_evangtermine_domain_model_hash',
+                    [
+                        'pid' => 0,
+                        'tstamp' => time(),
+                        'crdate' => time(),
+                        'day' => $day,
+                        'month' => $month,
+                        'year' => $year,
+                    ],
+                );
+            return $items;
+        }
+        if (empty($record['hash']) || $record['hash'] !== $hash) {
+            $this->connectionPool
+                ->getConnectionForTable('tx_evangtermine_domain_model_hash')
+                ->update(
+                    'tx_evangtermine_domain_model_hash',
+                    [ 'hash' => $hash ],
+                    [ 'uid' => $record['uid'] ]
+                );
+            return $items;
+        }
+        return [];
     }
 
     /**
@@ -407,19 +507,14 @@ class ImportEventsCommand extends Command
      * @throws DBALException
      * @throws Exception
      */
-    protected function deleteEvents(array $items)
+    protected function deleteEvents()
     {
-        $ids = [];
-        foreach ($items as $item) {
-            $item = (array)$item;
-            $ids[] = $item['ID'];
-        }
-
         $queryBuilder = $this->connectionPool->getQueryBuilderForTable('tx_evangtermine_domain_model_event');
         $statement = $queryBuilder->select('uid')
             ->from('tx_evangtermine_domain_model_event')
             ->where(
-                $queryBuilder->expr()->notIn('id', $ids)
+                $queryBuilder->expr()->lte('start', time()),
+                $queryBuilder->expr()->lte('end', time())
             )
             ->execute();
         $events = $statement->fetchAllAssociative();

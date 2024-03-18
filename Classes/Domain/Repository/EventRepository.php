@@ -73,7 +73,7 @@ class EventRepository extends Repository
         return $events->toArray();
     }
 
-    public function getNumberOfEventsByEtKeys(QueryInterface $query, int $limit = 99999): int
+    public function getNumberOfEventsByEtKeys(QueryInterface $query, int $limit = 999999): int
     {
         $query->setLimit($limit);
         $query->setOffset(0);
@@ -410,9 +410,7 @@ class EventRepository extends Repository
      * @return array
      * @throws DBALException
      * @throws Exception
-     * @throws InvalidNumberOfConstraintsException
      * @throws NoSuchCacheException
-     * @throws UnexpectedTypeException
      */
     public function findAllPlacesWithEtKeys(?array $settings = null, int $pluginUid = 0): array
     {
@@ -423,9 +421,10 @@ class EventRepository extends Repository
         $places = $cache->get($cacheKey);
 
         if (empty($places)) {
-            $placesFromDb = $this->findAllPlaces($settings);
+            $places = $this->findAllPlaces($settings);
 
-            /** @var EtKeys $etKeys */
+            // this would remove select options with no events
+            /*$placesFromDb = $this->findAllPlaces($settings);
             list($query, $queryConstraints, $clonedQuery, $clonedQueryConstraints)
                 = $this->prepareQuery($settings);
             $places = [];
@@ -445,7 +444,7 @@ class EventRepository extends Repository
                 }
                 $query = $clonedQuery;
                 $queryConstraints = $clonedQueryConstraints;
-            }
+            }*/
             $cache->set($cacheKey, $places);
         }
         return $places;
@@ -518,9 +517,7 @@ class EventRepository extends Repository
      * @return array
      * @throws DBALException
      * @throws Exception
-     * @throws InvalidNumberOfConstraintsException
      * @throws NoSuchCacheException
-     * @throws UnexpectedTypeException
      */
     public function findAllRegionsWithEtKeys(?array $settings = null, int $pluginUid = 0): array
     {
@@ -531,7 +528,10 @@ class EventRepository extends Repository
         $regions = $cache->get($cacheKey);
 
         if (empty($regions)) {
-            $regionsFromDb = $this->findAllRegions($settings);
+            $regions = $this->findAllRegions($settings);
+
+            // this would remove select options with no events
+            /*$regionsFromDb = $this->findAllRegions($settings);
             list($query, $queryConstraints, $clonedQuery, $clonedQueryConstraints)
                 = $this->prepareQuery($settings);
 
@@ -552,7 +552,7 @@ class EventRepository extends Repository
                 }
                 $query = $clonedQuery;
                 $queryConstraints = $clonedQueryConstraints;
-            }
+            }*/
             $cache->set($cacheKey, $regions);
         }
         return $regions;
@@ -582,9 +582,7 @@ class EventRepository extends Repository
      * @param array|null $settings
      * @param int $pluginUid
      * @return array
-     * @throws InvalidNumberOfConstraintsException
      * @throws NoSuchCacheException
-     * @throws UnexpectedTypeException
      */
     public function findAllCategoriesWithEtKeys(?array $settings = null, int $pluginUid = 0): array
     {
@@ -596,7 +594,10 @@ class EventRepository extends Repository
 
         if (empty($categories)) {
             $categoryList = GeneralUtility::makeInstance(Categorylist::class);
-            $categoriesFromItemlist = $categoryList->getItemslist();
+            $categories = $categoryList->getItemslist();
+
+            // this would remove select options with no events
+            /*$categoriesFromItemlist = $categoryList->getItemslist();
             list($query, $queryConstraints, $clonedQuery, $clonedQueryConstraints)
                 = $this->prepareQuery($settings);
 
@@ -622,7 +623,7 @@ class EventRepository extends Repository
                 }
                 $query = $clonedQuery;
                 $queryConstraints = $clonedQueryConstraints;
-            }
+            }*/
             $cache->set($cacheKey, $categories);
         }
         return $categories;
@@ -632,9 +633,7 @@ class EventRepository extends Repository
      * @param array|null $settings
      * @param int $pluginUid
      * @return array
-     * @throws InvalidNumberOfConstraintsException
      * @throws NoSuchCacheException
-     * @throws UnexpectedTypeException
      */
     public function findAllGroupsWithEtKeys(?array $settings = null, int $pluginUid = 0): array
     {
@@ -646,8 +645,10 @@ class EventRepository extends Repository
 
         if (empty($groups)) {
             $grouplist = GeneralUtility::makeInstance(Grouplist::class);
+            $groups = $grouplist->getItemslist();
 
-            $groupsFromItemslist = $grouplist->getItemslist();
+            // this would remove select options with no events
+            /*$groupsFromItemslist = $grouplist->getItemslist();
             list($query, $queryConstraints, $clonedQuery, $clonedQueryConstraints)
                 = $this->prepareQuery($settings);
 
@@ -673,7 +674,7 @@ class EventRepository extends Repository
                 }
                 $query = $clonedQuery;
                 $queryConstraints = $clonedQueryConstraints;
-            }
+            }*/
             $cache->set($cacheKey, $groups);
         }
         return $groups;
