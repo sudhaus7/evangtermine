@@ -291,8 +291,15 @@ class ImportEventsCommand extends Command
             }
             $progressBar->advance();
         }
+
+        // every item only once
+        $items = [];
+        foreach ($newItems as $newItem) {
+            $itemArray = (array)$newItem;
+            $items[$itemArray['ID']] = $newItem;
+        }
         $progressBar->finish();
-        return $newItems;
+        return $items;
     }
 
     /**
@@ -310,7 +317,13 @@ class ImportEventsCommand extends Command
 
         $items = $eventContainer->getItems();
 
-        $hash = sha1(json_encode($items));
+        $eventModified = [];
+        foreach ($items ?? [] as $item) {
+            $item = (array)$item;
+            $eventModified[] = $item['ID'] . ',' . $item['_event_MODIFIED'];
+        }
+
+        $hash = sha1(json_encode($eventModified));
 
         $queryBuilder = $this->connectionPool->getQueryBuilderForTable('tx_evangtermine_domain_model_hash');
         $queryBuilder->select('*')
@@ -334,6 +347,8 @@ class ImportEventsCommand extends Command
                         'day' => $day,
                         'month' => $month,
                         'year' => $year,
+                        'hash' => $hash,
+                        'events' => json_encode($eventModified)
                     ],
                 );
             return $items;
@@ -343,10 +358,27 @@ class ImportEventsCommand extends Command
                 ->getConnectionForTable('tx_evangtermine_domain_model_hash')
                 ->update(
                     'tx_evangtermine_domain_model_hash',
-                    [ 'hash' => $hash ],
+                    [
+                        'hash' => $hash,
+                        'events' => json_encode($eventModified)
+                    ],
                     [ 'uid' => $record['uid'] ]
                 );
-            return $items;
+
+            $oldEvents = json_decode($record['events'], true);
+            $changedAndNewItems = [];
+            foreach ($items ?? [] as $item) {
+                $itemArray = (array)$item;
+                $itemModified = $itemArray['ID'] . ',' . $itemArray['_event_MODIFIED'];
+                foreach ($oldEvents ?? [] as $oldEvent) {
+                    if ($itemModified == $oldEvent) {
+                        continue 2;
+                    }
+                }
+                $changedAndNewItems[] = $item;
+            }
+
+            return $changedAndNewItems;
         }
         return [];
     }
