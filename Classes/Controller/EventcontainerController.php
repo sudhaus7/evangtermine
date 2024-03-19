@@ -107,7 +107,7 @@ class EventcontainerController extends ActionController
     public function __construct(CacheManager $cacheManager)
     {
         $this->cacheManager = $cacheManager;
-        $this->date = new \DateTime('today midnight');
+        $this->date = new \DateTime();
     }
 
     protected function initializeAction()
@@ -165,7 +165,7 @@ class EventcontainerController extends ActionController
 
         $requestArgumentsHash = sha1(\json_encode($requestArguments));
         $cache = $this->cacheManager->getCache('evangtermine_event_list');
-        $cacheKey = 'argumentshash-' . $requestArgumentsHash . '-' . $this->date->format('Ymd') . '-' . $this->currentPluginUid;
+        $cacheKey = $this->getCacheKey($requestArgumentsHash, $this->currentPluginUid);
         $content = $cache->get($cacheKey);
 
         if (empty($content)) {
@@ -216,7 +216,7 @@ class EventcontainerController extends ActionController
         $data = $this->configurationManager->getContentObject()->data;
 
         $cache = $this->cacheManager->getCache('evangtermine_event_teaser');
-        $cacheKey = 'argumentshash-' . $this->date->format('Ymd') . '-' . $data['uid'];
+        $cacheKey = $this->getCacheKey('', $data['uid']);
         $content = $cache->get($cacheKey);
 
         if (empty($content)) {
@@ -268,5 +268,19 @@ class EventcontainerController extends ActionController
      */
     public function genericinfoAction()
     {
+    }
+
+    /**
+     * @param string $requestArgumentsHash
+     * @param int $uid
+     * @return string
+     */
+    protected function getCacheKey(string $requestArgumentsHash, int $uid): string
+    {
+        // cache key is valid for 0.5h
+        return 'argumentshash-' . $requestArgumentsHash . '-'
+            . $this->date->format('YmdH') . '-'
+            . ($this->date->format('i') - 30 > 0 ? '1' : '0')
+            . '-' . $uid;
     }
 }
