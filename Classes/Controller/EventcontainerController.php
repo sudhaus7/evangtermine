@@ -233,10 +233,8 @@ class EventcontainerController extends ActionController
 
     /**
      * action show
-     * @throws InvalidNumberOfConstraintsException
      * @throws NoSuchCacheException
      * @throws StopActionException
-     * @throws UnexpectedTypeException
      */
     public function showAction()
     {
