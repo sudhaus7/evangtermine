@@ -19,6 +19,7 @@ use TYPO3\CMS\Extbase\Persistence\Generic\Exception\UnexpectedTypeException;
 use TYPO3\CMS\Extbase\Persistence\Generic\Query;
 use TYPO3\CMS\Extbase\Persistence\QueryInterface;
 use TYPO3\CMS\Extbase\Persistence\Repository;
+use TYPO3\CMS\Extbase\Utility\DebuggerUtility;
 
 /**
  * EventRepository
@@ -34,10 +35,9 @@ class EventRepository extends Repository
      */
     public function prepareFindByEtKeysQuery(EtKeys $etKeys): ?array
     {
-        $eventUids = $this->findWithinDistance($etKeys);
-        $eventUids = $this->hideOngoingEvents($etKeys, $eventUids);
+        [$eventUids, $filtered] = $this->preSelect($etKeys);
 
-        if (empty($eventUids)) {
+        if (empty($eventUids) && $filtered) {
             return null;
         }
 
@@ -68,6 +68,13 @@ class EventRepository extends Repository
         $itemsPerPage = (int)$etKeys->getItemsPerPage() ?: 20;
         $query->setLimit($itemsPerPage);
         $query->setOffset($itemsPerPage * ((int)($etKeys->getPageID() ?: 1) - 1));
+        $query->setOrderings(
+            [
+                'start' => QueryInterface::ORDER_ASCENDING,
+                'end' => QueryInterface::ORDER_ASCENDING,
+                'title' => QueryInterface::ORDER_ASCENDING
+            ]
+        );
         // get events
         $events = $query->execute();
         return $events->toArray();
@@ -96,6 +103,12 @@ class EventRepository extends Repository
         return $eventsWithSearchWord;
     }
 
+    public function preSelect(EtKeys $etKeys): array
+    {
+        list($eventUids, $filtered) = $this->findWithinDistance($etKeys);
+        return $this->hideOngoingEvents($etKeys, $eventUids, $filtered);
+    }
+
     public function findWithinDistance(EtKeys $etKeys): array
     {
         $zip = $etKeys->getZip();
@@ -103,7 +116,7 @@ class EventRepository extends Repository
 
         $query = $this->createQuery();
         if (empty($zip) || empty($radius)) {
-            return $query->execute(true);
+            return [null, false];
         }
 
         $osmService = GeneralUtility::makeInstance(OsmService::class);
@@ -124,17 +137,19 @@ class EventRepository extends Repository
         ';
         $query->statement($statement);
         // only return array of uids
-        return $query->execute(true);
+        return [$query->execute(true), true];
     }
 
     /**
      * @throws InvalidNumberOfConstraintsException
      * @throws UnexpectedTypeException
      */
-    public function setConstraints(QueryInterface $query, EtKeys $etKeys, array $eventUids): array
+    public function setConstraints(QueryInterface $query, EtKeys $etKeys, ?array $eventUids): array
     {
         $queryConstraints = [];
-        $queryConstraints = array_merge($queryConstraints, $this->setUidConstraint($query, $eventUids));
+        if (!empty($eventUids)) {
+            $queryConstraints = array_merge($queryConstraints, $this->setUidConstraint($query, $eventUids));
+        }
         $queryConstraints = array_merge($queryConstraints, $this->setVid($query, $etKeys));
         $queryConstraints = array_merge($queryConstraints, $this->setHighlightConstraint($query, $etKeys));
         $queryConstraints = array_merge($queryConstraints, $this->setCategoryConstraint($query, $etKeys));
@@ -204,15 +219,21 @@ class EventRepository extends Repository
     {
         $queryConstraints = [];
         $category = $etKeys->getEventtype();
-        if (empty($category) || $category == 'all') {
-            return $queryConstraints;
+
+        $categoryArray = explode(',', $category);
+        $categoryConstraints = [];
+        foreach ($categoryArray as $category) {
+            if (empty($category) || $category == 'all') {
+                continue;
+            }
+            $categoryConstraints[] = $query->equals('categories', $category);
+            $categoryConstraints[] = $query->like('categories', '%,' . $category . ',%');
+            $categoryConstraints[] = $query->like('categories', $category . ',%');
+            $categoryConstraints[] = $query->like('categories', '%,' . $category);
         }
-        $queryConstraints[] = $query->logicalOr(
-            $query->equals('categories', $category),
-            $query->like('categories', '%,' . $category . ',%'),
-            $query->like('categories', $category . ',%'),
-            $query->like('categories', '%,' . $category),
-        );
+        if (!empty($categoryConstraints)) {
+            $queryConstraints[] = $query->logicalOr(...$categoryConstraints);
+        }
         return $queryConstraints;
     }
 
@@ -319,13 +340,21 @@ class EventRepository extends Repository
         return $queryConstraints;
     }
 
-    protected function hideOngoingEvents(EtKeys $etKeys, array $eventUids): array
+    protected function hideOngoingEvents(EtKeys $etKeys, ?array $eventUids, bool $filtered): array
     {
-        if (
-            empty($eventUids) ||
-            empty($etKeys->getHideOngoingEvents())
-        ) {
-            return $eventUids;
+        if ($filtered) {
+            if (
+                empty($eventUids) ||
+                empty($etKeys->getHideOngoingEvents())
+            ) {
+                return [$eventUids, true];
+            }
+        } else {
+            if (empty($etKeys->getHideOngoingEvents())) {
+                return [null, false];
+            }
+            $query = $this->createQuery();
+            $eventUids = $query->execute(true);
         }
         $uids = [];
         foreach ($eventUids as $eventUid) {
@@ -340,7 +369,7 @@ class EventRepository extends Repository
                 (tx_evangtermine_domain_model_event.end/1 - tx_evangtermine_domain_model_event.start/1) < ' . $time . '
             )
         ');
-        return $query->execute(true);
+        return [$query->execute(true), true];
     }
 
     /**
@@ -395,11 +424,12 @@ class EventRepository extends Repository
                 $queryBuilder->expr()->in('uid', $uids)
             );
         }
-        $queryBuilder->groupBy('place_city')
-            ->orderBy('place_zip');
+        $queryBuilder->orderBy('place_zip');
         $placesFromDB = $queryBuilder->execute()->fetchAllAssociative();
         foreach ($placesFromDB as $place) {
-            $places[$place['place_id']] = $place['place_zip'] . ' ' . $place['place_city'];
+            if (!in_array($place['place_zip'] . ' ' . $place['place_city'], $places)) {
+                $places[$place['place_id']] = $place['place_zip'] . ' ' . $place['place_city'];
+            }
         }
         return $places;
     }
