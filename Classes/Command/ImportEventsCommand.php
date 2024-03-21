@@ -114,7 +114,7 @@ class ImportEventsCommand extends Command
 
     public function configure()
     {
-        $this->setDescription('Add pattern to a set of reports')
+        $this->setDescription('Import events from one of the APIs of the Evangelische Kirche')
              ->setHelp('vendor/bin/typo3 evangtermine:importevents');
     }
 
