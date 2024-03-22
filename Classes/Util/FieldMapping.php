@@ -142,6 +142,7 @@ class FieldMapping
             'user_intdata' => '_user_INTDATA',
             'liturg_bez' => 'LITURG_BEZ',
             'channels' => 'CHANNELS',
+            'attributes' => 'attributes',
         ];
     }
 }

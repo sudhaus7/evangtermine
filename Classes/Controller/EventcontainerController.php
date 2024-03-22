@@ -56,7 +56,6 @@ use TYPO3\CMS\Extbase\Mvc\Controller\ActionController;
 use TYPO3\CMS\Extbase\Mvc\Exception\StopActionException;
 use TYPO3\CMS\Extbase\Persistence\Generic\Exception\InvalidNumberOfConstraintsException;
 use TYPO3\CMS\Extbase\Persistence\Generic\Exception\UnexpectedTypeException;
-use TYPO3\CMS\Extbase\Utility\DebuggerUtility;
 
 /**
  * EventcontainerController
@@ -128,7 +127,6 @@ class EventcontainerController extends ActionController
         $etkeys->setResetValues();
 
         $this->settingsUtility->fetchParamsFromSettings($this->settings, $etkeys);
-
         return $etkeys;
     }
 

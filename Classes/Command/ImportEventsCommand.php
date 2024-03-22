@@ -150,7 +150,9 @@ class ImportEventsCommand extends Command
         $progressBar = new ProgressBar($output, count($items));
 
         foreach ($items as $item) {
+            $attributes = $this->addAttributesToItems($item);
             $item = (array)$item;
+            $item['attributes'] = json_encode($attributes);
 
             if (strpos($item['END'], '0000-00-00') !== false) {
                 $startArray = explode(' ', $item['START']);
@@ -271,8 +273,9 @@ class ImportEventsCommand extends Command
         $metaData = $eventContainer->getMetaData();
         $this->months = (array)$metaData->months->month;
 
-        $progressBar = new ProgressBar($output, count($this->months));
-        $newItems = [];
+
+
+        $urls = [];
         foreach ($this->months as $month) {
             if (is_string($month)) {
                 foreach ($this->monthsArray as $key => $monthsArrayItem) {
@@ -281,14 +284,47 @@ class ImportEventsCommand extends Command
                         $m = $key;
                         $y = mb_substr($monthArray[1], -2);
 
+
                         for ($d = 1; $d < 32; $d++) {
-                            $url = $urlMainPart . '&d=' . $d . '&month=' . $m . '.' . $y;
-                            $itemsFromDay = $this->getNewItems($url, $d, $m, $y);
-                            $newItems = array_merge($newItems, $itemsFromDay);
+                            $urls[$d . '-' . $m . '-' . $y] = $urlMainPart . '&d=' . $d . '&month=' . $m . '.' . $y;
                         }
                     }
                 }
             }
+        }
+
+        $curls = [];
+        $mh = curl_multi_init();
+        foreach ($urls as $key => $url) {
+            $curls[$key] = curl_init();
+            curl_setopt($curls[$key], CURLOPT_URL, $url);
+            curl_setopt($curls[$key], CURLOPT_RETURNTRANSFER, 1);
+            curl_setopt($curls[$key], CURLOPT_HEADER, false);
+            curl_multi_add_handle($mh, $curls[$key]);
+        }
+
+        $running = null;
+        do {
+            curl_multi_exec($mh, $running);
+        } while ($running);
+
+        foreach ($curls as $curl) {
+            curl_multi_remove_handle($mh, $curl);
+        }
+        curl_multi_close($mh);
+
+        $progressBar = new ProgressBar($output, count($curls));
+
+        $newItems = [];
+        $eventContainer = GeneralUtility::makeInstance(EventContainer::class);
+        foreach ($curls as $key => $curl) {
+            $rawXml = curl_multi_getcontent($curl);
+            $eventContainer->loadXML($rawXml);
+            $items = $eventContainer->getItems();
+            file_put_contents('/tmp/jww.txt', print_r($items, true), FILE_APPEND);
+            $itemsFromDay = $this->getNewItems($items ?? [], $key);
+            $newItems = array_merge($newItems, $itemsFromDay);
+
             $progressBar->advance();
         }
 
@@ -298,6 +334,7 @@ class ImportEventsCommand extends Command
             $itemArray = (array)$newItem;
             $items[$itemArray['ID']] = $newItem;
         }
+
         $progressBar->finish();
         return $items;
     }
@@ -306,19 +343,15 @@ class ImportEventsCommand extends Command
      * @throws Exception
      * @throws DBALException
      */
-    protected function getNewItems(string $url, int $day, int $month, string $year)
+    protected function getNewItems(array $items, string $key): array
     {
-        // URL abfragen, nur IPv4 Auflösung
-        $rawXml = UrlUtility::loadUrl($url);
-
-        // XML im Eventcontainer wandeln
-        $eventContainer = GeneralUtility::makeInstance(EventContainer::class);
-        $eventContainer->loadXML($rawXml);
-
-        $items = $eventContainer->getItems();
+        $keyArray = explode('-', $key);
+        $day = $keyArray[0];
+        $month = $keyArray[1];
+        $year = $keyArray[2];
 
         $eventModified = [];
-        foreach ($items ?? [] as $item) {
+        foreach ($items as $item) {
             $item = (array)$item;
             $eventModified[] = $item['ID'] . ',' . $item['_event_MODIFIED'];
         }
@@ -367,7 +400,7 @@ class ImportEventsCommand extends Command
 
             $oldEvents = json_decode($record['events'], true);
             $changedAndNewItems = [];
-            foreach ($items ?? [] as $item) {
+            foreach ($items as $item) {
                 $itemArray = (array)$item;
                 $itemModified = $itemArray['ID'] . ',' . $itemArray['_event_MODIFIED'];
                 foreach ($oldEvents ?? [] as $oldEvent) {
@@ -381,6 +414,27 @@ class ImportEventsCommand extends Command
             return $changedAndNewItems;
         }
         return [];
+    }
+
+    protected function addAttributesToItems(\SimpleXMLElement $item): array
+    {
+        /** @var FieldMapping $fieldMapping */
+        $fieldMapping = GeneralUtility::makeInstance(FieldMapping::class);
+        $fields = $fieldMapping->getFields();
+
+        $attributes = [];
+        foreach ($item->children() as $key => $value) {
+            $json = json_encode($value);
+            // "@attributes" would disappear when we transform the object or json to an array,
+            // therefore we rename it to "attributes"
+            $json = str_replace('@attributes', 'attributes', $json);
+            $array = json_decode($json, true);
+            $label = $array['attributes']['Label'] ?? '';
+            if (!empty($label)) {
+                $attributes[array_search($key, $fields)] = $label;
+            }
+        }
+        return $attributes;
     }
 
     /**

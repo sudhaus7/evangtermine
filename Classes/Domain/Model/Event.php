@@ -112,6 +112,7 @@ class Event extends AbstractEntity
     protected ?FileReference $userImage = null;
     protected string $liturgBez = '';
     protected string $channels = '';
+    protected string $attributes = '';
     protected string $slug = '';
 
     public function getId(): string
@@ -1132,6 +1133,21 @@ class Event extends AbstractEntity
     public function setChannels(string $channels): void
     {
         $this->channels = $channels;
+    }
+
+    public function getAttributes(): string
+    {
+        return $this->attributes;
+    }
+
+    public function getAttributesAsArray(): array
+    {
+        return json_decode($this->attributes, true);
+    }
+
+    public function setAttributes(string $attributes): void
+    {
+        $this->attributes = $attributes;
     }
 
     public function getSlug(): string

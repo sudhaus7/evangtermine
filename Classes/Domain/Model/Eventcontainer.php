@@ -63,9 +63,8 @@ class Eventcontainer extends AbstractEntity implements EventcontainerInterface
 
     /**
      * content of the <meta> tag in XML result
-     * @var SimpleXMLElement
      */
-    private SimpleXMLElement $metaData;
+    private ?SimpleXMLElement $metaData;
 
     /**
      * detail-tag, only present in single view
@@ -110,14 +109,14 @@ class Eventcontainer extends AbstractEntity implements EventcontainerInterface
         $this->items = $items;
     }
 
-    public function getMetaData(): SimpleXMLElement
+    public function getMetaData(): ?SimpleXMLElement
     {
         return $this->metaData;
     }
 
     public function setMetaData($metaData)
     {
-        $this->metaData = $metaData;
+        $this->metaData = $metaData ?? null;
     }
 
     /**

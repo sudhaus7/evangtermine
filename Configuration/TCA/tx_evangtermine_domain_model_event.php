@@ -47,6 +47,9 @@ return [
         'text' => [
             'showitem' => 'textbox1,textbox2,--linebreak--,textbox3,--linebreak--,textline1,textline2,--linebreak--,textline3,textline4,--linebreak--,textline5,textline6,--linebreak--,textline7,textline8',
         ],
+        'attributes' => [
+            'showitem' => 'attributes',
+        ],
     ],
     'types' => [
         '0' => [
@@ -67,6 +70,8 @@ return [
                 --palette--;;text,
                 --div--;Geokoordinaten,
                 --palette--;;geo,
+                --div--;Attribute,
+                --palette--;;attributes,
                 ',
         ],
     ],
@@ -1145,6 +1150,15 @@ return [
             'config' => [
                 'type' => 'input',
                 'eval' => 'trim',
+                'readOnly' => true,
+            ],
+        ],
+        'attributes' => [
+            'label' => 'Attribute',
+            'config' => [
+                'type' => 'text',
+                'cols' => 60,
+                'rows' => 5,
                 'readOnly' => true,
             ],
         ],

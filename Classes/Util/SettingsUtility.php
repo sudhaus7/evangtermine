@@ -82,6 +82,9 @@ class SettingsUtility
     public function fetchParamsFromRequest(array $requestParams, EtKeys $etks)
     {
         foreach ($requestParams as $key => $value) {
+            if (empty($value) || $value == '0' || $value == 'all') {
+                continue;
+            }
             $targetMethod = 'set' . ucfirst($key);
             if (method_exists($etks, $targetMethod)) {
                 $etks->{$targetMethod}($value);

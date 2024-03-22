@@ -24,7 +24,7 @@ return [
     ],
     'palettes' => [],
     'types' => [
-        '1' => ['showitem' => 'hidden,day,month,year,hash,text'],
+        '1' => ['showitem' => 'hidden,day,month,year,hash,events'],
     ],
     'columns' => [
         'hidden' => [
@@ -76,7 +76,7 @@ return [
                 'readOnly' => true,
             ],
         ],
-        'text' => [
+        'events' => [
             'exclude' => 1,
             'label' => 'Termine',
             'config' => [

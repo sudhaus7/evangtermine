@@ -75,6 +75,7 @@ class EventRepository extends Repository
                 'title' => QueryInterface::ORDER_ASCENDING
             ]
         );
+
         // get events
         $events = $query->execute();
         return $events->toArray();
@@ -244,15 +245,25 @@ class EventRepository extends Repository
     {
         $queryConstraints = [];
         $person = $etKeys->getPeople();
-        if (empty($person) || $person == 'all') {
-            return $queryConstraints;
+
+        $personArray = explode(',', $person);
+        if (empty($personArray[0]) || $personArray[0] == 'all') {
+            $personArray = explode(',', $etKeys->getPeople());
         }
-        $queryConstraints[] = $query->logicalOr(
-            $query->equals('people', $person),
-            $query->like('people', '%,' . $person . ',%'),
-            $query->like('people', $person . ',%'),
-            $query->like('people', '%,' . $person),
-        );
+
+        $personConstraints = [];
+        foreach ($personArray as $person) {
+            if (empty($person) || $person == 'all') {
+                continue;
+            }
+            $personConstraints[] = $query->equals('people', $person);
+            $personConstraints[] = $query->like('people', '%,' . $person . ',%');
+            $personConstraints[] = $query->like('people', $person . ',%');
+            $personConstraints[] = $query->like('people', '%,' . $person);
+        }
+        if (!empty($personConstraints)) {
+            $queryConstraints[] = $query->logicalOr(...$personConstraints);
+        }
         return $queryConstraints;
     }
 
@@ -676,6 +687,16 @@ class EventRepository extends Repository
         if (empty($groups)) {
             $grouplist = GeneralUtility::makeInstance(Grouplist::class);
             $groups = $grouplist->getItemslist();
+            if (!empty($settings['etkey_people']) && $settings['etkey_people'] !== 'all') {
+                $allowedGroups = [];
+                $allowedGroups[0] = $groups[0];
+                foreach (explode(',', $settings['etkey_people']) as $person) {
+                    if (!empty($groups[$person])) {
+                        $allowedGroups[$person] = $groups[$person];
+                    }
+                }
+                $groups = $allowedGroups;
+            }
 
             // this would remove select options with no events
             /*$groupsFromItemslist = $grouplist->getItemslist();
