@@ -1142,6 +1142,9 @@ class Event extends AbstractEntity
 
     public function getAttributesAsArray(): array
     {
+        if (empty($this->attributes)) {
+            return [];
+        }
         return json_decode($this->attributes, true);
     }
 
