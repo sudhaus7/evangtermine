@@ -273,8 +273,6 @@ class ImportEventsCommand extends Command
         $metaData = $eventContainer->getMetaData();
         $this->months = (array)$metaData->months->month;
 
-
-
         $urls = [];
         foreach ($this->months as $month) {
             if (is_string($month)) {
@@ -283,7 +281,6 @@ class ImportEventsCommand extends Command
                         $monthArray = explode(' ', $month);
                         $m = $key;
                         $y = mb_substr($monthArray[1], -2);
-
 
                         for ($d = 1; $d < 32; $d++) {
                             $urls[$d . '-' . $m . '-' . $y] = $urlMainPart . '&d=' . $d . '&month=' . $m . '.' . $y;
@@ -321,22 +318,13 @@ class ImportEventsCommand extends Command
             $rawXml = curl_multi_getcontent($curl);
             $eventContainer->loadXML($rawXml);
             $items = $eventContainer->getItems();
-            file_put_contents('/tmp/jww.txt', print_r($items, true), FILE_APPEND);
             $itemsFromDay = $this->getNewItems($items ?? [], $key);
             $newItems = array_merge($newItems, $itemsFromDay);
 
             $progressBar->advance();
         }
-
-        // every item only once
-        $items = [];
-        foreach ($newItems as $newItem) {
-            $itemArray = (array)$newItem;
-            $items[$itemArray['ID']] = $newItem;
-        }
-
         $progressBar->finish();
-        return $items;
+        return $newItems;
     }
 
     /**
