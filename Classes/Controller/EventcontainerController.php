@@ -224,6 +224,7 @@ class EventcontainerController extends ActionController
 
             $this->view->assign('events', $events);
             $this->view->assign('pageId', $GLOBALS['TSFE']->id);
+            $this->view->assign('data', $this->configurationManager->getContentObject()->data);
             $content = $this->view->render();
             $cache->set($cacheKey, $content);
         }
