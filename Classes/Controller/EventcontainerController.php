@@ -195,6 +195,7 @@ class EventcontainerController extends ActionController
                 'placeList' => $this->eventRepository->findAllPlacesWithEtKeys($this->settings, $this->currentPluginUid),
                 'regionList' => $this->eventRepository->findAllRegionsWithEtKeys($this->settings, $this->currentPluginUid),
                 'pagerdata' => $this->pager->getPgr(),
+                'data' => $this->configurationManager->getContentObject()->data,
             ]);
 
             $content = $this->view->render();
