@@ -71,6 +71,7 @@ class ImportEventsCommand extends Command
         11 => 'November',
         12 => 'Dezember'
     ];
+    protected array $allIds = [];
 
     /**
      * @throws ExistingTargetFolderException
@@ -145,7 +146,7 @@ class ImportEventsCommand extends Command
     {
         $items = $this->getItems($output);
 
-        $this->deleteEvents();
+        $this->deleteEvents($output);
 
         $progressBar = new ProgressBar($output, count($items));
 
@@ -273,9 +274,10 @@ class ImportEventsCommand extends Command
         $metaData = $eventContainer->getMetaData();
         $this->months = (array)$metaData->months->month;
 
-        $urls = [];
+        $newItems = [];
         foreach ($this->months as $month) {
             if (is_string($month)) {
+                $urls = [];
                 foreach ($this->monthsArray as $key => $monthsArrayItem) {
                     if (str_contains($month, $monthsArrayItem)) {
                         $monthArray = explode(' ', $month);
@@ -285,45 +287,12 @@ class ImportEventsCommand extends Command
                         for ($d = 1; $d < 32; $d++) {
                             $urls[$d . '-' . $m . '-' . $y] = $urlMainPart . '&d=' . $d . '&month=' . $m . '.' . $y;
                         }
+                        $newItems = $this->getEventsFromApi($urls, $output, $newItems);
                     }
                 }
             }
         }
 
-        $curls = [];
-        $mh = curl_multi_init();
-        foreach ($urls as $key => $url) {
-            $curls[$key] = curl_init();
-            curl_setopt($curls[$key], CURLOPT_URL, $url);
-            curl_setopt($curls[$key], CURLOPT_RETURNTRANSFER, 1);
-            curl_setopt($curls[$key], CURLOPT_HEADER, false);
-            curl_multi_add_handle($mh, $curls[$key]);
-        }
-
-        $running = null;
-        do {
-            curl_multi_exec($mh, $running);
-        } while ($running);
-
-        foreach ($curls as $curl) {
-            curl_multi_remove_handle($mh, $curl);
-        }
-        curl_multi_close($mh);
-
-        $progressBar = new ProgressBar($output, count($curls));
-
-        $newItems = [];
-        $eventContainer = GeneralUtility::makeInstance(EventContainer::class);
-        foreach ($curls as $key => $curl) {
-            $rawXml = curl_multi_getcontent($curl);
-            $eventContainer->loadXML($rawXml);
-            $items = $eventContainer->getItems();
-            $itemsFromDay = $this->getNewItems($items ?? [], $key);
-            $newItems = array_merge($newItems, $itemsFromDay);
-
-            $progressBar->advance();
-        }
-        $progressBar->finish();
         return $newItems;
     }
 
@@ -342,6 +311,8 @@ class ImportEventsCommand extends Command
         foreach ($items as $item) {
             $item = (array)$item;
             $eventModified[] = $item['ID'] . ',' . $item['_event_MODIFIED'];
+
+            $this->allIds[] = $item['ID'];
         }
 
         $hash = sha1(json_encode($eventModified));
@@ -581,7 +552,7 @@ class ImportEventsCommand extends Command
      * @throws DBALException
      * @throws Exception
      */
-    protected function deleteEvents()
+    protected function deleteEvents(OutputInterface $output): void
     {
         $queryBuilder = $this->connectionPool->getQueryBuilderForTable('tx_evangtermine_domain_model_event');
         $statement = $queryBuilder->select('uid')
@@ -590,7 +561,7 @@ class ImportEventsCommand extends Command
                 $queryBuilder->expr()->lte('start', time()),
                 $queryBuilder->expr()->lte('end', time())
             )
-            ->execute();
+            ->executeQuery();
         $events = $statement->fetchAllAssociative();
 
         foreach ($events as $event) {
@@ -600,5 +571,114 @@ class ImportEventsCommand extends Command
                     ['uid' => $event['uid']]  // where
                 );
         }
+        $this->deleteEventsThatAreNotInApiAnymore($output);
+    }
+
+    /**
+     * @param OutputInterface $output
+     * @return void
+     * @throws DBALException
+     * @throws Exception
+     */
+    protected function deleteEventsThatAreNotInApiAnymore(OutputInterface $output): void
+    {
+        $ids = implode(',', $this->allIds);
+        // save events that may need to be deleted
+        $queryBuilder = $this->connectionPool->getQueryBuilderForTable('tx_evangtermine_domain_model_event');
+        $queryBuilder->select('*')
+            ->from('tx_evangtermine_domain_model_event')
+            ->where(
+                $queryBuilder->expr()->notIn('id', $ids)
+            );
+        $events = $queryBuilder->executeQuery()->fetchAllAssociative();
+
+        $progressBar = new ProgressBar($output, count($events));
+
+        $count = 0;
+        foreach ($events as $event) {
+            // Check max. 1000 events.
+            // If it's more than 1000 events, the curl probably gathered not all events.
+            if ($count > 1000) {
+                continue;
+            }
+            $count++;
+
+            $id = $event['id'];
+            $date = new \DateTime();
+            $date->setTimestamp($event['start']);
+            $d = $date->format('d');
+            $m = $date->format('m');
+            $y = $date->format('y');
+            $url = 'https://' . $this->extConfig['host'] . '/Veranstalter/xml.php?itemsPerPage=99&highlight=all';
+            $url .= '&q=' . urlencode($event['title']) . '&d=' . $d . '&month=' . $m . '.' . $y;
+
+            // check if the event is really not in the API anymore
+            $rawXml = UrlUtility::loadUrl($url);
+
+            // XML im Eventcontainer wandeln
+            $eventContainer = GeneralUtility::makeInstance(EventContainer::class);
+            $eventContainer->loadXML($rawXml);
+            $items = $eventContainer->getItems();
+
+            foreach ($items as $item) {
+                $item = (array)$item;
+                if ($item['ID'] == $id) {
+                    continue 2;
+                }
+            }
+
+            // delete the event if it is not found in the API
+            $this->connectionPool->getConnectionForTable('tx_evangtermine_domain_model_event')
+                ->delete(
+                    'tx_evangtermine_domain_model_event', // from
+                    ['uid' => $event['uid']]  // where
+                );
+            $progressBar->advance();
+        }
+        $progressBar->finish();
+    }
+
+    /**
+     * @param array $urls
+     * @param OutputInterface $output
+     * @param array $newItems
+     * @return array
+     * @throws DBALException
+     * @throws Exception
+     */
+    protected function getEventsFromApi(array $urls, OutputInterface $output, array $newItems): array
+    {
+        $curls = [];
+        $mh = curl_multi_init();
+        foreach ($urls as $key => $url) {
+            $curls[$key] = curl_init();
+            curl_setopt($curls[$key], CURLOPT_URL, $url);
+            curl_setopt($curls[$key], CURLOPT_RETURNTRANSFER, 1);
+            curl_setopt($curls[$key], CURLOPT_HEADER, false);
+            curl_multi_add_handle($mh, $curls[$key]);
+        }
+
+        $running = null;
+        do {
+            curl_multi_exec($mh, $running);
+        } while ($running);
+
+        $progressBar = new ProgressBar($output, count($curls));
+
+        $eventContainer = GeneralUtility::makeInstance(EventContainer::class);
+
+        foreach ($curls as $key => $curl) {
+            $rawXml = curl_multi_getcontent($curl);
+            $eventContainer->loadXML($rawXml);
+            $items = $eventContainer->getItems();
+            $itemsFromDay = $this->getNewItems($items ?? [], $key);
+            $newItems = array_merge($newItems, $itemsFromDay);
+            curl_multi_remove_handle($mh, $curl);
+
+            $progressBar->advance();
+        }
+        curl_multi_close($mh);
+        $progressBar->finish();
+        return $newItems;
     }
 }
