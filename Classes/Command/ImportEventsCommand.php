@@ -596,9 +596,9 @@ class ImportEventsCommand extends Command
 
         $count = 0;
         foreach ($events as $event) {
-            // Check max. 1000 events.
-            // If it's more than 1000 events, the curl probably gathered not all events.
-            if ($count > 1000) {
+            // Check max. 100 events.
+            // If it's more than 100 events, the curl probably gathered not all events.
+            if ($count > 100) {
                 continue;
             }
             $count++;
