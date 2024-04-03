@@ -19,7 +19,6 @@ use TYPO3\CMS\Extbase\Persistence\Generic\Exception\UnexpectedTypeException;
 use TYPO3\CMS\Extbase\Persistence\Generic\Query;
 use TYPO3\CMS\Extbase\Persistence\QueryInterface;
 use TYPO3\CMS\Extbase\Persistence\Repository;
-use TYPO3\CMS\Extbase\Utility\DebuggerUtility;
 
 /**
  * EventRepository
@@ -72,7 +71,7 @@ class EventRepository extends Repository
             [
                 'start' => QueryInterface::ORDER_ASCENDING,
                 'end' => QueryInterface::ORDER_ASCENDING,
-                'title' => QueryInterface::ORDER_ASCENDING
+                'title' => QueryInterface::ORDER_ASCENDING,
             ]
         );
 
@@ -458,7 +457,7 @@ class EventRepository extends Repository
         $cacheManager = GeneralUtility::makeInstance(CacheManager::class);
         $dateString = (new \DateTime('today midnight'))->format('Ymd');
         $cache = $cacheManager->getCache('evangtermine');
-        $cacheKey = 'places-with-events-' . $dateString . '-' . $pluginUid;;
+        $cacheKey = 'places-with-events-' . $dateString . '-' . $pluginUid;
         $places = $cache->get($cacheKey);
 
         if (empty($places)) {
@@ -565,7 +564,7 @@ class EventRepository extends Repository
         $cacheManager = GeneralUtility::makeInstance(CacheManager::class);
         $dateString = (new \DateTime('today midnight'))->format('Ymd');
         $cache = $cacheManager->getCache('evangtermine');
-        $cacheKey = 'regions-with-events-' . $dateString . '-' . $pluginUid;;
+        $cacheKey = 'regions-with-events-' . $dateString . '-' . $pluginUid;
         $regions = $cache->get($cacheKey);
 
         if (empty($regions)) {

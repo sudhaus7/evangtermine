@@ -85,6 +85,6 @@ return [
                 'rows' => 5,
                 'readOnly' => true,
             ],
-        ]
+        ],
     ],
 ];
