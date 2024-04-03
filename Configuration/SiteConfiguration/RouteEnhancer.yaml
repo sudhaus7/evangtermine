@@ -1,5 +1,5 @@
 routeEnhancers:
-  EvangtermineDetail:
+  EvangtermineList:
     type: Extbase
     extension: Evangtermine
     plugin: List
@@ -49,3 +49,18 @@ routeEnhancers:
         type: PlaceStaticValueMapper
         map:
           id: 0
+  EvangtermineDetail:
+    type: Extbase
+    extension: Evangtermine
+    plugin: Detail
+    routes:
+      - routePath: '/{eventtitle}'
+        _controller: 'Eventcontainer::show'
+        _arguments:
+          eventtitle: uid
+    aspects:
+      eventtitle:
+        type: PersistedAliasMapper
+        tableName: 'tx_evangtermine_domain_model_event'
+        routeFieldName: 'slug'
+        routeValuePrefix: '/'

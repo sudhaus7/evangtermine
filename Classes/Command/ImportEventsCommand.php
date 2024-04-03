@@ -397,7 +397,11 @@ class ImportEventsCommand extends Command
             $array = json_decode($json, true);
             $label = $array['attributes']['Label'] ?? '';
             if (!empty($label)) {
-                $attributes[array_search($key, $fields)] = $label;
+                $attributes[array_search($key, $fields)]['label'] = $label;
+            }
+            $db = $array['attributes']['db'] ?? '';
+            if (!empty($db)) {
+                $attributes[array_search($key, $fields)]['db'] = $db;
             }
         }
         return $attributes;

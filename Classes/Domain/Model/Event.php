@@ -1145,7 +1145,13 @@ class Event extends AbstractEntity
         if (empty($this->attributes)) {
             return [];
         }
-        return json_decode($this->attributes, true);
+        $attributesArray = json_decode($this->attributes, true);
+        foreach ($attributesArray as $key => $value) {
+            if (!empty($value['db'])) {
+                $attributesArray[$key]['db'] = explode(',', $value['db']);
+            }
+        }
+        return $attributesArray;
     }
 
     public function setAttributes(string $attributes): void
