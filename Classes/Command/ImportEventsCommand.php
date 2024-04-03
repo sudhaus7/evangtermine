@@ -55,6 +55,8 @@ class ImportEventsCommand extends Command
     protected ResourceStorage $storage;
     protected SlugHelper $slugHelper;
     protected array $extConfig;
+    protected string $host;
+    protected string $fileNameForRunCheck;
     protected string $imageFolder;
     protected array $months = [];
     protected array $monthsArray = [
@@ -69,7 +71,7 @@ class ImportEventsCommand extends Command
         9 => 'September',
         10 => 'Oktober',
         11 => 'November',
-        12 => 'Dezember'
+        12 => 'Dezember',
     ];
     protected array $allIds = [];
 
@@ -111,6 +113,8 @@ class ImportEventsCommand extends Command
         } catch (\Exception $e) {
             $this->storage->createFolder($this->imageFolder);
         }
+        $this->host = $this->extConfig['host'];
+        $this->fileNameForRunCheck = '/tmp/evangelischeTermine_' . sha1($this->host) . '.txt';
     }
 
     public function configure()
@@ -130,6 +134,10 @@ class ImportEventsCommand extends Command
      */
     public function execute(InputInterface $input, OutputInterface $output): int
     {
+        if ($this->thisCommandIsStillRunning()) {
+            return 0;
+        }
+
         $this->importAllEvents($output);
 
         return 0;
@@ -260,9 +268,8 @@ class ImportEventsCommand extends Command
      */
     protected function getItems(OutputInterface $output): array
     {
-        $host = $this->extConfig['host'];
-        $urlForMetaData = 'https://' . $host . '/Veranstalter/xml.php?itemsPerPage=1&highlight=all';
-        $urlMainPart = 'https://' . $host . '/Veranstalter/xml.php?itemsPerPage=9999&highlight=all';
+        $urlForMetaData = 'https://' . $this->host . '/Veranstalter/xml.php?itemsPerPage=1&highlight=all';
+        $urlMainPart = 'https://' . $this->host . '/Veranstalter/xml.php?itemsPerPage=9999&highlight=all';
 
         // URL abfragen, nur IPv4 Auflösung
         $rawXml = UrlUtility::loadUrl($urlForMetaData);
@@ -340,7 +347,7 @@ class ImportEventsCommand extends Command
                         'month' => $month,
                         'year' => $year,
                         'hash' => $hash,
-                        'events' => json_encode($eventModified)
+                        'events' => json_encode($eventModified),
                     ],
                 );
             return $items;
@@ -352,7 +359,7 @@ class ImportEventsCommand extends Command
                     'tx_evangtermine_domain_model_hash',
                     [
                         'hash' => $hash,
-                        'events' => json_encode($eventModified)
+                        'events' => json_encode($eventModified),
                     ],
                     [ 'uid' => $record['uid'] ]
                 );
@@ -576,7 +583,6 @@ class ImportEventsCommand extends Command
 
     /**
      * @param OutputInterface $output
-     * @return void
      * @throws DBALException
      * @throws Exception
      */
@@ -680,5 +686,23 @@ class ImportEventsCommand extends Command
         curl_multi_close($mh);
         $progressBar->finish();
         return $newItems;
+    }
+
+    protected function thisCommandIsStillRunning(): bool
+    {
+        if (file_exists($this->fileNameForRunCheck)) {
+            return true;
+        }
+
+        file_put_contents($this->fileNameForRunCheck, print_r($this->host, true));
+        register_shutdown_function(function () {
+            \ArbkomEKvW\Evangtermine\Command\ImportEventsCommand::removeFileForRunCheck();
+        });
+        return false;
+    }
+
+    protected function removeFileForRunCheck()
+    {
+        unlink($this->fileNameForRunCheck);
     }
 }
