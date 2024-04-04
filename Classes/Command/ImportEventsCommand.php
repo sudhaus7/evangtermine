@@ -692,7 +692,7 @@ class ImportEventsCommand extends Command implements LoggerAwareInterface
         } while ($running && $count < ImportEventsCommand::MAX_NR_OF_ITERATIONS_OF_CURL_MULTI_EXEC);
 
         if ($count >= ImportEventsCommand::MAX_NR_OF_ITERATIONS_OF_CURL_MULTI_EXEC) {
-            $this->logger->debug(sprintf('Host %s: Import stopped because of too much curl_multi_exec iterations.', $this->host));
+            $this->logger->debug(sprintf('Host %s: Import stopped because of too many curl_multi_exec iterations.', $this->host));
             exit;
         }
 
