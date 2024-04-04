@@ -133,7 +133,7 @@ class CategoryUtil
         if (empty($regions)) {
             $eventRepo = GeneralUtility::makeInstance(EventRepository::class);
             $regionsFromEvents = $eventRepo->findAllRegions();
-            foreach ($regionsFromEvents as $key => $region) {
+            foreach ($regionsFromEvents ?? [] as $key => $region) {
                 $regions[] = [
                     0 => $region,
                     1 => $key,
@@ -157,7 +157,7 @@ class CategoryUtil
         if (empty($places)) {
             $eventRepository = GeneralUtility::makeInstance(EventRepository::class);
             $placesFromEvents = $eventRepository->findAllPlaces();
-            foreach ($placesFromEvents as $key => $place) {
+            foreach ($placesFromEvents ?? [] as $key => $place) {
                 $places[] = [
                     0 => $place,
                     1 => $key,
