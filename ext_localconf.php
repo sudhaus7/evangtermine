@@ -82,3 +82,14 @@ $GLOBALS['TYPO3_CONF_VARS']['SYS']['routing']['aspects']['RegionStaticValueMappe
     = ArbkomEKvW\Evangtermine\Routing\Aspect\RegionStaticValueMapper::class;
 $GLOBALS['TYPO3_CONF_VARS']['SYS']['routing']['aspects']['PlaceStaticValueMapper']
     = ArbkomEKvW\Evangtermine\Routing\Aspect\PlaceStaticValueMapper::class;
+
+$GLOBALS['TYPO3_CONF_VARS']['LOG']['ArbkomEKvW']['Evangtermine']['Command']['writerConfiguration'] = [
+    // configuration for ERROR level log entries
+    \TYPO3\CMS\Core\Log\LogLevel::DEBUG => [
+        // add a FileWriter
+        \TYPO3\CMS\Core\Log\Writer\FileWriter::class => [
+            // configuration for the writer
+            'logFile' => \TYPO3\CMS\Core\Core\Environment::getVarPath() . '/log/evangtermine_command.log',
+        ],
+    ],
+];
