@@ -22,6 +22,8 @@ use ArbkomEKvW\Evangtermine\Util\FieldMapping;
 use ArbkomEKvW\Evangtermine\Util\UrlUtility;
 use Doctrine\DBAL\DBALException;
 use Doctrine\DBAL\Driver\Exception;
+use Psr\Log\LoggerAwareInterface;
+use Psr\Log\LoggerAwareTrait;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Helper\ProgressBar;
 use Symfony\Component\Console\Input\InputInterface;
@@ -35,6 +37,7 @@ use TYPO3\CMS\Core\DataHandling\Model\RecordStateFactory;
 use TYPO3\CMS\Core\DataHandling\SlugHelper;
 use TYPO3\CMS\Core\Exception\SiteNotFoundException;
 use TYPO3\CMS\Core\Http\RequestFactory;
+use TYPO3\CMS\Core\Log\LogManager;
 use TYPO3\CMS\Core\Resource\DuplicationBehavior;
 use TYPO3\CMS\Core\Resource\Exception\ExistingTargetFolderException;
 use TYPO3\CMS\Core\Resource\Exception\InsufficientFolderAccessPermissionsException;
@@ -44,8 +47,10 @@ use TYPO3\CMS\Core\Resource\ResourceStorage;
 use TYPO3\CMS\Core\Resource\StorageRepository;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 
-class ImportEventsCommand extends Command
+class ImportEventsCommand extends Command implements LoggerAwareInterface
 {
+    use LoggerAwareTrait;
+
     protected ConnectionPool $connectionPool;
     protected RequestFactory $requestFactory;
     protected array $categoryList;
@@ -115,6 +120,8 @@ class ImportEventsCommand extends Command
         }
         $this->host = $this->extConfig['host'];
         $this->fileNameForRunCheck = '/tmp/evangelischeTermine_' . sha1($this->host) . '.txt';
+
+        $this->logger = GeneralUtility::makeInstance(LogManager::class)->getLogger(__CLASS__);
     }
 
     public function configure()
@@ -137,6 +144,7 @@ class ImportEventsCommand extends Command
         if ($this->thisCommandIsStillRunning()) {
             return 0;
         }
+        $this->logger->debug(sprintf('Host %s: Import started.', $this->host));
 
         $this->importAllEvents($output);
 
@@ -155,6 +163,8 @@ class ImportEventsCommand extends Command
         $items = $this->getItems($output);
 
         $this->deleteEvents($output);
+
+        $this->logger->debug(sprintf('Host %s: Number of events that changed in API: %d', $this->host, count($items)));
 
         $progressBar = new ProgressBar($output, count($items));
 
@@ -248,6 +258,7 @@ class ImportEventsCommand extends Command
 
         $this->deleteImages();
 
+        $this->logger->debug(sprintf('Host %s: Import finished', $this->host));
         $progressBar->finish();
     }
 
@@ -602,6 +613,7 @@ class ImportEventsCommand extends Command
             );
         $events = $queryBuilder->executeQuery()->fetchAllAssociative();
 
+        $this->logger->debug(sprintf('Host %s: Number of events that may be deleted: %d', $this->host, count($events)));
         $progressBar = new ProgressBar($output, count($events));
 
         $count = 0;
@@ -644,7 +656,9 @@ class ImportEventsCommand extends Command
                     ['uid' => $event['uid']]  // where
                 );
             $progressBar->advance();
+            $this->logger->debug(sprintf('Host %s: Event deleted: uid(%d)', $this->host, $event['uid']));
         }
+        $this->logger->debug(sprintf('Host %s: Deletion finished', $this->host));
         $progressBar->finish();
     }
 
