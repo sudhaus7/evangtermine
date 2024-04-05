@@ -39,6 +39,7 @@ namespace ArbkomEKvW\Evangtermine\Util;
  ***************************************************************/
 
 use ArbkomEKvW\Evangtermine\Domain\Repository\EventRepository;
+use DateTime;
 use Doctrine\DBAL\DBALException;
 use Doctrine\DBAL\Driver\Exception;
 use RuntimeException;
@@ -67,7 +68,7 @@ class CategoryUtil
         $extconf = GeneralUtility::makeInstance(ExtConf::class);
         $this->host = $extconf->getExtConfArray()['host'];
         $this->cacheManager = GeneralUtility::makeInstance(CacheManager::class);
-        $this->dateString = (new \DateTime('today midnight'))->format('Ymd');
+        $this->dateString = (new DateTime('today midnight'))->format('Ymd');
         $this->cache = $this->cacheManager->getCache('evangtermine');
     }
 
@@ -79,14 +80,13 @@ class CategoryUtil
     public function getCategories(array &$configuration)
     {
         $cacheKey = 'categories-' . $this->dateString;
-        $categories = $this->cache->get($cacheKey);
 
-        if (empty($categories)) {
+
+        if (!$categories = $this->cache->get($cacheKey)) {
+			$categories = [];
             $url = 'https://' . $this->host . '/service/eventtypes.json';
             $rawCategories = $this->getUrlContent($url);
-
-            $categories = [];
-            $categories[] = ['Alle Kategorien', 'all'];
+			$categories[] = ['Alle Kategorien', 'all'];
 
             foreach ($rawCategories as $item) {
                 $categories[] = [ $item->name, $item->id ];
@@ -104,14 +104,11 @@ class CategoryUtil
     public function getGroups(array &$configuration)
     {
         $cacheKey = 'groups-' . $this->dateString;
-        $groups = $this->cache->get($cacheKey);
 
-        if (empty($groups)) {
+        if (!$groups = $this->cache->get($cacheKey)) {
+			$groups = [];
             $url = 'https://' . $this->host . '/service/people.json';
             $rawGroups = $this->getUrlContent($url);
-
-            $groups = [];
-
             foreach ($rawGroups as $item) {
                 $groups[] = [$item->name, $item->id];
             }
@@ -128,9 +125,9 @@ class CategoryUtil
     public function getRegions(array &$configuration)
     {
         $cacheKey = 'regions-' . $this->dateString;
-        $regions = $this->cache->get($cacheKey);
-
-        if (empty($regions)) {
+		// $this->cache->get can be false!!!!
+        if (!$regions = $this->cache->get($cacheKey)) {
+			$regions = [];
             $eventRepo = GeneralUtility::makeInstance(EventRepository::class);
             $regionsFromEvents = $eventRepo->findAllRegions();
             foreach ($regionsFromEvents ?? [] as $key => $region) {
@@ -152,9 +149,9 @@ class CategoryUtil
     public function getPlaces(array &$configuration)
     {
         $cacheKey = 'places-' . $this->dateString;
-        $places = $this->cache->get($cacheKey);
-
-        if (empty($places)) {
+	    // $this->cache->get can be false!!!!
+        if (!$places = $this->cache->get($cacheKey)) {
+			$places = [];
             $eventRepository = GeneralUtility::makeInstance(EventRepository::class);
             $placesFromEvents = $eventRepository->findAllPlaces();
             foreach ($placesFromEvents ?? [] as $key => $place) {
