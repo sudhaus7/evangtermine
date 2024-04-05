@@ -51,7 +51,7 @@ class ImportEventsCommand extends Command implements LoggerAwareInterface
 {
     use LoggerAwareTrait;
 
-    const MAX_NR_OF_ITERATIONS_OF_CURL_MULTI_EXEC = 1_000_000_000;
+    const MAX_NR_OF_ITERATIONS_OF_CURL_MULTI_EXEC = 1_000_000;
 
     protected ConnectionPool $connectionPool;
     protected RequestFactory $requestFactory;
@@ -146,7 +146,7 @@ class ImportEventsCommand extends Command implements LoggerAwareInterface
         if ($this->thisCommandIsStillRunning()) {
             return 0;
         }
-        $this->logger->debug(sprintf('Host %s: Import started.', $this->host));
+        $this->logger->debug(sprintf('Host %s: Import started', $this->host));
 
         $this->importAllEvents($output);
 
@@ -307,7 +307,9 @@ class ImportEventsCommand extends Command implements LoggerAwareInterface
                         for ($d = 1; $d < 32; $d++) {
                             $urls[$d . '-' . $m . '-' . $y] = $urlMainPart . '&d=' . $d . '&month=' . $m . '.' . $y;
                         }
+                        $this->logger->debug(sprintf('Host %s: Before "getEventsFromApi", month: %s', $this->host, $m . '.' . $y));
                         $newItems = $this->getEventsFromApi($urls, $output, $newItems);
+                        $this->logger->debug(sprintf('Host %s: After "getEventsFromApi", month: %s', $this->host, $m . '.' . $y));
                     }
                 }
             }
@@ -684,6 +686,7 @@ class ImportEventsCommand extends Command implements LoggerAwareInterface
             curl_multi_add_handle($mh, $curls[$key]);
         }
 
+        $this->logger->debug(sprintf('Host %s: Before "while"', $this->host));
         $running = null;
         $count = 0;
         do {
@@ -695,6 +698,7 @@ class ImportEventsCommand extends Command implements LoggerAwareInterface
             $this->logger->debug(sprintf('Host %s: Import stopped because of too many curl_multi_exec iterations.', $this->host));
             exit;
         }
+        $this->logger->debug(sprintf('Host %s: After "while"', $this->host));
 
         $progressBar = new ProgressBar($output, count($curls));
 
