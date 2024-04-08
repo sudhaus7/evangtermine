@@ -81,6 +81,7 @@ class ImportEventsCommand extends Command implements LoggerAwareInterface
         12 => 'Dezember',
     ];
     protected array $allIds = [];
+    protected array $hashUpdates = [];
 
     /**
      * @throws ExistingTargetFolderException
@@ -260,6 +261,7 @@ class ImportEventsCommand extends Command implements LoggerAwareInterface
 
         $this->deleteImages();
 
+        $this->updateHashTable();
         $this->logger->debug(sprintf('Host %s: Import finished', $this->host));
         $progressBar->finish();
     }
@@ -307,9 +309,7 @@ class ImportEventsCommand extends Command implements LoggerAwareInterface
                         for ($d = 1; $d < 32; $d++) {
                             $urls[$d . '-' . $m . '-' . $y] = $urlMainPart . '&d=' . $d . '&month=' . $m . '.' . $y;
                         }
-                        $this->logger->debug(sprintf('Host %s: Before "getEventsFromApi", month: %s', $this->host, $m . '.' . $y));
                         $newItems = $this->getEventsFromApi($urls, $output, $newItems);
-                        $this->logger->debug(sprintf('Host %s: After "getEventsFromApi", month: %s', $this->host, $m . '.' . $y));
                     }
                 }
             }
@@ -350,34 +350,29 @@ class ImportEventsCommand extends Command implements LoggerAwareInterface
         $record = $queryBuilder->executeQuery()->fetchAssociative();
 
         if (empty($record)) {
-            $this->connectionPool
-                ->getConnectionForTable('tx_evangtermine_domain_model_hash')
-                ->insert(
-                    'tx_evangtermine_domain_model_hash',
-                    [
-                        'pid' => 0,
-                        'tstamp' => time(),
-                        'crdate' => time(),
-                        'day' => $day,
-                        'month' => $month,
-                        'year' => $year,
-                        'hash' => $hash,
-                        'events' => json_encode($eventModified),
-                    ],
-                );
+            $this->hashUpdates[] = [
+                'insert' => [
+                    'pid' => 0,
+                    'tstamp' => time(),
+                    'crdate' => time(),
+                    'day' => $day,
+                    'month' => $month,
+                    'year' => $year,
+                    'hash' => $hash,
+                    'events' => json_encode($eventModified),
+                ]
+            ];
             return $items;
         }
         if (empty($record['hash']) || $record['hash'] !== $hash) {
-            $this->connectionPool
-                ->getConnectionForTable('tx_evangtermine_domain_model_hash')
-                ->update(
-                    'tx_evangtermine_domain_model_hash',
-                    [
-                        'hash' => $hash,
-                        'events' => json_encode($eventModified),
-                    ],
-                    [ 'uid' => $record['uid'] ]
-                );
+            $this->hashUpdates[] = [
+                'update' => [
+                    'hash' => $hash,
+                    'events' => json_encode($eventModified),
+                    'tstamp' => time()
+                ],
+                'uid' => $record['uid']
+            ];
 
             $oldEvents = json_decode($record['events'], true);
             $changedAndNewItems = [];
@@ -686,7 +681,6 @@ class ImportEventsCommand extends Command implements LoggerAwareInterface
             curl_multi_add_handle($mh, $curls[$key]);
         }
 
-        $this->logger->debug(sprintf('Host %s: Before "while"', $this->host));
         $running = null;
         $count = 0;
         do {
@@ -698,7 +692,6 @@ class ImportEventsCommand extends Command implements LoggerAwareInterface
             $this->logger->debug(sprintf('Host %s: Import stopped because of too many curl_multi_exec iterations.', $this->host));
             exit;
         }
-        $this->logger->debug(sprintf('Host %s: After "while"', $this->host));
 
         $progressBar = new ProgressBar($output, count($curls));
 
@@ -735,5 +728,28 @@ class ImportEventsCommand extends Command implements LoggerAwareInterface
     protected function removeFileForRunCheck()
     {
         unlink($this->fileNameForRunCheck);
+    }
+
+    protected function updateHashTable()
+    {
+        foreach ($this->hashUpdates as $hashUpdate) {
+            if (!empty($hashUpdate['update'])) {
+                $this->connectionPool
+                    ->getConnectionForTable('tx_evangtermine_domain_model_hash')
+                    ->update(
+                        'tx_evangtermine_domain_model_hash',
+                        $hashUpdate['update'],
+                        [ 'uid' => $hashUpdate['uid'] ]
+                    );
+            }
+            if (!empty($hashUpdate['insert'])) {
+                $this->connectionPool
+                    ->getConnectionForTable('tx_evangtermine_domain_model_hash')
+                    ->insert(
+                        'tx_evangtermine_domain_model_hash',
+                        $hashUpdate['insert']
+                    );
+            }
+        }
     }
 }

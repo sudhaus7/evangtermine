@@ -103,7 +103,20 @@ CREATE TABLE tx_evangtermine_domain_model_event
 	liturg_bez varchar(255) DEFAULT '' NOT NULL,
 	channels varchar(255) DEFAULT '' NOT NULL,
 	attributes text,
-	slug varchar(255) DEFAULT '' NOT NULL
+	slug varchar(255) DEFAULT '' NOT NULL,
+
+	index index_start (start),
+	index index_end (end),
+	index index_title (title),
+	index index_categories (categories),
+	index index_people (people),
+	index index_region (region),
+	index index_highlight (highlight),
+	index index_event_user_id (event_user_id),
+	index index_place_id (place_id),
+	index index_place_zip (place_zip),
+	index index_place_city (place_city),
+	index index_slug (slug)
 );
 
 CREATE TABLE tx_evangtermine_domain_model_hash
@@ -112,5 +125,7 @@ CREATE TABLE tx_evangtermine_domain_model_hash
 	month int(11) unsigned DEFAULT 0 NOT NULL,
 	year int(11) unsigned DEFAULT 0 NOT NULL,
 	hash varchar(255) DEFAULT '' NOT NULL,
-	events text
+	events text,
+
+	index index_hash (hash)
 );
