@@ -147,7 +147,6 @@ class ImportEventsCommand extends Command implements LoggerAwareInterface
         if ($this->thisCommandIsStillRunning()) {
             return 0;
         }
-        $this->logger->debug(sprintf('Host %s: Import started', $this->host));
 
         $this->importAllEvents($output);
 
@@ -655,9 +654,7 @@ class ImportEventsCommand extends Command implements LoggerAwareInterface
                     ['uid' => $event['uid']]  // where
                 );
             $progressBar->advance();
-            $this->logger->debug(sprintf('Host %s: Event deleted: uid(%d)', $this->host, $event['uid']));
         }
-        $this->logger->debug(sprintf('Host %s: Deletion finished', $this->host));
         $progressBar->finish();
     }
 
