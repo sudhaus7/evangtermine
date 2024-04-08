@@ -15,12 +15,6 @@ routeEnhancers:
       -
         routePath: '/highlight/{highlight}/kategorie/{eventtype}/zielgruppe/{people}'
         _controller: 'Eventcontainer::list'
-      -
-        routePath: '/region/{region}'
-        _controller: 'Eventcontainer::list'
-      -
-        routePath: '/ort/{place}'
-        _controller: 'Eventcontainer::list'
     defaultController: 'Eventcontainer::list'
     aspects:
       eventtitle:
@@ -41,14 +35,6 @@ routeEnhancers:
         type: StaticRangeMapper
         start: '0'
         end: '40'
-      region:
-        type: RegionStaticValueMapper
-        map:
-          id: 0
-      place:
-        type: PlaceStaticValueMapper
-        map:
-          id: 0
   EvangtermineDetail:
     type: Extbase
     extension: Evangtermine
