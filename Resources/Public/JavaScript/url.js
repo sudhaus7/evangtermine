@@ -26,12 +26,12 @@ const replaceUrl = function () {
         case 'highlightEventtypePeople':
           urlForHighlightEventtypePeople(formData.entries(), urlPartToKeep);
           break;
-        case 'region':
+        /*case 'region':
           urlForRegion(formData.entries(), urlPartToKeep);
           break;
         case 'place':
           urlForPlace(formData.entries(), urlPartToKeep);
-          break;
+          break;*/
       }
     });
   }
