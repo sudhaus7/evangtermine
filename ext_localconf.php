@@ -78,10 +78,10 @@ if (!isset($GLOBALS['TYPO3_CONF_VARS']['SYS']['caching']['cacheConfigurations'][
         = \TYPO3\CMS\Core\Cache\Frontend\VariableFrontend::class;
 }
 
-$GLOBALS['TYPO3_CONF_VARS']['SYS']['routing']['aspects']['RegionStaticValueMapper']
+/*$GLOBALS['TYPO3_CONF_VARS']['SYS']['routing']['aspects']['RegionStaticValueMapper']
     = ArbkomEKvW\Evangtermine\Routing\Aspect\RegionStaticValueMapper::class;
 $GLOBALS['TYPO3_CONF_VARS']['SYS']['routing']['aspects']['PlaceStaticValueMapper']
-    = ArbkomEKvW\Evangtermine\Routing\Aspect\PlaceStaticValueMapper::class;
+    = ArbkomEKvW\Evangtermine\Routing\Aspect\PlaceStaticValueMapper::class;*/
 
 $GLOBALS['TYPO3_CONF_VARS']['LOG']['ArbkomEKvW']['Evangtermine']['Command']['writerConfiguration'] = [
     // configuration for ERROR level log entries
