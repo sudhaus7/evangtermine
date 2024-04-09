@@ -73,10 +73,10 @@ class Etpager
             $totalItems = (int)$totalItems;
         }
 
-        $itemsPerPage = (int)$itemsPerPage;
+        $itemsPerPage = (int)$itemsPerPage ?: 20;
 
         // Number of pages in pager
-        $this->pgr['pages'] =  ceil($totalItems / $itemsPerPage);
+        $this->pgr['pages'] = ceil($totalItems / $itemsPerPage);
 
         // Current page
         $this->pgr['current'] = $currentPage ?? 1;
