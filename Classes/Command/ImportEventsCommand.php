@@ -432,52 +432,78 @@ class ImportEventsCommand extends Command implements LoggerAwareInterface
                 ->execute();
             $eventFromDB = $statement->fetchAssociative();
 
-            if ($eventFromDB[$eventField] == 0) {
-                if (substr($itemField, 0, 2) === '//') {
-                    $itemField = 'https:' . $itemField;
+            if (substr($itemField, 0, 2) === '//') {
+                $itemField = 'https:' . $itemField;
+            }
+            $options = [
+                'allow_redirects' => false,
+            ];
+
+            try {
+                // delete old images
+                $queryBuilder = $this->connectionPool->getQueryBuilderForTable('sys_file');
+                $queryBuilder->select('sys_file_reference.*')
+                    ->from('sys_file')
+                    ->join(
+                        'sys_file',
+                        'sys_file_reference',
+                        'sys_file_reference',
+                        $queryBuilder->expr()->eq('sys_file_reference.uid_local', $queryBuilder->quoteIdentifier('sys_file.uid'))
+                    )
+                    ->where(
+                        $queryBuilder->expr()->eq('sys_file_reference.uid_foreign', $queryBuilder->createNamedParameter($eventFromDB['uid'])),
+                        $queryBuilder->expr()->eq('sys_file_reference.tablenames', $queryBuilder->createNamedParameter('tx_evangtermine_domain_model_event')),
+                        $queryBuilder->expr()->eq('sys_file_reference.fieldname', $queryBuilder->createNamedParameter($eventField))
+                    );
+
+                $statement = $queryBuilder->execute();
+                $result = $statement->fetchAllAssociative();
+
+                foreach ($result ?? [] as $row) {
+                    $this->connectionPool->getConnectionForTable('sys_file_reference')
+                        ->delete(
+                            'sys_file_reference',
+                            ['uid' => $row['uid']]
+                        );
                 }
-                $options = [
-                    'allow_redirects' => false,
-                ];
 
-                try {
-                    $response = $this->requestFactory->request($itemField, 'GET', $options);
-                    if ($response->getStatusCode() === 200) {
-                        $contents = $response->getBody()->getContents();
-                        $imageNameArray = explode('/', $itemField);
-                        $imageName = end($imageNameArray);
-                        $tmpFileName = '/tmp/' . $imageName;
-                        file_put_contents('/tmp/' . $imageName, print_r($contents, true));
+                // get new image
+                $response = $this->requestFactory->request($itemField, 'GET', $options);
+                if ($response->getStatusCode() === 200) {
+                    $contents = $response->getBody()->getContents();
+                    $imageNameArray = explode('/', $itemField);
+                    $imageName = end($imageNameArray);
+                    $tmpFileName = '/tmp/' . $imageName;
+                    file_put_contents('/tmp/' . $imageName, print_r($contents, true));
 
-                        $folder = $this->storage->getFolder($this->extConfig['imageFolder']);
-                        $newFile = $this->storage->addFile(
-                            $tmpFileName,
-                            $folder,
-                            $imageName,
-                            DuplicationBehavior::REPLACE
+                    $folder = $this->storage->getFolder($this->extConfig['imageFolder']);
+                    $newFile = $this->storage->addFile(
+                        $tmpFileName,
+                        $folder,
+                        $imageName,
+                        DuplicationBehavior::REPLACE
+                    );
+
+                    $this->connectionPool->getConnectionForTable('sys_file_reference')
+                        ->insert(
+                            'sys_file_reference',
+                            [
+                                'uid_local' => $newFile->getUid(),
+                                'uid_foreign' => $eventFromDB['uid'],
+                                'tablenames' => 'tx_evangtermine_domain_model_event',
+                                'fieldname' => $eventField,
+                                'pid' => $eventFromDB['pid'],
+                            ],
                         );
 
-                        $this->connectionPool->getConnectionForTable('sys_file_reference')
-                            ->insert(
-                                'sys_file_reference',
-                                [
-                                    'uid_local' => $newFile->getUid(),
-                                    'uid_foreign' => $eventFromDB['uid'],
-                                    'tablenames' => 'tx_evangtermine_domain_model_event',
-                                    'fieldname' => $eventField,
-                                    'pid' => $eventFromDB['pid'],
-                                ],
-                            );
-
-                        $this->connectionPool->getConnectionForTable('tx_evangtermine_domain_model_event')
-                            ->update(
-                                'tx_evangtermine_domain_model_event',
-                                [$eventField => $newFile->getUid()],
-                                ['uid' => $eventFromDB['uid']]
-                            );
-                    }
-                } catch (\Exception $e) {
+                    $this->connectionPool->getConnectionForTable('tx_evangtermine_domain_model_event')
+                        ->update(
+                            'tx_evangtermine_domain_model_event',
+                            [$eventField => $newFile->getUid()],
+                            ['uid' => $eventFromDB['uid']]
+                        );
                 }
+            } catch (\Exception $e) {
             }
         }
     }
