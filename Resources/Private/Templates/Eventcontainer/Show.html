@@ -30,7 +30,7 @@
                     </div>
                     <f:if condition="{event.image}">
                         <div class="et_event_image">
-                            <f:media file="{event.image}" alt="{event.title}" title="{event.title}"/>
+                            <img alt="{event.title}" src="{event.image}" title="{event.title}"/>
                             <f:if condition="{event.caption}">
                                 <br>
                                 <span class="et_event_caption">{event.caption}</span>
@@ -60,7 +60,7 @@
                             --></f:comment>
                             <f:if condition="{event.placeImage} && !{event.image}">
                                 <br>
-                                <f:media file="{event.placeImage}" id="et_place_image" style="display: none;"/>
+                                <img id="et_place_image" src="{event.placeImage}" style="display: none;"/>
                             </f:if>
                         </div>
                     </div>
@@ -122,7 +122,7 @@
                     <div class="et_content_row" id="et_event_FEEDBACK_ID">
                         <div class="et_content_detaillabel">Rückmeldeformular</div>
                         <div class="et_content_detailvalue">
-                            <a href="javascript:;" OnClick="window.open('//{eventhost}/rueckmeldeformular{event.feedbackId}-{event.id}', 'Rückmeldeformular','toolbar=no,location=no,status=no,menubar=no,scrollbars=yes,resizable=yes,width=850,height=650,top=10,left=200');" class="feedbacklink et_link" >für die Veranstaltung anmelden</a>
+                            <a href="javascript:" OnClick="window.open('//{eventhost}/rueckmeldeformular{event.feedbackId}-{event.id}', 'Rückmeldeformular','toolbar=no,location=no,status=no,menubar=no,scrollbars=yes,resizable=yes,width=850,height=650,top=10,left=200');" class="feedbacklink et_link" >für die Veranstaltung anmelden</a>
                             <f:comment><!--
                             <f:if condition="{et:str(on:meta.avail)}">
                                 (noch {et:str(on:meta.avail)} verfügbare Plätze)
@@ -155,7 +155,7 @@
                 <div class="et_content_row et_user">
                     <div class="et_content_detaillabel">Veranstalter</div>
                     <div class="et_content_detailvalue">
-                        <f:if condition="{event.userImage}"><f:media file="{event.userImage}" alt="{event.userRealname}" title="{event.userRealname}"/></f:if>
+                        <f:if condition="{event.userImage}"><img alt="{event.userRealname}" src="{event.userImage}" title="{event.userRealname}"/></f:if>
                         <span class="et_user_REALNAME">{event.userRealname}</span><br>
                         <f:if condition="{event.userDescription}"><span class="et_user_DESCRIPTION">{event.userDescription}</span><br></f:if>
                         <span class="et_user_STREET_NR">{event.userStreetNr}</span><br>

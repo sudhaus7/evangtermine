@@ -663,51 +663,12 @@ return [
         'image' => [
             'exclude' => 1,
             'label' => 'Bild der Veranstaltung',
-            'config' => ExtensionManagementUtility::getFileFieldTCAConfig(
-                'image',
-                [
-                    'maxitems' => 1,
-                    'minitems' => 0,
-                    'appearance' => [
-                        'createNewRelationLinkTitle' => 'LLL:EXT:fwd_template/Resources/Private/Language/locallang_db.xlf:tx_fwd_template.addImage',
-                    ],
-                    'overrideChildTca' => [
-                        'types' => [
-                            '0' => [
-                                'showitem' => '
-                                    --palette--;LLL:EXT:lang/locallang_tca.xlf:sys_file_reference.imageoverlayPalette;imageoverlayPalette,
-                                    --palette--;;filePalette',
-                            ],
-                            '1' => [
-                                'showitem' => '
-                                    --palette--;LLL:EXT:lang/locallang_tca.xlf:sys_file_reference.imageoverlayPalette;imageoverlayPalette,
-                                    --palette--;;filePalette',
-                            ],
-                            '2' => [
-                                'showitem' => '
-                                    --palette--;LLL:EXT:lang/locallang_tca.xlf:sys_file_reference.imageoverlayPalette;imageoverlayPalette,
-                                    --palette--;;filePalette',
-                            ],
-                            '3' => [
-                                'showitem' => '
-                                    --palette--;LLL:EXT:lang/locallang_tca.xlf:sys_file_reference.imageoverlayPalette;imageoverlayPalette,
-                                    --palette--;;filePalette',
-                            ],
-                            '4' => [
-                                'showitem' => '
-                                    --palette--;LLL:EXT:lang/locallang_tca.xlf:sys_file_reference.imageoverlayPalette;imageoverlayPalette,
-                                    --palette--;;filePalette',
-                            ],
-                            '5' => [
-                                'showitem' => '
-                                    --palette--;LLL:EXT:lang/locallang_tca.xlf:sys_file_reference.imageoverlayPalette;imageoverlayPalette,
-                                    --palette--;;filePalette',
-                            ],
-                        ],
-                    ],
-                ],
-                $GLOBALS['TYPO3_CONF_VARS']['GFX']['imagefile_ext']
-            ),
+            'config' => [
+	            'type' => 'input',
+	            'size' => 30,
+	            'eval' => 'trim',
+	            'readOnly' => 1,
+            ],
         ],
         'caption' => [
             'exclude' => 1,
@@ -832,51 +793,12 @@ return [
         'place_image' => [
             'exclude' => 1,
             'label' => 'Ort - Bild',
-            'config' => ExtensionManagementUtility::getFileFieldTCAConfig(
-                'place_image',
-                [
-                    'maxitems' => 1,
-                    'minitems' => 0,
-                    'appearance' => [
-                        'createNewRelationLinkTitle' => 'LLL:EXT:fwd_template/Resources/Private/Language/locallang_db.xlf:tx_fwd_template.addImage',
-                    ],
-                    'overrideChildTca' => [
-                        'types' => [
-                            '0' => [
-                                'showitem' => '
-                                    --palette--;LLL:EXT:lang/locallang_tca.xlf:sys_file_reference.imageoverlayPalette;imageoverlayPalette,
-                                    --palette--;;filePalette',
-                            ],
-                            '1' => [
-                                'showitem' => '
-                                    --palette--;LLL:EXT:lang/locallang_tca.xlf:sys_file_reference.imageoverlayPalette;imageoverlayPalette,
-                                    --palette--;;filePalette',
-                            ],
-                            '2' => [
-                                'showitem' => '
-                                    --palette--;LLL:EXT:lang/locallang_tca.xlf:sys_file_reference.imageoverlayPalette;imageoverlayPalette,
-                                    --palette--;;filePalette',
-                            ],
-                            '3' => [
-                                'showitem' => '
-                                    --palette--;LLL:EXT:lang/locallang_tca.xlf:sys_file_reference.imageoverlayPalette;imageoverlayPalette,
-                                    --palette--;;filePalette',
-                            ],
-                            '4' => [
-                                'showitem' => '
-                                    --palette--;LLL:EXT:lang/locallang_tca.xlf:sys_file_reference.imageoverlayPalette;imageoverlayPalette,
-                                    --palette--;;filePalette',
-                            ],
-                            '5' => [
-                                'showitem' => '
-                                    --palette--;LLL:EXT:lang/locallang_tca.xlf:sys_file_reference.imageoverlayPalette;imageoverlayPalette,
-                                    --palette--;;filePalette',
-                            ],
-                        ],
-                    ],
-                ],
-                $GLOBALS['TYPO3_CONF_VARS']['GFX']['imagefile_ext']
-            ),
+            'config' => [
+	            'type' => 'input',
+	            'size' => 30,
+	            'eval' => 'trim',
+	            'readOnly' => 1,
+            ],
         ],
         'place_image_caption' => [
             'exclude' => 1,
@@ -1100,51 +1022,12 @@ return [
         'user_image' => [
             'exclude' => 1,
             'label' => 'Benutzer - Bild',
-            'config' => ExtensionManagementUtility::getFileFieldTCAConfig(
-                'user_image',
-                [
-                    'maxitems' => 1,
-                    'minitems' => 0,
-                    'appearance' => [
-                        'createNewRelationLinkTitle' => 'LLL:EXT:fwd_template/Resources/Private/Language/locallang_db.xlf:tx_fwd_template.addImage',
-                    ],
-                    'overrideChildTca' => [
-                        'types' => [
-                            '0' => [
-                                'showitem' => '
-                                    --palette--;LLL:EXT:lang/locallang_tca.xlf:sys_file_reference.imageoverlayPalette;imageoverlayPalette,
-                                    --palette--;;filePalette',
-                            ],
-                            '1' => [
-                                'showitem' => '
-                                    --palette--;LLL:EXT:lang/locallang_tca.xlf:sys_file_reference.imageoverlayPalette;imageoverlayPalette,
-                                    --palette--;;filePalette',
-                            ],
-                            '2' => [
-                                'showitem' => '
-                                    --palette--;LLL:EXT:lang/locallang_tca.xlf:sys_file_reference.imageoverlayPalette;imageoverlayPalette,
-                                    --palette--;;filePalette',
-                            ],
-                            '3' => [
-                                'showitem' => '
-                                    --palette--;LLL:EXT:lang/locallang_tca.xlf:sys_file_reference.imageoverlayPalette;imageoverlayPalette,
-                                    --palette--;;filePalette',
-                            ],
-                            '4' => [
-                                'showitem' => '
-                                    --palette--;LLL:EXT:lang/locallang_tca.xlf:sys_file_reference.imageoverlayPalette;imageoverlayPalette,
-                                    --palette--;;filePalette',
-                            ],
-                            '5' => [
-                                'showitem' => '
-                                    --palette--;LLL:EXT:lang/locallang_tca.xlf:sys_file_reference.imageoverlayPalette;imageoverlayPalette,
-                                    --palette--;;filePalette',
-                            ],
-                        ],
-                    ],
-                ],
-                $GLOBALS['TYPO3_CONF_VARS']['GFX']['imagefile_ext']
-            ),
+            'config' => [
+	            'type' => 'input',
+	            'size' => 30,
+	            'eval' => 'trim',
+	            'readOnly' => 1,
+            ],
         ],
         'liturg_bez' => [
             'exclude' => 1,

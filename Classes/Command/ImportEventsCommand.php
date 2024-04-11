@@ -276,9 +276,8 @@ class ImportEventsCommand extends Command implements LoggerAwareInterface
             $progressBar->advance();
         }
 
-        $this->deleteImages();
+        //$this->deleteImages();
 
-        $this->updateHashTable();
         $this->logger->debug(sprintf('Host %s: Import finished', $this->host));
         $progressBar->finish();
     }
@@ -514,92 +513,25 @@ class ImportEventsCommand extends Command implements LoggerAwareInterface
      */
     protected function insertImage(array $event, string $itemField, string $eventField)
     {
+	    $queryBuilder = $this->connectionPool->getQueryBuilderForTable('tx_evangtermine_domain_model_event');
+	    $statement = $queryBuilder->select('*')
+	                              ->from('tx_evangtermine_domain_model_event')
+	                              ->where(
+		                              $queryBuilder->expr()->eq('id', $queryBuilder->createNamedParameter($event['id']))
+	                              )
+	                              ->execute();
+	    $eventFromDB = $statement->fetchAssociative();
         if (!empty($itemField)) {
-            $queryBuilder = $this->connectionPool->getQueryBuilderForTable('tx_evangtermine_domain_model_event');
-            $statement = $queryBuilder->select('*')
-                ->from('tx_evangtermine_domain_model_event')
-                ->where(
-                    $queryBuilder->expr()->eq('id', $queryBuilder->createNamedParameter($event['id']))
-                )
-                ->execute();
-            $eventFromDB = $statement->fetchAssociative();
-
             if (substr($itemField, 0, 2) === '//') {
                 $itemField = 'https:' . $itemField;
             }
-            $options = [
-                'allow_redirects' => false,
-            ];
-
-            try {
-                // delete old images
-                $queryBuilder = $this->connectionPool->getQueryBuilderForTable('sys_file');
-                $queryBuilder->select('sys_file_reference.*')
-                    ->from('sys_file')
-                    ->join(
-                        'sys_file',
-                        'sys_file_reference',
-                        'sys_file_reference',
-                        $queryBuilder->expr()->eq('sys_file_reference.uid_local', $queryBuilder->quoteIdentifier('sys_file.uid'))
-                    )
-                    ->where(
-                        $queryBuilder->expr()->eq('sys_file_reference.uid_foreign', $queryBuilder->createNamedParameter($eventFromDB['uid'])),
-                        $queryBuilder->expr()->eq('sys_file_reference.tablenames', $queryBuilder->createNamedParameter('tx_evangtermine_domain_model_event')),
-                        $queryBuilder->expr()->eq('sys_file_reference.fieldname', $queryBuilder->createNamedParameter($eventField))
-                    );
-
-                $statement = $queryBuilder->execute();
-                $result = $statement->fetchAllAssociative();
-
-                foreach ($result ?? [] as $row) {
-                    $this->connectionPool->getConnectionForTable('sys_file_reference')
-                        ->delete(
-                            'sys_file_reference',
-                            ['uid' => $row['uid']]
-                        );
-                }
-
-                // get new image
-                $this->logger->debug('Fetch image ' . $itemField);
-                $response = $this->requestFactory->request($itemField, 'GET', $options);
-                if ($response->getStatusCode() === 200) {
-                    $contents = $response->getBody()->getContents();
-                    $imageNameArray = explode('/', $itemField);
-                    $imageName = end($imageNameArray);
-
-                    $tmpFileName = sys_get_temp_dir() . '/' . $imageName;
-                    file_put_contents( sys_get_temp_dir() . '/' . $imageName, print_r($contents, true));
-
-                    $folder = $this->storage->getFolder($this->extConfig['imageFolder']);
-                    $newFile = $this->storage->addFile(
-                        $tmpFileName,
-                        $folder,
-                        $imageName,
-                        DuplicationBehavior::REPLACE
-                    );
-
-                    $this->connectionPool->getConnectionForTable('sys_file_reference')
-                        ->insert(
-                            'sys_file_reference',
-                            [
-                                'uid_local' => $newFile->getUid(),
-                                'uid_foreign' => $eventFromDB['uid'],
-                                'tablenames' => 'tx_evangtermine_domain_model_event',
-                                'fieldname' => $eventField,
-                                'pid' => $eventFromDB['pid'],
-                            ],
-                        );
-
-                    $this->connectionPool->getConnectionForTable('tx_evangtermine_domain_model_event')
-                        ->update(
-                            'tx_evangtermine_domain_model_event',
-                            [$eventField => $newFile->getUid()],
-                            ['uid' => $eventFromDB['uid']]
-                        );
-                }
-            } catch (\Exception $e) {
-            }
         }
+	    $this->connectionPool->getConnectionForTable('tx_evangtermine_domain_model_event')
+         ->update(
+             'tx_evangtermine_domain_model_event',
+             [$eventField => $itemField],
+             ['uid' => $eventFromDB['uid']]
+         );
     }
 
     protected function setHighlight(string $highlight): int
@@ -841,26 +773,4 @@ class ImportEventsCommand extends Command implements LoggerAwareInterface
         unlink($this->fileNameForRunCheck);
     }
 
-    protected function updateHashTable()
-    {
-        foreach ($this->hashUpdates as $hashUpdate) {
-            if (!empty($hashUpdate['update'])) {
-                $this->connectionPool
-                    ->getConnectionForTable('tx_evangtermine_domain_model_hash')
-                    ->update(
-                        'tx_evangtermine_domain_model_hash',
-                        $hashUpdate['update'],
-                        [ 'uid' => $hashUpdate['uid'] ]
-                    );
-            }
-            if (!empty($hashUpdate['insert'])) {
-                $this->connectionPool
-                    ->getConnectionForTable('tx_evangtermine_domain_model_hash')
-                    ->insert(
-                        'tx_evangtermine_domain_model_hash',
-                        $hashUpdate['insert']
-                    );
-            }
-        }
-    }
 }
