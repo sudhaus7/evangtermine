@@ -20,13 +20,18 @@ use ArbkomEKvW\Evangtermine\Domain\Model\Eventcontainer;
 use ArbkomEKvW\Evangtermine\Domain\Model\Grouplist;
 use ArbkomEKvW\Evangtermine\Util\FieldMapping;
 use ArbkomEKvW\Evangtermine\Util\UrlUtility;
+use DateTime;
 use Doctrine\DBAL\DBALException;
 use Doctrine\DBAL\Driver\Exception;
 use Psr\Log\LoggerAwareInterface;
 use Psr\Log\LoggerAwareTrait;
+use SimpleXMLElement;
+use SplObjectStorage;
+use Sudhaus7\Logformatter\Logger\ConsoleLogger;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Helper\ProgressBar;
 use Symfony\Component\Console\Input\InputInterface;
+use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use TYPO3\CMS\Core\Configuration\Exception\ExtensionConfigurationExtensionNotConfiguredException;
 use TYPO3\CMS\Core\Configuration\Exception\ExtensionConfigurationPathDoesNotExistException;
@@ -46,12 +51,14 @@ use TYPO3\CMS\Core\Resource\File;
 use TYPO3\CMS\Core\Resource\ResourceStorage;
 use TYPO3\CMS\Core\Resource\StorageRepository;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
+use function sys_get_temp_dir;
 
 class ImportEventsCommand extends Command implements LoggerAwareInterface
 {
     use LoggerAwareTrait;
 
     const MAX_NR_OF_ITERATIONS_OF_CURL_MULTI_EXEC = 1_000_000;
+    const ITEMS_PER_PAGE = 100;
 
     protected ConnectionPool $connectionPool;
     protected RequestFactory $requestFactory;
@@ -90,9 +97,8 @@ class ImportEventsCommand extends Command implements LoggerAwareInterface
      * @throws ExtensionConfigurationExtensionNotConfiguredException
      * @throws InsufficientFolderWritePermissionsException
      */
-    public function __construct(string $name = null)
+    public function initialize(InputInterface $input, OutputInterface $output)
     {
-        parent::__construct($name);
         $this->connectionPool = GeneralUtility::makeInstance(ConnectionPool::class);
         $this->requestFactory = GeneralUtility::makeInstance(RequestFactory::class);
         $this->categoryList = GeneralUtility::makeInstance(Categorylist::class)->getItemslist();
@@ -122,7 +128,7 @@ class ImportEventsCommand extends Command implements LoggerAwareInterface
             $this->storage->createFolder($this->imageFolder);
         }
         $this->host = $this->extConfig['host'];
-        $this->fileNameForRunCheck = '/tmp/evangelischeTermine_' . sha1($this->host) . '.txt';
+        $this->fileNameForRunCheck = sys_get_temp_dir() . '/evangelischeTermine_' . sha1($this->host) . '.txt';
 
         $this->logger = GeneralUtility::makeInstance(LogManager::class)->getLogger(__CLASS__);
     }
@@ -130,6 +136,8 @@ class ImportEventsCommand extends Command implements LoggerAwareInterface
     public function configure()
     {
         $this->setDescription('Import events from one of the APIs of the Evangelische Kirche')
+            ->addOption('debug', null, InputOption::VALUE_NONE, 'Use the Console Logger (add -vv or -vvv to actually get the messages)')
+            ->addOption('removelock', null, InputOption::VALUE_NONE, 'Remove the lock file')
              ->setHelp('vendor/bin/typo3 evangtermine:importevents');
     }
 
@@ -144,8 +152,14 @@ class ImportEventsCommand extends Command implements LoggerAwareInterface
      */
     public function execute(InputInterface $input, OutputInterface $output): int
     {
+        if ($input->getOption('removelock')) {
+            $this->removeFileForRunCheck();
+        }
         if ($this->thisCommandIsStillRunning()) {
             return 0;
+        }
+        if ($input->getOption('debug')) {
+            $this->logger = new ConsoleLogger($output);
         }
 
         $this->importAllEvents($output);
@@ -162,8 +176,9 @@ class ImportEventsCommand extends Command implements LoggerAwareInterface
      */
     protected function importAllEvents(OutputInterface $output)
     {
+        $this->logger->info('Fetching Items');
         $items = $this->getItems($output);
-
+        $this->logger->info('Cleanup Items');
         $this->deleteEvents($output);
 
         $this->logger->debug(sprintf('Host %s: Number of events that changed in API: %d', $this->host, count($items)));
@@ -171,10 +186,12 @@ class ImportEventsCommand extends Command implements LoggerAwareInterface
         $progressBar = new ProgressBar($output, count($items));
 
         foreach ($items as $item) {
+            //$hash = sha1((string)$item);
+            $hash = $items[$item]['hash'];
             $attributes = $this->addAttributesToItems($item);
             $item = (array)$item;
             $item['attributes'] = json_encode($attributes);
-
+            $item['hash'] = $hash;
             if (strpos($item['END'], '0000-00-00') !== false) {
                 $startArray = explode(' ', $item['START']);
                 if (strpos($item['END'], '0000-00-00 00:00:00') !== false) {
@@ -190,8 +207,9 @@ class ImportEventsCommand extends Command implements LoggerAwareInterface
                 'tstamp' => time(),
                 'crdate' => time(),
                 'id' => $item['ID'] ?? 0,
-                'start' => \DateTime::createFromFormat('Y-m-d H:i:s', $item['START'])->getTimestamp(),
-                'end' => !empty($item['END']) ? \DateTime::createFromFormat('Y-m-d H:i:s', $item['END'])->getTimestamp() : 0,
+                'start' => DateTime::createFromFormat('Y-m-d H:i:s', $item['START'])->getTimestamp(),
+                'end' => !empty($item['END']) ? DateTime::createFromFormat('Y-m-d H:i:s', $item['END'])->getTimestamp() : 0,
+                'hash' => $item['hash'],
             ];
 
             /** @var FieldMapping $fieldMapping */
@@ -277,25 +295,57 @@ class ImportEventsCommand extends Command implements LoggerAwareInterface
     }
 
     /**
-     * @throws Exception
+     * @param OutputInterface $output
+     *
+     * @return SplObjectStorage<SimpleXMLElement>
      * @throws DBALException
+     * @throws Exception
      */
-    protected function getItems(OutputInterface $output): array
+    protected function getItems(OutputInterface $output): SplObjectStorage
     {
-        $urlForMetaData = 'https://' . $this->host . '/Veranstalter/xml.php?itemsPerPage=1&highlight=all';
-        $urlMainPart = 'https://' . $this->host . '/Veranstalter/xml.php?itemsPerPage=9999&highlight=all';
+        $urlForMetaData = 'https://' . $this->host . '/Veranstalter/xml.php?itemsPerPage=0&highlight=all';
+        $urlMainPart = 'https://' . $this->host . '/Veranstalter/xml.php?itemsPerPage=' . self::ITEMS_PER_PAGE . '&highlight=all';
 
         // URL abfragen, nur IPv4 Auflösung
         $rawXml = UrlUtility::loadUrl($urlForMetaData);
 
         // XML im Eventcontainer wandeln
-        $eventContainer = GeneralUtility::makeInstance(EventContainer::class);
+        $eventContainer = GeneralUtility::makeInstance(Eventcontainer::class);
         $eventContainer->loadXML($rawXml);
 
         $metaData = $eventContainer->getMetaData();
+        $newItems = new SplObjectStorage();
+
+        $totalItems = $metaData->totalItems;
+        $pages = ceil($totalItems/self::ITEMS_PER_PAGE);
+        $this->logger->info(sprintf('Fetching %d items in %d pages ', $totalItems, $pages));
+        $progressBar = new ProgressBar($output, $pages);
+        $urlset = [];
+        for ($i = 1; $i <= $pages; $i++) {
+            $this->logger->debug(sprintf('Fetching page %d with url %s', $i, $urlMainPart . '&pageID=' . $i));
+            //$rawXml = UrlUtility::loadUrl($urlMainPart.'&pageID='.$i);
+            //$eventContainer = GeneralUtility::makeInstance(Eventcontainer::class);
+            //$eventContainer->loadXML($rawXml);
+            //$items = $eventContainer->getItems();
+            //$this->getNewItems($newItems,$items ?? [], '');
+            //$progressBar->advance();
+
+            $urlset[] = $urlMainPart . '&pageID=' . $i;
+            if (count($urlset) === 10) {
+                $this->getEventsFromApi($urlset, $output, $newItems);
+                $urlset = [];
+            }
+            $progressBar->advance();
+        }
+        if (count($urlset) > 0) { // get the rest
+            $this->getEventsFromApi($urlset, $output, $newItems);
+        }
+        $progressBar->finish();
+
+        /*
         $this->months = (array)$metaData->months->month;
 
-        $newItems = [];
+
         foreach ($this->months as $month) {
             if (is_string($month)) {
                 $urls = [];
@@ -306,22 +356,61 @@ class ImportEventsCommand extends Command implements LoggerAwareInterface
                         $y = mb_substr($monthArray[1], -2);
 
                         for ($d = 1; $d < 32; $d++) {
-                            $urls[$d . '-' . $m . '-' . $y] = $urlMainPart . '&d=' . $d . '&month=' . $m . '.' . $y;
+
+                            $metaMonthXML = UrlUtility::loadUrl($urlForMetaData. '&d=' . $d . '&month=' . $m . '.' . $y);
+                            $metaContainerForMonth = GeneralUtility::makeInstance( Eventcontainer::class);
+                            $metaContainerForMonth->loadXML( $metaMonthXML);
+                            $maxItems = $metaContainerForMonth->getMetaData()->totalItems;
+                            $pages = ceil($maxItems/self::ITEMS_PER_PAGE);
+                            for ($page = 1; $page <= $pages; $page++) {
+                                $urls[$d . '-' . $m . '-' . $y.'p'.$page] = $urlMainPart . '&d=' . $d . '&month=' . $m . '.' . $y.'&pageID='.$page;
+                            }
+
                         }
-                        $newItems = $this->getEventsFromApi($urls, $output, $newItems);
+                        $this->getEventsFromApi($urls, $output, $newItems);
                     }
                 }
             }
+
         }
+        */
 
         return $newItems;
+    }
+
+    protected function getNewItems( SplObjectStorage $newItems, array $items, string $key): void
+    {
+        foreach ($items as $item) {
+            $id = $item->ID;
+            if (in_array($id, $this->allIds)) {
+                $this->logger->alert('skipping ' . $id);
+                continue;
+            }
+
+            $this->allIds[] = $id;
+            $hash = sha1($item->asXML());
+            $res = GeneralUtility::makeInstance(ConnectionPool::class)->getConnectionForTable('tx_evangtermine_domain_model_event')
+                                 ->select(
+                                     [ 'hash' ],
+                                     'tx_evangtermine_domain_model_event',
+                                     ['id'=>$id]
+                                 );
+            $row = $res->fetchAssociative();
+            if (!$row || $row['hash'] !== $hash) {
+                //new or updated
+                $newItems->attach($item);
+                $newItems[$item] = ['hash' => $hash];
+                $this->logger->debug('adding ' . $id . ' ' . $hash);
+            }
+        }
+        //return $changedAndNewItems;
     }
 
     /**
      * @throws Exception
      * @throws DBALException
      */
-    protected function getNewItems(array $items, string $key): array
+    protected function getNewItemsXX(array $items, string $key): array
     {
         $keyArray = explode('-', $key);
         $day = $keyArray[0];
@@ -329,10 +418,13 @@ class ImportEventsCommand extends Command implements LoggerAwareInterface
         $year = $keyArray[2];
 
         $eventModified = [];
+        /** @var SimpleXMLElement $item */
         foreach ($items as $item) {
-            $item = (array)$item;
-            $eventModified[] = $item['ID'] . ',' . $item['_event_MODIFIED'];
+            $itemXML = (string)$item;
 
+            $item = (array)$item;
+            //$eventModified[] = $item['ID'] . ',' . $item['_event_MODIFIED'];
+            $eventModified[] = $item['ID'] . ',' . sha1($itemXML);
             $this->allIds[] = $item['ID'];
         }
 
@@ -359,7 +451,7 @@ class ImportEventsCommand extends Command implements LoggerAwareInterface
                     'year' => $year,
                     'hash' => $hash,
                     'events' => json_encode($eventModified),
-                ]
+                ],
             ];
             return $items;
         }
@@ -368,9 +460,9 @@ class ImportEventsCommand extends Command implements LoggerAwareInterface
                 'update' => [
                     'hash' => $hash,
                     'events' => json_encode($eventModified),
-                    'tstamp' => time()
+                    'tstamp' => time(),
                 ],
-                'uid' => $record['uid']
+                'uid' => $record['uid'],
             ];
 
             $oldEvents = json_decode($record['events'], true);
@@ -391,7 +483,7 @@ class ImportEventsCommand extends Command implements LoggerAwareInterface
         return [];
     }
 
-    protected function addAttributesToItems(\SimpleXMLElement $item): array
+    protected function addAttributesToItems( SimpleXMLElement $item): array
     {
         /** @var FieldMapping $fieldMapping */
         $fieldMapping = GeneralUtility::makeInstance(FieldMapping::class);
@@ -468,13 +560,15 @@ class ImportEventsCommand extends Command implements LoggerAwareInterface
                 }
 
                 // get new image
+                $this->logger->debug('Fetch image ' . $itemField);
                 $response = $this->requestFactory->request($itemField, 'GET', $options);
                 if ($response->getStatusCode() === 200) {
                     $contents = $response->getBody()->getContents();
                     $imageNameArray = explode('/', $itemField);
                     $imageName = end($imageNameArray);
-                    $tmpFileName = '/tmp/' . $imageName;
-                    file_put_contents('/tmp/' . $imageName, print_r($contents, true));
+
+                    $tmpFileName = sys_get_temp_dir() . '/' . $imageName;
+                    file_put_contents( sys_get_temp_dir() . '/' . $imageName, print_r($contents, true));
 
                     $folder = $this->storage->getFolder($this->extConfig['imageFolder']);
                     $newFile = $this->storage->addFile(
@@ -642,6 +736,7 @@ class ImportEventsCommand extends Command implements LoggerAwareInterface
 
         $count = 0;
         foreach ($events as $event) {
+            /*
             // Check max. 100 events.
             // If it's more than 100 events, the curl probably gathered not all events.
             if ($count > 100) {
@@ -662,7 +757,7 @@ class ImportEventsCommand extends Command implements LoggerAwareInterface
             $rawXml = UrlUtility::loadUrl($url);
 
             // XML im Eventcontainer wandeln
-            $eventContainer = GeneralUtility::makeInstance(EventContainer::class);
+            $eventContainer = GeneralUtility::makeInstance(Eventcontainer::class);
             $eventContainer->loadXML($rawXml);
             $items = $eventContainer->getItems();
 
@@ -673,6 +768,8 @@ class ImportEventsCommand extends Command implements LoggerAwareInterface
                 }
             }
 
+            */
+            $this->logger->debug(sprintf('Deleting %s %s', $event['uid'], $event['title']));
             // delete the event if it is not found in the API
             $this->connectionPool->getConnectionForTable('tx_evangtermine_domain_model_event')
                 ->delete(
@@ -692,11 +789,12 @@ class ImportEventsCommand extends Command implements LoggerAwareInterface
      * @throws DBALException
      * @throws Exception
      */
-    protected function getEventsFromApi(array $urls, OutputInterface $output, array $newItems): array
+    protected function getEventsFromApi(array $urls, OutputInterface $output, SplObjectStorage $newItems): void
     {
         $curls = [];
         $mh = curl_multi_init();
         foreach ($urls as $key => $url) {
+            $this->logger->debug(sprintf('Processing url: %s', $url));
             $curls[$key] = curl_init();
             curl_setopt($curls[$key], CURLOPT_URL, $url);
             curl_setopt($curls[$key], CURLOPT_RETURNTRANSFER, 1);
@@ -705,34 +803,24 @@ class ImportEventsCommand extends Command implements LoggerAwareInterface
         }
 
         $running = null;
-        $count = 0;
         do {
-            $count++;
-            curl_multi_exec($mh, $running);
-        } while ($running && $count < ImportEventsCommand::MAX_NR_OF_ITERATIONS_OF_CURL_MULTI_EXEC);
+            $status = curl_multi_exec($mh, $running);
+        } while ($running && $status === CURLM_OK);
 
-        if ($count >= ImportEventsCommand::MAX_NR_OF_ITERATIONS_OF_CURL_MULTI_EXEC) {
-            $this->logger->debug(sprintf('Host %s: Import stopped because of too many curl_multi_exec iterations.', $this->host));
-            exit;
-        }
-
-        $progressBar = new ProgressBar($output, count($curls));
-
-        $eventContainer = GeneralUtility::makeInstance(EventContainer::class);
+        //$progressBar = new ProgressBar($output, count($curls));
 
         foreach ($curls as $key => $curl) {
+            $this->logger->debug(sprintf('Parsing response from url: %s', $urls[$key]));
             $rawXml = curl_multi_getcontent($curl);
+            $eventContainer = GeneralUtility::makeInstance(Eventcontainer::class);
             $eventContainer->loadXML($rawXml);
             $items = $eventContainer->getItems();
-            $itemsFromDay = $this->getNewItems($items ?? [], $key);
-            $newItems = array_merge($newItems, $itemsFromDay);
+            $this->getNewItems($newItems, $items ?? [], $key);
             curl_multi_remove_handle($mh, $curl);
-
-            $progressBar->advance();
+            //$progressBar->advance();
         }
         curl_multi_close($mh);
-        $progressBar->finish();
-        return $newItems;
+        //$progressBar->finish();
     }
 
     protected function thisCommandIsStillRunning(): bool
@@ -743,7 +831,7 @@ class ImportEventsCommand extends Command implements LoggerAwareInterface
 
         file_put_contents($this->fileNameForRunCheck, print_r($this->host, true));
         register_shutdown_function(function () {
-            \ArbkomEKvW\Evangtermine\Command\ImportEventsCommand::removeFileForRunCheck();
+            ImportEventsCommand::removeFileForRunCheck();
         });
         return false;
     }

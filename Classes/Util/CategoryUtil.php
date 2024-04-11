@@ -81,12 +81,11 @@ class CategoryUtil
     {
         $cacheKey = 'categories-' . $this->dateString;
 
-
         if (!$categories = $this->cache->get($cacheKey)) {
-			$categories = [];
+            $categories = [];
             $url = 'https://' . $this->host . '/service/eventtypes.json';
             $rawCategories = $this->getUrlContent($url);
-			$categories[] = ['Alle Kategorien', 'all'];
+            $categories[] = ['Alle Kategorien', 'all'];
 
             foreach ($rawCategories as $item) {
                 $categories[] = [ $item->name, $item->id ];
@@ -106,7 +105,7 @@ class CategoryUtil
         $cacheKey = 'groups-' . $this->dateString;
 
         if (!$groups = $this->cache->get($cacheKey)) {
-			$groups = [];
+            $groups = [];
             $url = 'https://' . $this->host . '/service/people.json';
             $rawGroups = $this->getUrlContent($url);
             foreach ($rawGroups as $item) {
@@ -125,9 +124,9 @@ class CategoryUtil
     public function getRegions(array &$configuration)
     {
         $cacheKey = 'regions-' . $this->dateString;
-		// $this->cache->get can be false!!!!
+        // $this->cache->get can be false!!!!
         if (!$regions = $this->cache->get($cacheKey)) {
-			$regions = [];
+            $regions = [];
             $eventRepo = GeneralUtility::makeInstance(EventRepository::class);
             $regionsFromEvents = $eventRepo->findAllRegions();
             foreach ($regionsFromEvents ?? [] as $key => $region) {
@@ -149,9 +148,9 @@ class CategoryUtil
     public function getPlaces(array &$configuration)
     {
         $cacheKey = 'places-' . $this->dateString;
-	    // $this->cache->get can be false!!!!
+        // $this->cache->get can be false!!!!
         if (!$places = $this->cache->get($cacheKey)) {
-			$places = [];
+            $places = [];
             $eventRepository = GeneralUtility::makeInstance(EventRepository::class);
             $placesFromEvents = $eventRepository->findAllPlaces();
             foreach ($placesFromEvents ?? [] as $key => $place) {

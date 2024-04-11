@@ -1,5 +1,7 @@
 <?php
 
+use TYPO3\CMS\Core\Utility\ExtensionManagementUtility;
+
 if (!defined('TYPO3')) {
     die('Access denied.');
 }
@@ -24,7 +26,7 @@ return [
     ],
     'palettes' => [
         'general' => [
-            'showitem' => 'hidden,--linebreak--,id,--linebreak--,title,--linebreak--,subtitle,--linebreak--,liturg_bez,--linebreak--,email,link,--linebreak--,short_description,--linebreak--,long_description,--linebreak--,image,caption,--linebreak--,highlight,--linebreak--,people,--linebreak--,categories,--linebreak--feedback_id,--linebreak--,poll_id,webform_linkname,--linebreak--,event_modified,--linebreak--,channels,--linebreak--,slug',
+            'showitem' => 'hidden,--linebreak--,id,--linebreak--,hash,--linebreak--,title,--linebreak--,subtitle,--linebreak--,liturg_bez,--linebreak--,email,link,--linebreak--,short_description,--linebreak--,long_description,--linebreak--,image,caption,--linebreak--,highlight,--linebreak--,people,--linebreak--,categories,--linebreak--feedback_id,--linebreak--,poll_id,webform_linkname,--linebreak--,event_modified,--linebreak--,channels,--linebreak--,slug',
         ],
         'date' => [
             'showitem' => 'start,end,--linebreak--,mode,--linebreak--,datum1,datum2,--linebreak--,monthbar,allday',
@@ -92,6 +94,15 @@ return [
         'id' => [
             'exclude' => 1,
             'label' => 'Id',
+            'config' => [
+                'type' => 'input',
+                'eval' => 'trim',
+                'readOnly' => true,
+            ],
+        ],
+        'hash' => [
+            'exclude' => 1,
+            'label' => 'Hash',
             'config' => [
                 'type' => 'input',
                 'eval' => 'trim',
@@ -652,7 +663,7 @@ return [
         'image' => [
             'exclude' => 1,
             'label' => 'Bild der Veranstaltung',
-            'config' => \TYPO3\CMS\Core\Utility\ExtensionManagementUtility::getFileFieldTCAConfig(
+            'config' => ExtensionManagementUtility::getFileFieldTCAConfig(
                 'image',
                 [
                     'maxitems' => 1,
@@ -821,7 +832,7 @@ return [
         'place_image' => [
             'exclude' => 1,
             'label' => 'Ort - Bild',
-            'config' => \TYPO3\CMS\Core\Utility\ExtensionManagementUtility::getFileFieldTCAConfig(
+            'config' => ExtensionManagementUtility::getFileFieldTCAConfig(
                 'place_image',
                 [
                     'maxitems' => 1,
@@ -1089,7 +1100,7 @@ return [
         'user_image' => [
             'exclude' => 1,
             'label' => 'Benutzer - Bild',
-            'config' => \TYPO3\CMS\Core\Utility\ExtensionManagementUtility::getFileFieldTCAConfig(
+            'config' => ExtensionManagementUtility::getFileFieldTCAConfig(
                 'user_image',
                 [
                     'maxitems' => 1,
