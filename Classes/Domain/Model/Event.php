@@ -2,6 +2,7 @@
 
 namespace ArbkomEKvW\Evangtermine\Domain\Model;
 
+use DateTime;
 use TYPO3\CMS\Extbase\Domain\Model\FileReference;
 use TYPO3\CMS\Extbase\DomainObject\AbstractEntity;
 
@@ -11,8 +12,8 @@ use TYPO3\CMS\Extbase\DomainObject\AbstractEntity;
 class Event extends AbstractEntity
 {
     protected string $id = '';
-    protected ?\DateTime $start = null;
-    protected ?\DateTime $end = null;
+    protected ?DateTime $start = null;
+    protected ?DateTime $end = null;
     protected string $mode = '';
     protected string $subtitle = '';
     protected string $datum1 = '';
@@ -70,7 +71,7 @@ class Event extends AbstractEntity
     protected string $eventAccess = '';
     protected string $eventLang = '';
     protected int $eventUserId = 0;
-    protected ?FileReference $image = null;
+    protected string $image = '';
     protected string $caption = '';
     protected string $eventModified = '';
     protected string $eventKollDescr = '';
@@ -84,7 +85,7 @@ class Event extends AbstractEntity
     protected string $placeCity = '';
     protected string $placeInfo = '';
     protected string $placeHidden = '';
-    protected ?FileReference $placeImage = null;
+    protected string $placeImage = '';
     protected string $placeImageCaption = '';
     protected int $placePosition = 0;
     protected string $placeKat = '';
@@ -109,7 +110,7 @@ class Event extends AbstractEntity
     protected string $userUrl = '';
     protected string $userContact = '';
     protected string $userIntdata = '';
-    protected ?FileReference $userImage = null;
+    protected string $userImage = '';
     protected string $liturgBez = '';
     protected string $channels = '';
     protected string $attributes = '';
@@ -135,22 +136,22 @@ class Event extends AbstractEntity
         $this->title = $title;
     }
 
-    public function getStart(): ?\DateTime
+    public function getStart(): ?DateTime
     {
         return $this->start;
     }
 
-    public function setStart(?\DateTime $start): void
+    public function setStart(?DateTime $start): void
     {
         $this->start = $start;
     }
 
-    public function getEnd(): ?\DateTime
+    public function getEnd(): ?DateTime
     {
         return $this->end;
     }
 
-    public function setEnd(?\DateTime $end): void
+    public function setEnd(?DateTime $end): void
     {
         $this->end = $end;
     }
@@ -285,12 +286,12 @@ class Event extends AbstractEntity
         $this->highlight = $highlight;
     }
 
-    public function getImage(): ?FileReference
+    public function getImage(): string
     {
         return $this->image;
     }
 
-    public function setImage(?FileReference $image): void
+    public function setImage(string $image): void
     {
         $this->image = $image;
     }
@@ -485,12 +486,12 @@ class Event extends AbstractEntity
         $this->placeInfo = $placeInfo;
     }
 
-    public function getPlaceImage(): ?FileReference
+    public function getPlaceImage(): string
     {
         return $this->placeImage;
     }
 
-    public function setPlaceImage(?FileReference $placeImage): void
+    public function setPlaceImage(string $placeImage): void
     {
         $this->placeImage = $placeImage;
     }
@@ -625,12 +626,12 @@ class Event extends AbstractEntity
         $this->userDescription = $userDescription;
     }
 
-    public function getUserImage(): ?FileReference
+    public function getUserImage(): string
     {
         return $this->userImage;
     }
 
-    public function setUserImage(?FileReference $userImage): void
+    public function setUserImage(string $userImage): void
     {
         $this->userImage = $userImage;
     }
