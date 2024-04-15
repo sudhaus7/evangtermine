@@ -57,7 +57,6 @@ class ImportEventsCommand extends Command implements LoggerAwareInterface
 {
     use LoggerAwareTrait;
 
-    const MAX_NR_OF_ITERATIONS_OF_CURL_MULTI_EXEC = 1_000_000;
     const ITEMS_PER_PAGE = 100;
 
     protected ConnectionPool $connectionPool;
@@ -73,22 +72,7 @@ class ImportEventsCommand extends Command implements LoggerAwareInterface
     protected string $fileNameForRunCheck;
     protected string $imageFolder;
     protected array $months = [];
-    protected array $monthsArray = [
-        1 => 'Januar',
-        2 => 'Februar',
-        3 => 'März',
-        4 => 'April',
-        5 => 'Mai',
-        6 => 'Juni',
-        7 => 'Juli',
-        8 => 'August',
-        9 => 'September',
-        10 => 'Oktober',
-        11 => 'November',
-        12 => 'Dezember',
-    ];
     protected array $allIds = [];
-    protected array $hashUpdates = [];
 
     /**
      * @throws ExistingTargetFolderException
@@ -147,7 +131,6 @@ class ImportEventsCommand extends Command implements LoggerAwareInterface
      * @return int
      * @throws DBALException
      * @throws Exception
-     * @throws InsufficientFolderAccessPermissionsException
      * @throws SiteNotFoundException
      */
     public function execute(InputInterface $input, OutputInterface $output): int
@@ -171,7 +154,6 @@ class ImportEventsCommand extends Command implements LoggerAwareInterface
      * @param OutputInterface $output
      * @throws DBALException
      * @throws Exception
-     * @throws InsufficientFolderAccessPermissionsException
      * @throws SiteNotFoundException
      */
     protected function importAllEvents(OutputInterface $output)
@@ -285,7 +267,7 @@ class ImportEventsCommand extends Command implements LoggerAwareInterface
     /**
      * @throws SiteNotFoundException
      */
-    protected function createSlug(array $event, $uid)
+    protected function createSlug(array $event, $uid): string
     {
         $state = RecordStateFactory::forName('tx_evangtermine_domain_model_event')
             ->fromArray($event, $event['pid'], $uid);
@@ -297,8 +279,6 @@ class ImportEventsCommand extends Command implements LoggerAwareInterface
      * @param OutputInterface $output
      *
      * @return SplObjectStorage<SimpleXMLElement>
-     * @throws DBALException
-     * @throws Exception
      */
     protected function getItems(OutputInterface $output): SplObjectStorage
     {
@@ -322,12 +302,6 @@ class ImportEventsCommand extends Command implements LoggerAwareInterface
         $urlset = [];
         for ($i = 1; $i <= $pages; $i++) {
             $this->logger->debug(sprintf('Fetching page %d with url %s', $i, $urlMainPart . '&pageID=' . $i));
-            //$rawXml = UrlUtility::loadUrl($urlMainPart.'&pageID='.$i);
-            //$eventContainer = GeneralUtility::makeInstance(Eventcontainer::class);
-            //$eventContainer->loadXML($rawXml);
-            //$items = $eventContainer->getItems();
-            //$this->getNewItems($newItems,$items ?? [], '');
-            //$progressBar->advance();
 
             $urlset[] = $urlMainPart . '&pageID=' . $i;
             if (count($urlset) === 10) {
@@ -341,43 +315,13 @@ class ImportEventsCommand extends Command implements LoggerAwareInterface
         }
         $progressBar->finish();
 
-        /*
-        $this->months = (array)$metaData->months->month;
-
-
-        foreach ($this->months as $month) {
-            if (is_string($month)) {
-                $urls = [];
-                foreach ($this->monthsArray as $key => $monthsArrayItem) {
-                    if (str_contains($month, $monthsArrayItem)) {
-                        $monthArray = explode(' ', $month);
-                        $m = $key;
-                        $y = mb_substr($monthArray[1], -2);
-
-                        for ($d = 1; $d < 32; $d++) {
-
-                            $metaMonthXML = UrlUtility::loadUrl($urlForMetaData. '&d=' . $d . '&month=' . $m . '.' . $y);
-                            $metaContainerForMonth = GeneralUtility::makeInstance( Eventcontainer::class);
-                            $metaContainerForMonth->loadXML( $metaMonthXML);
-                            $maxItems = $metaContainerForMonth->getMetaData()->totalItems;
-                            $pages = ceil($maxItems/self::ITEMS_PER_PAGE);
-                            for ($page = 1; $page <= $pages; $page++) {
-                                $urls[$d . '-' . $m . '-' . $y.'p'.$page] = $urlMainPart . '&d=' . $d . '&month=' . $m . '.' . $y.'&pageID='.$page;
-                            }
-
-                        }
-                        $this->getEventsFromApi($urls, $output, $newItems);
-                    }
-                }
-            }
-
-        }
-        */
-
         return $newItems;
     }
 
-    protected function getNewItems( SplObjectStorage $newItems, array $items, string $key): void
+    /**
+     * @throws Exception
+     */
+    protected function getNewItems(SplObjectStorage $newItems, array $items, string $key): void
     {
         foreach ($items as $item) {
             $id = $item->ID;
@@ -402,84 +346,6 @@ class ImportEventsCommand extends Command implements LoggerAwareInterface
                 $this->logger->debug('adding ' . $id . ' ' . $hash);
             }
         }
-        //return $changedAndNewItems;
-    }
-
-    /**
-     * @throws Exception
-     * @throws DBALException
-     */
-    protected function getNewItemsXX(array $items, string $key): array
-    {
-        $keyArray = explode('-', $key);
-        $day = $keyArray[0];
-        $month = $keyArray[1];
-        $year = $keyArray[2];
-
-        $eventModified = [];
-        /** @var SimpleXMLElement $item */
-        foreach ($items as $item) {
-            $itemXML = (string)$item;
-
-            $item = (array)$item;
-            //$eventModified[] = $item['ID'] . ',' . $item['_event_MODIFIED'];
-            $eventModified[] = $item['ID'] . ',' . sha1($itemXML);
-            $this->allIds[] = $item['ID'];
-        }
-
-        $hash = sha1(json_encode($eventModified));
-
-        $queryBuilder = $this->connectionPool->getQueryBuilderForTable('tx_evangtermine_domain_model_hash');
-        $queryBuilder->select('*')
-            ->from('tx_evangtermine_domain_model_hash')
-            ->where(
-                $queryBuilder->expr()->eq('day', $queryBuilder->createNamedParameter($day)),
-                $queryBuilder->expr()->eq('month', $queryBuilder->createNamedParameter($month)),
-                $queryBuilder->expr()->eq('year', $queryBuilder->createNamedParameter($year)),
-            );
-        $record = $queryBuilder->executeQuery()->fetchAssociative();
-
-        if (empty($record)) {
-            $this->hashUpdates[] = [
-                'insert' => [
-                    'pid' => 0,
-                    'tstamp' => time(),
-                    'crdate' => time(),
-                    'day' => $day,
-                    'month' => $month,
-                    'year' => $year,
-                    'hash' => $hash,
-                    'events' => json_encode($eventModified),
-                ],
-            ];
-            return $items;
-        }
-        if (empty($record['hash']) || $record['hash'] !== $hash) {
-            $this->hashUpdates[] = [
-                'update' => [
-                    'hash' => $hash,
-                    'events' => json_encode($eventModified),
-                    'tstamp' => time(),
-                ],
-                'uid' => $record['uid'],
-            ];
-
-            $oldEvents = json_decode($record['events'], true);
-            $changedAndNewItems = [];
-            foreach ($items as $item) {
-                $itemArray = (array)$item;
-                $itemModified = $itemArray['ID'] . ',' . $itemArray['_event_MODIFIED'];
-                foreach ($oldEvents ?? [] as $oldEvent) {
-                    if ($itemModified == $oldEvent) {
-                        continue 2;
-                    }
-                }
-                $changedAndNewItems[] = $item;
-            }
-
-            return $changedAndNewItems;
-        }
-        return [];
     }
 
     protected function addAttributesToItems( SimpleXMLElement $item): array
@@ -666,41 +532,7 @@ class ImportEventsCommand extends Command implements LoggerAwareInterface
         $this->logger->debug(sprintf('Host %s: Number of events that may be deleted: %d', $this->host, count($events)));
         $progressBar = new ProgressBar($output, count($events));
 
-        $count = 0;
         foreach ($events as $event) {
-            /*
-            // Check max. 100 events.
-            // If it's more than 100 events, the curl probably gathered not all events.
-            if ($count > 100) {
-                continue;
-            }
-            $count++;
-
-            $id = $event['id'];
-            $date = new \DateTime();
-            $date->setTimestamp($event['start']);
-            $d = $date->format('d');
-            $m = $date->format('m');
-            $y = $date->format('y');
-            $url = 'https://' . $this->extConfig['host'] . '/Veranstalter/xml.php?itemsPerPage=99&highlight=all';
-            $url .= '&q=' . urlencode($event['title']) . '&d=' . $d . '&month=' . $m . '.' . $y;
-
-            // check if the event is really not in the API anymore
-            $rawXml = UrlUtility::loadUrl($url);
-
-            // XML im Eventcontainer wandeln
-            $eventContainer = GeneralUtility::makeInstance(Eventcontainer::class);
-            $eventContainer->loadXML($rawXml);
-            $items = $eventContainer->getItems();
-
-            foreach ($items as $item) {
-                $item = (array)$item;
-                if ($item['ID'] == $id) {
-                    continue 2;
-                }
-            }
-
-            */
             $this->logger->debug(sprintf('Deleting %s %s', $event['uid'], $event['title']));
             // delete the event if it is not found in the API
             $this->connectionPool->getConnectionForTable('tx_evangtermine_domain_model_event')
@@ -716,10 +548,7 @@ class ImportEventsCommand extends Command implements LoggerAwareInterface
     /**
      * @param array $urls
      * @param OutputInterface $output
-     * @param array $newItems
-     * @return array
-     * @throws DBALException
-     * @throws Exception
+     * @param SplObjectStorage $newItems
      */
     protected function getEventsFromApi(array $urls, OutputInterface $output, SplObjectStorage $newItems): void
     {
@@ -739,8 +568,6 @@ class ImportEventsCommand extends Command implements LoggerAwareInterface
             $status = curl_multi_exec($mh, $running);
         } while ($running && $status === CURLM_OK);
 
-        //$progressBar = new ProgressBar($output, count($curls));
-
         foreach ($curls as $key => $curl) {
             $this->logger->debug(sprintf('Parsing response from url: %s', $urls[$key]));
             $rawXml = curl_multi_getcontent($curl);
@@ -749,10 +576,8 @@ class ImportEventsCommand extends Command implements LoggerAwareInterface
             $items = $eventContainer->getItems();
             $this->getNewItems($newItems, $items ?? [], $key);
             curl_multi_remove_handle($mh, $curl);
-            //$progressBar->advance();
         }
         curl_multi_close($mh);
-        //$progressBar->finish();
     }
 
     protected function thisCommandIsStillRunning(): bool
