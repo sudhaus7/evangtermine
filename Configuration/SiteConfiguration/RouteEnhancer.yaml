@@ -5,7 +5,7 @@ routeEnhancers:
     plugin: List
     routes:
       -
-        routePath: '/detail/{eventtitle}'
+        routePath: '/termindetails/{eventtitle}'
         _controller: 'Eventcontainer::show'
         _arguments:
           eventtitle: uid
