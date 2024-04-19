@@ -14,6 +14,7 @@
                     <settings.etkey_vid>
                         <TCEforms>
                             <label>LLL:EXT:evangtermine/Resources/Private/Language/locallang.xlf:feflexform.vid</label>
+                            <!-- entspricht userId -->
                             <config>
                                 <type>input</type>
                                 <size>20</size>
