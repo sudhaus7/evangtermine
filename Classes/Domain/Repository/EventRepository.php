@@ -407,7 +407,6 @@ class EventRepository extends Repository
                             $queryBuilder->createNamedParameter(explode(',', $settings['etkey_places']), Connection::PARAM_STR_ARRAY)
                         )
                 )
-                ->groupBy('place_city')
                 ->orderBy('place_zip');
             $statement = $queryBuilder->execute();
             $placesFromDB = $statement->fetchAllAssociative();
@@ -437,9 +436,7 @@ class EventRepository extends Repository
         $queryBuilder->orderBy('place_zip');
         $placesFromDB = $queryBuilder->execute()->fetchAllAssociative();
         foreach ($placesFromDB as $place) {
-            if (!in_array($place['place_zip'] . ' ' . $place['place_city'], $places)) {
-                $places[$place['place_id']] = $place['place_zip'] . ' ' . $place['place_city'];
-            }
+            $places[$place['place_id']] = $place['place_zip'] . ' ' . $place['place_city'];
         }
         return $places;
     }

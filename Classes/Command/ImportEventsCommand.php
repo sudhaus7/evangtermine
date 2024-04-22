@@ -21,6 +21,7 @@ use ArbkomEKvW\Evangtermine\Domain\Model\Grouplist;
 use ArbkomEKvW\Evangtermine\Util\FieldMapping;
 use ArbkomEKvW\Evangtermine\Util\UrlUtility;
 use DateTime;
+use DateTimeZone;
 use Doctrine\DBAL\DBALException;
 use Doctrine\DBAL\Driver\Exception;
 use Psr\Log\LoggerAwareInterface;
@@ -189,8 +190,8 @@ class ImportEventsCommand extends Command implements LoggerAwareInterface
                 'tstamp' => time(),
                 'crdate' => time(),
                 'id' => $item['ID'] ?? 0,
-                'start' => DateTime::createFromFormat('Y-m-d H:i:s', $item['START'])->getTimestamp(),
-                'end' => !empty($item['END']) ? DateTime::createFromFormat('Y-m-d H:i:s', $item['END'])->getTimestamp() : 0,
+                'start' => DateTime::createFromFormat('Y-m-d H:i:s', $item['START'], new DateTimeZone('Europe/Berlin'))->getTimestamp(),
+                'end' => !empty($item['END']) ? DateTime::createFromFormat('Y-m-d H:i:s', $item['END'], new DateTimeZone('Europe/Berlin'))->getTimestamp() : 0,
                 'hash' => $item['hash'],
             ];
 
