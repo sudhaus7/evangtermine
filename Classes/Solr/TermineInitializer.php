@@ -2,6 +2,12 @@
 
 namespace ArbkomEKvW\Evangtermine\Solr;
 
-class TermineInitializer {
+use ApacheSolrForTypo3\Solr\IndexQueue\Initializer\AbstractInitializer;
 
+class TermineInitializer extends AbstractInitializer
+{
+	public function initialize(): bool
+	{
+		return false;
+	}
 }

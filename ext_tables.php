@@ -25,6 +25,8 @@ $extensionkey = 'evangtermine';
 );
 \TYPO3\CMS\Core\Utility\ExtensionManagementUtility::addStaticFile($extensionkey, 'Configuration/TypoScript', 'Evangelische Termine');
 
+\TYPO3\CMS\Core\Utility\ExtensionManagementUtility::addStaticFile($extensionkey, 'Configuration/TypoScript/Solr', 'Evangelische Termine SOLR Index');
+
 // Activate Flexforms
 $pluginSignature = 'evangtermine_list';
 $GLOBALS['TCA']['tt_content']['types']['list']['subtypes_addlist'][$pluginSignature] = 'pi_flexform';

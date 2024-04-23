@@ -31,8 +31,9 @@ class EventRepository extends Repository
     /**
      * @throws UnexpectedTypeException
      * @throws InvalidNumberOfConstraintsException
+     *
      */
-    public function prepareFindByEtKeysQuery(EtKeys $etKeys): ?array
+	public function prepareFindByEtKeysQuery(EtKeys $etKeys): ?array
     {
         [$eventUids, $filtered] = $this->preSelect($etKeys);
 

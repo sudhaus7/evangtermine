@@ -18,6 +18,7 @@ namespace ArbkomEKvW\Evangtermine\Command;
 use ArbkomEKvW\Evangtermine\Domain\Model\Categorylist;
 use ArbkomEKvW\Evangtermine\Domain\Model\Eventcontainer;
 use ArbkomEKvW\Evangtermine\Domain\Model\Grouplist;
+use ArbkomEKvW\Evangtermine\Solr\IndexService;
 use ArbkomEKvW\Evangtermine\Util\FieldMapping;
 use ArbkomEKvW\Evangtermine\Util\UrlUtility;
 use DateTime;
@@ -51,6 +52,7 @@ use TYPO3\CMS\Core\Resource\Exception\InsufficientFolderWritePermissionsExceptio
 use TYPO3\CMS\Core\Resource\File;
 use TYPO3\CMS\Core\Resource\ResourceStorage;
 use TYPO3\CMS\Core\Resource\StorageRepository;
+use TYPO3\CMS\Core\Utility\ExtensionManagementUtility;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 use function sys_get_temp_dir;
 
@@ -147,6 +149,15 @@ class ImportEventsCommand extends Command implements LoggerAwareInterface
         }
 
         $this->importAllEvents($output);
+
+
+		if (ExtensionManagementUtility::isLoaded( 'solr')) {
+			$this->logger->info( 'starting Solr Index' );
+			$solrIndexer = GeneralUtility::makeInstance( IndexService::class );
+			$solrIndexer->setLogger( $this->logger );
+			$solrIndexer->indexForAllSites();
+			$this->logger->info( 'finish Solr Index' );
+		}
 
         return 0;
     }

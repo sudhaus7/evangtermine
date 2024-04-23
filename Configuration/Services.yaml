@@ -12,3 +12,5 @@ services:
       - name: 'console.command'
         command: 'evangtermine:importevents'
         description: ''
+  ArbkomEKvW\Evangtermine\Solr\IndexService:
+    public: true

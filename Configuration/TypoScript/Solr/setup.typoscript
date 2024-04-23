@@ -1,0 +1,192 @@
+plugin.tx_solr.index.queue {
+
+    tx_evangtermine_domain_model_event = 1
+    tx_evangtermine_domain_model_event {
+        initialization = ArbkomEKvW\Evangtermine\Solr\TermineInitializer
+        type = tx_evangtermine_domain_model_event
+        fields {
+            title = title
+            created = crdate
+            changed = tstamp
+
+            internaltype_stringS = TEXT
+            internaltype_stringS.value = evangtermine
+
+            subtitle_stringS = TEXT
+            subtitle_stringS.field = subtitle
+
+            shortdescription_stringS = TEXT
+            shortdescription_stringS.field = short_description
+            description_stringS = TEXT
+            description_stringS.field = long_description
+
+            eventkat_stringS = TEXT
+            eventkat_stringS.field = event_kat
+            eventkat2_stringS = TEXT
+            eventkat2_stringS.field = event_kat2
+
+
+
+            eventregion_stringS = TEXT
+            eventregion_stringS.field = region
+            eventsubregion_stringS = TEXT
+            eventsubregion_stringS.field = event_subregion_id
+            eventregion2_stringS = TEXT
+            eventregion2_stringS.field = event_region2_id
+            eventregion3_stringS = TEXT
+            eventregion3_stringS.field = event_region3_id
+
+
+
+            yesno1_stringS = TEXT
+            yesno1_stringS.field = event_yesno1
+            yesno2_stringS = TEXT
+            yesno2_stringS.field = event_yesno2
+            yesno3_stringS = TEXT
+            yesno3_stringS.field = event_yesno3
+            destination_stringS = TEXT
+            destination_stringS.field = event_destination
+
+            placezip_stringS = TEXT
+            placezip_stringS.field = place_zip
+            placecity_stringS = TEXT
+            placecity_stringS.field = place_city
+            placename_stringS = TEXT
+            placename_stringS.field = place_name
+            placestreet_stringS = TEXT
+            placestreet_stringS.field = place_street_nr
+            placecat_stringS = TEXT
+            placecat_stringS.field = place_Kat
+            organizer_stringS = TEXT
+            organizer_stringS.field = user_realname
+
+
+
+            datum1_stringS = TEXT
+            datum1_stringS.field = datum1
+            datum2_stringS = TEXT
+            datum2_stringS.field = datum2
+
+            eventid_stringS = TEXT
+            eventid_stringS.field = eventid
+
+            categories_stringM = SOLR_MULTIVALUE
+            categories_stringM {
+                field = categories
+                separator = ,
+                removeEmptyValues = 1
+            }
+            profession_stringM = SOLR_MULTIVALUE
+            profession_stringM {
+                field = event_profession_id
+                separator = ;
+                removeEmptyValues = 1
+            }
+
+
+
+            content = SOLR_CONTENT
+            content {
+                cObject = COA
+                cObject {
+                    10 = TEXT
+                    10 {
+                        field = title
+                        noTrimWrap = || |
+                    }
+                    20 < .10
+                    20.field = subtitle
+                    30 < .10
+                    30.field = short_description
+                    40 < .10
+                    40.field = long_description
+                    50 < .10
+                    50.field = datum1
+                    60 < .10
+                    60.field = event_kat
+                    70 < .10
+                    70.field = event_kat2
+
+                    80 < .10
+                    80.field = email
+                    90 < .10
+                    90.field = event_subregion_id
+
+                    100 < .10
+                    100.field = event_region2_id
+                    110 < .10
+                    110.field = event_region3_id
+                    120 < .10
+                    120.field = event_profession_id
+                    130 < .10
+                    130.field = event_music_kat_id
+                    140 < .10
+                    140.field = event_flag_1
+
+                    150 < .10
+                    150.field = place_name
+                    155 < .10
+                    155.field = place_street_nr
+                    160 < .10
+                    160.field = place_zip
+                    165 < .10
+                    165.field = place_city
+                    170 < .10
+                    170.field = place_info
+                    175 < .10
+                    175.field = place_kat
+                    180 < .10
+                    180.field = user_description
+                    185 < .10
+                    185.field = user_street_nr
+                    190 < .10
+                    190.field = user_zip
+                    195 < .10
+                    195.field = user_city
+                    200 < .10
+                    200.field = textline1
+                    210 < .10
+                    210.field = textline2
+                    220 < .10
+                    220.field = textline3
+                    230 < .10
+                    230.field = textline4
+                    240 < .10
+                    240.field = textline5
+                    250 < .10
+                    250.field = textline6
+                    260 < .10
+                    260.field = textline7
+                    270 < .10
+                    270.field = textline8
+                    280 < .10
+                    280.field = textline9
+                    290 < .10
+                    290.field = textbox1
+                    300 < .10
+                    300.field = textbox2
+                    310 < .10
+                    310.field = textbox3
+                    320 < .10
+                    320.field = event_destination
+                    330 < .10
+                    330.field = event_lang
+                }
+            }
+
+
+
+            url = TEXT
+            url.typolink {
+                parameter.data = site:evangtermineTargetPage
+                additionalParams = &tx_evangtermine_list[action]=show&tx_evangtermine_list[uid]={field:uid}
+                additionalParams.insertData = 1
+                useCacheHash = 1
+                returnLast = url
+                linkAccessRestrictedPages = 1
+            }
+
+        }
+    }
+
+}
