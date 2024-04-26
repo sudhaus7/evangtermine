@@ -50,3 +50,18 @@ routeEnhancers:
         tableName: 'tx_evangtermine_domain_model_event'
         routeFieldName: 'slug'
         routeValuePrefix: '/'
+  EvangtermineTeaser:
+    type: Extbase
+    extension: Evangtermine
+    plugin: Teaser
+    routes:
+      - routePath: '/terminteaser/{eventtitle}'
+        _controller: 'Eventcontainer::show'
+        _arguments:
+          eventtitle: uid
+    aspects:
+      eventtitle:
+        type: PersistedAliasMapper
+        tableName: 'tx_evangtermine_domain_model_event'
+        routeFieldName: 'slug'
+        routeValuePrefix: '/'
