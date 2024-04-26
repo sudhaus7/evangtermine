@@ -1,3 +1,4 @@
 page.includeJSFooter {
   evangterminePager = EXT:evangtermine/Resources/Public/JavaScript/pager.min.js
+  evangterminePluginUid = EXT:evangtermine/Resources/Public/JavaScript/pluginuid.min.js
 }

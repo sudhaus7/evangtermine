@@ -24,6 +24,7 @@
                                        pluginName="List"
                                        arguments="{uid:event.uid}"
                                        class="et_link_title"
+                                       data="{pluginuid:'{f:if(condition: \'{settings.opmode_detailpage}\',then:\'{settings.opmode_detailpage}\',else:\'{data.uid}\')}'}"
                         >
                             {event.title}
                         </f:link.action>
@@ -35,6 +36,7 @@
                                        pluginName="List"
                                        arguments="{uid:event.uid}"
                                        class="et_link_title"
+                                       data="{pluginuid:'{f:if(condition: \'{settings.opmode_detailpage}\',then:\'{settings.opmode_detailpage}\',else:\'{data.uid}\')}'}"
                         >
                             {event.title}
                         </f:link.action>

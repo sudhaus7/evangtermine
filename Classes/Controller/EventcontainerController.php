@@ -233,31 +233,51 @@ class EventcontainerController extends ActionController
 
     /**
      * action show
+     * @return mixed|string|void
+     * @throws DBALException
+     * @throws Exception
+     * @throws InvalidNumberOfConstraintsException
      * @throws NoSuchCacheException
      * @throws StopActionException
+     * @throws UnexpectedTypeException
      */
     public function showAction()
     {
-        $extconf = GeneralUtility::makeInstance(ExtConf::class);
-        $uid = $this->request->getArguments()['uid'] ?? null;
-        if (!empty($uid)) {
-            /** @var Event $event */
-            $event = $this->eventRepository->findByUid($uid);
+        $data = $this->configurationManager->getContentObject()->data;
 
-            // hand model data to the view
-            $this->view->assign('event', $event);
-            $this->view->assign('eventhost', $extconf->getExtConfArray()['host']);
-            $this->view->assign('categoryList', $this->eventRepository->findAllCategoriesWithEtKeys($this->settings));
-            $this->view->assign('groupList', $this->eventRepository->findAllGroupsWithEtKeys($this->settings));
+        // If the current plugin is a 'detail' plugin, or if it is the plugin in which the user clicked on a link.
+        // We need this for multiple evang. Termine plugins on one site.
+        if ($this->pluginIsDetailPlugin($data)) {
+            $extconf = GeneralUtility::makeInstance(ExtConf::class);
+            $uid = $this->request->getArguments()['uid'] ?? null;
+            if (!empty($uid)) {
+                /** @var Event $event */
+                $event = $this->eventRepository->findByUid($uid);
 
-            if (!empty($event)) {
-                $this->eventDispatcher->dispatch(
-                    new ModifyEvangTermineShowActionViewEvent($this->view, $event)
-                );
+                // hand model data to the view
+                $this->view->assign('event', $event);
+                $this->view->assign('eventhost', $extconf->getExtConfArray()['host']);
+                $this->view->assign('categoryList', $this->eventRepository->findAllCategoriesWithEtKeys($this->settings));
+                $this->view->assign('groupList', $this->eventRepository->findAllGroupsWithEtKeys($this->settings));
+
+                if (!empty($event)) {
+                    $this->eventDispatcher->dispatch(
+                        new ModifyEvangTermineShowActionViewEvent($this->view, $event)
+                    );
+                }
+            } else {
+                $this->addFlashMessage('Keine Event-ID übergeben', '', AbstractMessage::ERROR);
+                $this->redirect('genericinfo');
             }
         } else {
-            $this->addFlashMessage('Keine Event-ID übergeben', '', AbstractMessage::ERROR);
-            $this->redirect('genericinfo');
+            // render content of teaser or list
+            if ($data['list_type'] == 'evangtermine_teaser') {
+                $content = $this->teaserAction();
+            } else {
+                $this->request->setArguments([]);
+                $content = $this->listAction();
+            }
+            return $content;
         }
     }
 
@@ -266,6 +286,28 @@ class EventcontainerController extends ActionController
      */
     public function genericinfoAction()
     {
+    }
+
+    protected function pluginIsDetailPlugin(array $data): bool
+    {
+        $uidCurrentPlugin = $data['uid'];
+        $uidDetailPlugin = $_COOKIE['etpluginuid' . $uidCurrentPlugin] ?? null;
+
+        // delete cookie
+        setcookie('etpluginuid' . $uidCurrentPlugin, '', -1, '/');
+
+        if ($data['list_type'] == 'evangtermine_detail') {
+            return true;
+        }
+
+        if (empty($uidDetailPlugin)) {
+            return false;
+        }
+
+        if ($uidCurrentPlugin == $uidDetailPlugin) {
+            return true;
+        }
+        return false;
     }
 
     /**
