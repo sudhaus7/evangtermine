@@ -291,7 +291,11 @@ class EventRepository extends Repository
         if (empty($region) || $region == 'all') {
             return $queryConstraints;
         }
-        $queryConstraints[] = $query->equals('region', $region);
+        $possibleRegions = [];
+        foreach (explode(',', $region) as $possibleRegion) {
+            $possibleRegions[] = $query->equals('region', $possibleRegion);
+        }
+        $queryConstraints[] = $query->logicalOr(...$possibleRegions);
         return $queryConstraints;
     }
 
@@ -315,7 +319,11 @@ class EventRepository extends Repository
         if (empty($place) || $place == 'all') {
             return $queryConstraints;
         }
-        $queryConstraints[] = $query->equals('place_id', $place);
+        $possiblePlaces = [];
+        foreach (explode(',', $place) as $possiblePlace) {
+            $possiblePlaces[] = $query->equals('place_id', $possiblePlace);
+        }
+        $queryConstraints[] = $query->logicalOr(...$possiblePlaces);
         return $queryConstraints;
     }
 

@@ -327,6 +327,9 @@ class EtKeys extends AbstractValueObject
 
     public function setRegions($regions)
     {
+        if (is_array($regions)) {
+            $regions = implode(',', $regions);
+        }
         $this->regions = $regions;
     }
 
@@ -347,6 +350,9 @@ class EtKeys extends AbstractValueObject
 
     public function setPlaces($places)
     {
+        if (is_array($places)) {
+            $places = implode(',', $places);
+        }
         $this->places = $places;
     }
 
