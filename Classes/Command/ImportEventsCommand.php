@@ -35,6 +35,7 @@ use Symfony\Component\Console\Helper\ProgressBar;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
+use function sys_get_temp_dir;
 use TYPO3\CMS\Core\Configuration\Exception\ExtensionConfigurationExtensionNotConfiguredException;
 use TYPO3\CMS\Core\Configuration\Exception\ExtensionConfigurationPathDoesNotExistException;
 use TYPO3\CMS\Core\Configuration\ExtensionConfiguration;
@@ -45,7 +46,6 @@ use TYPO3\CMS\Core\DataHandling\SlugHelper;
 use TYPO3\CMS\Core\Exception\SiteNotFoundException;
 use TYPO3\CMS\Core\Http\RequestFactory;
 use TYPO3\CMS\Core\Log\LogManager;
-use TYPO3\CMS\Core\Resource\DuplicationBehavior;
 use TYPO3\CMS\Core\Resource\Exception\ExistingTargetFolderException;
 use TYPO3\CMS\Core\Resource\Exception\InsufficientFolderAccessPermissionsException;
 use TYPO3\CMS\Core\Resource\Exception\InsufficientFolderWritePermissionsException;
@@ -54,7 +54,6 @@ use TYPO3\CMS\Core\Resource\ResourceStorage;
 use TYPO3\CMS\Core\Resource\StorageRepository;
 use TYPO3\CMS\Core\Utility\ExtensionManagementUtility;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
-use function sys_get_temp_dir;
 
 class ImportEventsCommand extends Command implements LoggerAwareInterface
 {
@@ -150,14 +149,13 @@ class ImportEventsCommand extends Command implements LoggerAwareInterface
 
         $this->importAllEvents($output);
 
-
-		if (ExtensionManagementUtility::isLoaded( 'solr')) {
-			$this->logger->info( 'starting Solr Index' );
-			$solrIndexer = GeneralUtility::makeInstance( IndexService::class );
-			$solrIndexer->setLogger( $this->logger );
-			$solrIndexer->indexForAllSites();
-			$this->logger->info( 'finish Solr Index' );
-		}
+        if (ExtensionManagementUtility::isLoaded('solr')) {
+            $this->logger->info('starting Solr Index');
+            $solrIndexer = GeneralUtility::makeInstance(IndexService::class);
+            $solrIndexer->setLogger($this->logger);
+            $solrIndexer->indexForAllSites();
+            $this->logger->info('finish Solr Index');
+        }
 
         return 0;
     }
@@ -360,7 +358,7 @@ class ImportEventsCommand extends Command implements LoggerAwareInterface
         }
     }
 
-    protected function addAttributesToItems( SimpleXMLElement $item): array
+    protected function addAttributesToItems(SimpleXMLElement $item): array
     {
         /** @var FieldMapping $fieldMapping */
         $fieldMapping = GeneralUtility::makeInstance(FieldMapping::class);
@@ -391,20 +389,20 @@ class ImportEventsCommand extends Command implements LoggerAwareInterface
      */
     protected function insertImage(array $event, string $itemField, string $eventField)
     {
-	    $queryBuilder = $this->connectionPool->getQueryBuilderForTable('tx_evangtermine_domain_model_event');
-	    $statement = $queryBuilder->select('*')
-	                              ->from('tx_evangtermine_domain_model_event')
-	                              ->where(
-		                              $queryBuilder->expr()->eq('id', $queryBuilder->createNamedParameter($event['id']))
-	                              )
-	                              ->execute();
-	    $eventFromDB = $statement->fetchAssociative();
+        $queryBuilder = $this->connectionPool->getQueryBuilderForTable('tx_evangtermine_domain_model_event');
+        $statement = $queryBuilder->select('*')
+                                  ->from('tx_evangtermine_domain_model_event')
+                                  ->where(
+                                      $queryBuilder->expr()->eq('id', $queryBuilder->createNamedParameter($event['id']))
+                                  )
+                                  ->execute();
+        $eventFromDB = $statement->fetchAssociative();
         if (!empty($itemField)) {
             if (substr($itemField, 0, 2) === '//') {
                 $itemField = 'https:' . $itemField;
             }
         }
-	    $this->connectionPool->getConnectionForTable('tx_evangtermine_domain_model_event')
+        $this->connectionPool->getConnectionForTable('tx_evangtermine_domain_model_event')
          ->update(
              'tx_evangtermine_domain_model_event',
              [$eventField => $itemField],
@@ -609,5 +607,4 @@ class ImportEventsCommand extends Command implements LoggerAwareInterface
     {
         unlink($this->fileNameForRunCheck);
     }
-
 }

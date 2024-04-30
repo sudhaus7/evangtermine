@@ -3,7 +3,6 @@
 namespace ArbkomEKvW\Evangtermine\Domain\Model;
 
 use DateTime;
-use TYPO3\CMS\Extbase\Domain\Model\FileReference;
 use TYPO3\CMS\Extbase\DomainObject\AbstractEntity;
 
 /**

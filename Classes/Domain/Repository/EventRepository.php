@@ -31,9 +31,8 @@ class EventRepository extends Repository
     /**
      * @throws UnexpectedTypeException
      * @throws InvalidNumberOfConstraintsException
-     *
      */
-	public function prepareFindByEtKeysQuery(EtKeys $etKeys): ?array
+    public function prepareFindByEtKeysQuery(EtKeys $etKeys): ?array
     {
         [$eventUids, $filtered] = $this->preSelect($etKeys);
 
@@ -380,7 +379,7 @@ class EventRepository extends Repository
             $uids[] = $eventUid['uid'];
         }
 
-        $time = 60 * 60 * 24 * 7 * $etKeys->getHideOngoingEvents();
+        $time = 60 * 60 * 24 * 7 * 2; // 2 weeks
         $query = $this->createQuery();
         $query->statement('Select uid from tx_evangtermine_domain_model_event
             WHERE uid in (' . implode(',', $uids) . ')

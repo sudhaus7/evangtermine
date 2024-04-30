@@ -6,8 +6,8 @@ use ApacheSolrForTypo3\Solr\IndexQueue\Initializer\AbstractInitializer;
 
 class TermineInitializer extends AbstractInitializer
 {
-	public function initialize(): bool
-	{
-		return false;
-	}
+    public function initialize(): bool
+    {
+        return false;
+    }
 }

@@ -174,8 +174,8 @@
 			</trans-unit>
 
 			<trans-unit id="feflexform.hideOngoingEvents">
-				<source>Hide events that started more than ... ago:</source>
-				<target>Veranstaltungen ausblenden, die vor mehr als ... anfingen:</target>
+				<source>Hide ongoing events</source>
+				<target>Dauerveranstaltungen ausblenden</target>
 			</trans-unit>
 
 			<trans-unit id="feflexform.hideEvents">
@@ -186,46 +186,6 @@
 			<trans-unit id="feflexform.nothingSelected">
 				<source>Nothing selected</source>
 				<target>Nichts ausgewählt</target>
-			</trans-unit>
-
-			<trans-unit id="feflexform.1week">
-				<source>1 week</source>
-				<target>1 Woche</target>
-			</trans-unit>
-
-			<trans-unit id="feflexform.2weeks">
-				<source>2 weeks</source>
-				<target>2 weeks</target>
-			</trans-unit>
-
-			<trans-unit id="feflexform.6weeks">
-				<source>6 weeks</source>
-				<target>6 weeks</target>
-			</trans-unit>
-
-			<trans-unit id="feflexform.12weeks">
-				<source>12 weeks</source>
-				<target>12 weeks</target>
-			</trans-unit>
-
-			<trans-unit id="feflexform.1weekLong">
-				<source>that started more than 1 week ago</source>
-				<target>Veranstaltungen ausblenden, die vor mehr als 1 Woche anfingen</target>
-			</trans-unit>
-
-			<trans-unit id="feflexform.2weeksLong">
-				<source>that started more than 2 weeks ago</source>
-				<target>Veranstaltungen ausblenden, die vor mehr als 2 Wochen anfingen</target>
-			</trans-unit>
-
-			<trans-unit id="feflexform.6weeksLong">
-				<source>that started more than 6 weeks ago</source>
-				<target>Veranstaltungen ausblenden, die vor mehr als 6 Wochen anfingen</target>
-			</trans-unit>
-
-			<trans-unit id="feflexform.12weeksLong">
-				<source>that started more than 12 weeks ago</source>
-				<target>Veranstaltungen ausblenden, die vor mehr als 12 Wochen anfingen</target>
 			</trans-unit>
 
 			<trans-unit id="noEventsFound">

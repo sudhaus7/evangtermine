@@ -181,37 +181,14 @@
                             </config>
                         </TCEforms>
                     </settings.hide_place_names>
-                    <settings.hideOngoingEvents>
+                    <settings.etkey_hideOngoingEvents>
                         <TCEforms>
                             <label>LLL:EXT:evangtermine/Resources/Private/Language/locallang.xlf:feflexform.hideOngoingEvents</label>
                             <config>
-                                <type>select</type>
-                                <renderType>selectSingle</renderType>
-                                <items type="array">
-                                    <numIndex index="0" type="array">
-                                        <numIndex index="0">LLL:EXT:evangtermine/Resources/Private/Language/locallang.xlf:feflexform.nothingSelected</numIndex>
-                                        <numIndex index="1">0</numIndex>
-                                    </numIndex>
-                                    <numIndex index="1" type="array">
-                                        <numIndex index="0">LLL:EXT:evangtermine/Resources/Private/Language/locallang.xlf:feflexform.1week</numIndex>
-                                        <numIndex index="1">1</numIndex>
-                                    </numIndex>
-                                    <numIndex index="2" type="array">
-                                        <numIndex index="0">LLL:EXT:evangtermine/Resources/Private/Language/locallang.xlf:feflexform.2weeks</numIndex>
-                                        <numIndex index="1">2</numIndex>
-                                    </numIndex>
-                                    <numIndex index="3" type="array">
-                                        <numIndex index="0">LLL:EXT:evangtermine/Resources/Private/Language/locallang.xlf:feflexform.6weeks</numIndex>
-                                        <numIndex index="1">6</numIndex>
-                                    </numIndex>
-                                    <numIndex index="4" type="array">
-                                        <numIndex index="0">LLL:EXT:evangtermine/Resources/Private/Language/locallang.xlf:feflexform.12weeks</numIndex>
-                                        <numIndex index="1">12</numIndex>
-                                    </numIndex>
-                                </items>
+                                <type>check</type>
                             </config>
                         </TCEforms>
-                    </settings.hideOngoingEvents>
+                    </settings.etkey_hideOngoingEvents>
                 </el>
         	</ROOT>
         </opmode>

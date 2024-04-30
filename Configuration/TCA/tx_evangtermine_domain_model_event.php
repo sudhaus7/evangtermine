@@ -1,7 +1,5 @@
 <?php
 
-use TYPO3\CMS\Core\Utility\ExtensionManagementUtility;
-
 if (!defined('TYPO3')) {
     die('Access denied.');
 }
@@ -664,10 +662,10 @@ return [
             'exclude' => 1,
             'label' => 'Bild der Veranstaltung',
             'config' => [
-	            'type' => 'input',
-	            'size' => 30,
-	            'eval' => 'trim',
-	            'readOnly' => 1,
+                'type' => 'input',
+                'size' => 30,
+                'eval' => 'trim',
+                'readOnly' => 1,
             ],
         ],
         'caption' => [
@@ -794,10 +792,10 @@ return [
             'exclude' => 1,
             'label' => 'Ort - Bild',
             'config' => [
-	            'type' => 'input',
-	            'size' => 30,
-	            'eval' => 'trim',
-	            'readOnly' => 1,
+                'type' => 'input',
+                'size' => 30,
+                'eval' => 'trim',
+                'readOnly' => 1,
             ],
         ],
         'place_image_caption' => [
@@ -1023,10 +1021,10 @@ return [
             'exclude' => 1,
             'label' => 'Benutzer - Bild',
             'config' => [
-	            'type' => 'input',
-	            'size' => 30,
-	            'eval' => 'trim',
-	            'readOnly' => 1,
+                'type' => 'input',
+                'size' => 30,
+                'eval' => 'trim',
+                'readOnly' => 1,
             ],
         ],
         'liturg_bez' => [

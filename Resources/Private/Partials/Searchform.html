@@ -74,12 +74,13 @@
             </div>
         </f:if>
         <f:if condition="{settings.hide_hideOngoingEvents} == 0">
+            <f:debug title="epokpo">{settings}</f:debug>
             <div class="et_filter_row_right">
                 <label for="hideOngoingEvents"><f:translate key="feflexform.hideEvents" extensionName="Evangtermine"/></label>
                 <f:form.select property="hideOngoingEvents"
                                id="hideOngoingEvents"
                                size="1"
-                               options="{0: '{f:translate(key: \'feflexform.nothingSelected\', extensionName: \'Evangtermine\')}', 1: '{f:translate(key: \'feflexform.1weekLong\', extensionName: \'Evangtermine\')}', 2: '{f:translate(key: \'feflexform.2weeksLong\', extensionName: \'Evangtermine\')}', 6: '{f:translate(key: \'feflexform.6weeksLong\', extensionName: \'Evangtermine\')}', 12: '{f:translate(key: \'feflexform.12weeksLong\', extensionName: \'Evangtermine\')}'}"
+                               options="{0: '{f:translate(key: \'feflexform.nothingSelected\', extensionName: \'Evangtermine\')}', 1: '{f:translate(key: \'feflexform.hideOngoingEvents\', extensionName: \'Evangtermine\')}'}"
                 />
             </div>
         </f:if>

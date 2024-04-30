@@ -146,7 +146,7 @@
 			</trans-unit>
 
 			<trans-unit id="feflexform.hideOngoingEvents">
-				<source>Hide events that started more than ... ago:</source>
+				<source>Hide ongoing events</source>
 			</trans-unit>
 
 			<trans-unit id="feflexform.hideEvents">
@@ -155,38 +155,6 @@
 
 			<trans-unit id="feflexform.nothingSelected">
 				<source>Nothing selected</source>
-			</trans-unit>
-
-			<trans-unit id="feflexform.1week">
-				<source>1 week</source>
-			</trans-unit>
-
-			<trans-unit id="feflexform.2weeks">
-				<source>2 weeks</source>
-			</trans-unit>
-
-			<trans-unit id="feflexform.6weeks">
-				<source>6 weeks</source>
-			</trans-unit>
-
-			<trans-unit id="feflexform.12weeks">
-				<source>12 weeks</source>
-			</trans-unit>
-
-			<trans-unit id="feflexform.1weekLong">
-				<source>Hide events that started more than 1 week ago</source>
-			</trans-unit>
-
-			<trans-unit id="feflexform.2weeksLong">
-				<source>Hide events that started more than 2 weeks ago</source>
-			</trans-unit>
-
-			<trans-unit id="feflexform.6weeksLong">
-				<source>Hide events that started more than 6 weeks ago</source>
-			</trans-unit>
-
-			<trans-unit id="feflexform.12weeksLong">
-				<source>Hide events that started more than 12 weeks ago</source>
 			</trans-unit>
 
 			<trans-unit id="noEventsFound">
