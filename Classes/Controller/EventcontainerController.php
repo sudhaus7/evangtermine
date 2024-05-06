@@ -291,6 +291,11 @@ class EventcontainerController extends ActionController
     protected function pluginIsDetailPlugin(array $data): bool
     {
         $uidCurrentPlugin = $data['uid'];
+
+        if (!is_numeric($uidCurrentPlugin)) {
+            return true;
+        }
+
         $uidDetailPlugin = $_COOKIE['etpluginuid' . $uidCurrentPlugin] ?? null;
 
         // delete cookie
