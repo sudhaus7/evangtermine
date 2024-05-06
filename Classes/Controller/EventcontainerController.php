@@ -292,14 +292,14 @@ class EventcontainerController extends ActionController
     {
         $uidCurrentPlugin = $data['uid'];
 
-        if (!is_numeric($uidCurrentPlugin)) {
-            return true;
-        }
-
         $uidDetailPlugin = $_COOKIE['etpluginuid' . $uidCurrentPlugin] ?? null;
 
         // delete cookie
         setcookie('etpluginuid' . $uidCurrentPlugin, '', -1, '/');
+
+        if (!is_numeric($uidCurrentPlugin)) {
+            return true;
+        }
 
         if ($data['list_type'] == 'evangtermine_detail') {
             return true;
@@ -309,7 +309,7 @@ class EventcontainerController extends ActionController
             return false;
         }
 
-        if ($uidCurrentPlugin == $uidDetailPlugin) {
+        if ($uidCurrentPlugin == $uidDetailPlugin || $uidDetailPlugin == -1) {
             return true;
         }
         return false;
