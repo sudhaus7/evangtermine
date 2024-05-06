@@ -180,7 +180,7 @@ class CategoryUtil
 			// try reading the cached files
 
 		    if (is_file(\sys_get_temp_dir().'/'.$fname)) {
-			    $contentString = \file_get_contents( $fname);
+			    $contentString = \file_get_contents( \sys_get_temp_dir().'/'.$fname);
 				$contentArray = json_decode( $contentString );
 		    }
 	    }
