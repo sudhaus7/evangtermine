@@ -174,12 +174,21 @@ class CategoryUtil
     {
         // URL abfragen, nur IPv4 Auflösung
         $contentString = UrlUtility::loadUrl($url);
-
+	    $fname = basename($url);
         $contentArray = json_decode($contentString);
+	    if ($contentArray === null) {
+			// try reading the cached files
+
+		    if (is_file(\sys_get_temp_dir().'/'.$fname)) {
+			    $contentString = \file_get_contents( $fname);
+				$contentArray = json_decode( $contentString );
+		    }
+	    }
         if ($contentArray === null) {
             throw new RuntimeException('No valid JSON in ' . $url);
         }
 
+		file_put_contents(\sys_get_temp_dir().'/'.$fname,$contentString);
         return $contentArray;
     }
 }
