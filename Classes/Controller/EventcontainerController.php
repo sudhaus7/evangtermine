@@ -52,10 +52,12 @@ use TYPO3\CMS\Core\Cache\CacheManager;
 use TYPO3\CMS\Core\Cache\Exception\NoSuchCacheException;
 use TYPO3\CMS\Core\Messaging\AbstractMessage;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
+use TYPO3\CMS\Extbase\Configuration\BackendConfigurationManager;
 use TYPO3\CMS\Extbase\Mvc\Controller\ActionController;
 use TYPO3\CMS\Extbase\Mvc\Exception\StopActionException;
 use TYPO3\CMS\Extbase\Persistence\Generic\Exception\InvalidNumberOfConstraintsException;
 use TYPO3\CMS\Extbase\Persistence\Generic\Exception\UnexpectedTypeException;
+use TYPO3\CMS\Fluid\View\StandaloneView;
 
 /**
  * EventcontainerController
@@ -199,7 +201,9 @@ class EventcontainerController extends ActionController
             ]);
 
             $content = $this->view->render();
-            $cache->set($cacheKey, $content);
+            if ($this->ifContentIsNotEmpty($content, $events ?? [])) {
+                $cache->set($cacheKey, $content);
+            }
         }
         return $content;
     }
@@ -275,6 +279,7 @@ class EventcontainerController extends ActionController
                 $content = $this->teaserAction();
             } else {
                 $this->request->setArguments([]);
+                $this->view = $this->setView('listAction');
                 $content = $this->listAction();
             }
             return $content;
@@ -288,14 +293,58 @@ class EventcontainerController extends ActionController
     {
     }
 
+    protected function setView(string $actionName)
+    {
+        $backendConfigurationManager = GeneralUtility::makeInstance( BackendConfigurationManager::class);
+        $typoscript = $backendConfigurationManager->getTypoScriptSetup();
+        $pluginConfiguration = $typoscript['plugin.']['tx_evangtermine.']['view.'] ?? [];
+        if (empty($pluginConfiguration)) {
+            return $this->view;
+        }
+        $templateRootPaths = $pluginConfiguration['templateRootPaths.'] ?? [];
+        $partialRootPaths = $pluginConfiguration['partialRootPaths.'] ?? [];
+        $layoutRootPaths = $pluginConfiguration['layoutRootPaths.'] ?? [];
+
+        if (empty($templateRootPaths) || empty($partialRootPaths) || empty($layoutRootPaths)) {
+            return $this->view;
+        }
+        $this->view = GeneralUtility::makeInstance(StandaloneView::class);
+        $this->view->setTemplate($actionName);
+        $this->view->setTemplateRootPaths($templateRootPaths);
+        $this->view->setPartialRootPaths($partialRootPaths);
+        $this->view->setLayoutRootPaths($layoutRootPaths);
+        return $this->view;
+    }
+
+    protected function ifContentIsNotEmpty(string $content, array $events): bool
+    {
+        if (empty($events)) {
+            return false;
+        }
+        if (!empty($content) && strpos($content, 'Diese Veranstaltung existiert nicht.') === false) {
+            return true;
+        }
+        return false;
+    }
+
     protected function pluginIsDetailPlugin(array $data): bool
     {
         $uidCurrentPlugin = $data['uid'];
 
+        $cookies = [];
+        foreach ($_COOKIE as $key => $cookie) {
+            if (strpos($key, 'etpluginuid') === 0) {
+                $cookies[] = $cookie;
+            }
+        }
         $uidDetailPlugin = $_COOKIE['etpluginuid' . $uidCurrentPlugin] ?? null;
 
         // delete cookie
         setcookie('etpluginuid' . $uidCurrentPlugin, '', -1, '/');
+
+        if (empty($cookies)) {
+            return true;
+        }
 
         if (!is_numeric($uidCurrentPlugin)) {
             return true;
