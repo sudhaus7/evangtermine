@@ -124,18 +124,18 @@ class EventRepository extends Repository
 
         $statement = 'SELECT uid FROM tx_evangtermine_domain_model_event
             WHERE (
-                power((' . $lat . ' - tx_evangtermine_domain_model_event.lat) * ' . EventRepository::LAT_IN_KM . ', 2)
-              + power((' . $lon . ' - tx_evangtermine_domain_model_event.lon) * ' . EventRepository::LON_IN_KM . ', 2)
-              < power(' . $radius . ', 2)
+                power((? - tx_evangtermine_domain_model_event.lat) * ' . EventRepository::LAT_IN_KM . ', 2)
+              + power((? - tx_evangtermine_domain_model_event.lon) * ' . EventRepository::LON_IN_KM . ', 2)
+              < power(?, 2)
               OR
-                tx_evangtermine_domain_model_event.place_zip = "' . $zip . '"
+                tx_evangtermine_domain_model_event.place_zip = ?
             )
             ORDER BY
-                power((' . $lat . ' - tx_evangtermine_domain_model_event.lat) * ' . EventRepository::LAT_IN_KM . ', 2)
-              + power((' . $lon . ' - tx_evangtermine_domain_model_event.lon) * ' . EventRepository::LON_IN_KM . ', 2),
+                power((? - tx_evangtermine_domain_model_event.lat) * ' . EventRepository::LAT_IN_KM . ', 2)
+              + power((? - tx_evangtermine_domain_model_event.lon) * ' . EventRepository::LON_IN_KM . ', 2),
                 tx_evangtermine_domain_model_event.place_zip
         ';
-        $query->statement($statement);
+        $query->statement($statement, [$lat, $lon, $radius, $zip, $lat, $lon]);
         // only return array of uids
         return [$query->execute(true), true];
     }
