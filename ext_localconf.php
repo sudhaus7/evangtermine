@@ -42,6 +42,12 @@ $extensionkey = 'evangtermine';
     ]
 );
 
+$GLOBALS['TYPO3_CONF_VARS']['SYS']['formEngine']['nodeRegistry'][1715678295] = [
+    'nodeName' => 'toggleAllFilters',
+    'priority' => 30,
+    'class' => ArbkomEKvW\Evangtermine\Backend\FieldControl\ToggleAllFilters::class,
+];
+
 if (!isset($GLOBALS['TYPO3_CONF_VARS']['SYS']['caching']['cacheConfigurations']['evangtermine'])) {
     $GLOBALS['TYPO3_CONF_VARS']['SYS']['caching']['cacheConfigurations']['evangtermine'] = [];
 }

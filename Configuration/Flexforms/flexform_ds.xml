@@ -199,6 +199,19 @@
                 </TCEforms>
                 <type>array</type>
                 <el>
+                    <settings.toggleAllFilters>
+                        <TCEforms>
+                            <label>LLL:EXT:evangtermine/Resources/Private/Language/locallang.xlf:feflexform.toggleAllFilters</label>
+                            <config>
+                                <type>check</type>
+                                <fieldInformation>
+                                    <toggleAllFilters>
+                                        <renderType>toggleAllFilters</renderType>
+                                    </toggleAllFilters>
+                                </fieldInformation>
+                            </config>
+                        </TCEforms>
+                    </settings.toggleAllFilters>
                     <settings.hide_highlights>
                         <TCEforms>
                             <label>LLL:EXT:evangtermine/Resources/Private/Language/locallang.xlf:feflexform.hideHighlights</label>

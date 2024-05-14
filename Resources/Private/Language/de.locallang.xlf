@@ -35,6 +35,11 @@
 				<target>Modus</target>
 			</trans-unit>
 
+			<trans-unit id="feflexform.toggleAllFilters">
+				<source></source>
+				<target>Alle Filter ein-/ausblenden</target>
+			</trans-unit>
+
 			<trans-unit id="feflexform.vid">
 				<source></source>
 				<target>Veranstalter-Id:</target>
