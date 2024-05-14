@@ -33,6 +33,10 @@
 				<source>Search form settings</source>
 			</trans-unit>
 
+			<trans-unit id="feflexform.toggleAllFilters">
+				<source>Show/Hide all filters</source>
+			</trans-unit>
+
 			<trans-unit id="feflexform.vid">
 				<source>Organizer ID:</source>
 			</trans-unit>
