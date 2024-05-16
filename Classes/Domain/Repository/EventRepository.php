@@ -27,10 +27,21 @@ class EventRepository extends Repository
 {
     const LAT_IN_KM = 111.1;
     const LON_IN_KM = 73;
+    const REGION_FIELDS = [
+        'region',
+        'event_subregion_id',
+        'event_region2_id',
+        'event_region3_id',
+        'place_region'
+    ];
 
     /**
-     * @throws UnexpectedTypeException
+     * @param EtKeys $etKeys
+     * @return array|null
+     * @throws DBALException
+     * @throws Exception
      * @throws InvalidNumberOfConstraintsException
+     * @throws UnexpectedTypeException
      */
     public function prepareFindByEtKeysQuery(EtKeys $etKeys): ?array
     {
@@ -141,6 +152,12 @@ class EventRepository extends Repository
     }
 
     /**
+     * @param QueryInterface $query
+     * @param EtKeys $etKeys
+     * @param array|null $eventUids
+     * @return array
+     * @throws DBALException
+     * @throws Exception
      * @throws InvalidNumberOfConstraintsException
      * @throws UnexpectedTypeException
      */
@@ -267,6 +284,11 @@ class EventRepository extends Repository
     }
 
     /**
+     * @param Query $query
+     * @param EtKeys $etKeys
+     * @return array
+     * @throws DBALException
+     * @throws Exception
      * @throws InvalidNumberOfConstraintsException
      */
     public function setRegionConstraint(Query $query, EtKeys $etKeys): array
@@ -287,15 +309,54 @@ class EventRepository extends Repository
         }
 
         $region = $etKeys->getRegion();
+
         if (empty($region) || $region == 'all') {
             return $queryConstraints;
         }
         $possibleRegions = [];
         foreach (explode(',', $region) as $possibleRegion) {
-            $possibleRegions[] = $query->equals('region', $possibleRegion);
+            if (is_numeric($possibleRegion)) {
+                $regionName = $this->getRegionById((int)$possibleRegion);
+                if (!empty($regionName)) {
+                    foreach (self::REGION_FIELDS as $field) {
+                        $possibleRegions[] = $query->equals($field, $regionName);
+                    }
+
+                }
+            } else {
+                $possibleRegions[] = $query->equals('region', $possibleRegion);
+            }
         }
         $queryConstraints[] = $query->logicalOr(...$possibleRegions);
         return $queryConstraints;
+    }
+
+    /**
+     * @throws DBALException
+     * @throws Exception
+     */
+    protected function getRegionById(int $id): ?string
+    {
+        $connectionPool = GeneralUtility::makeInstance(ConnectionPool::class);
+        $queryBuilder = $connectionPool->getQueryBuilderForTable('tx_evangtermine_domain_model_event');
+        $queryBuilder->select('region','event_subregion_id','event_region2_id','event_region3_id','place_region','attributes')
+            ->from('tx_evangtermine_domain_model_event')
+            ->where(
+                $queryBuilder->expr()->like('attributes', $queryBuilder->createNamedParameter('%' . $queryBuilder->escapeLikeWildcards($id) . '%', Connection::PARAM_STR))
+            );
+        $result = $queryBuilder->execute()->fetchAllAssociative();
+        if (empty($result)) {
+            return null;
+        }
+        foreach ($result as $event) {
+            $attributes = json_decode($event['attributes'], true);
+            foreach (self::REGION_FIELDS as $field) {
+                if (((int)$attributes[$field]['db'] ?? 0) == $id) {
+                    return $event[$field] ?? null;
+                }
+            }
+        }
+        return null;
     }
 
     /**
@@ -335,6 +396,9 @@ class EventRepository extends Repository
         $date = $etKeys->getDate();
         if (!empty($date)) {
             $dateTime = (new \DateTime())->createFromFormat('Y-m-d', $date);
+            if (empty($dateTime)) {
+                $dateTime = (new \DateTime())->createFromFormat('d.m.Y', $date);
+            }
             if (!empty($dateTime)) {
                 $timestampStart = strtotime(date('d.m.Y', $dateTime->getTimestamp()) . ' 00:00:00');
                 $timestampEnd = $timestampStart + 24 * 60 * 60 - 1;
