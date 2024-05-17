@@ -28,11 +28,11 @@ class EventRepository extends Repository
     const LAT_IN_KM = 111.1;
     const LON_IN_KM = 73;
     const REGION_FIELDS = [
-        'region',
+        /*'region',*/
         'event_subregion_id',
-        'event_region2_id',
+        /*'event_region2_id',
         'event_region3_id',
-        'place_region'
+        'place_region'*/
     ];
 
     /**
@@ -321,13 +321,14 @@ class EventRepository extends Repository
                     foreach (self::REGION_FIELDS as $field) {
                         $possibleRegions[] = $query->equals($field, $regionName);
                     }
-
                 }
             } else {
                 $possibleRegions[] = $query->equals('region', $possibleRegion);
             }
         }
-        $queryConstraints[] = $query->logicalOr(...$possibleRegions);
+        if (!empty($possibleRegions)) {
+            $queryConstraints[] = $query->logicalOr(...$possibleRegions);
+        }
         return $queryConstraints;
     }
 
@@ -351,7 +352,7 @@ class EventRepository extends Repository
         foreach ($result as $event) {
             $attributes = json_decode($event['attributes'], true);
             foreach (self::REGION_FIELDS as $field) {
-                if (((int)$attributes[$field]['db'] ?? 0) == $id) {
+                if ((isset($attributes[$field]['db']) && (int)$attributes[$field]['db'] ?? 0) == $id) {
                     return $event[$field] ?? null;
                 }
             }
