@@ -331,7 +331,7 @@ class EventcontainerController extends ActionController
      */
     protected function getDetailPage(): int
     {
-        $detailPage = $this->settings['opmode_detailpage'];
+        $detailPage = $this->settings['opmode_detailpage'] ?? 0;
         if (empty($detailPage)) {
             return 0;
         }
@@ -376,7 +376,7 @@ class EventcontainerController extends ActionController
      */
     protected function getDetailPagePluginUid(array $data): int
     {
-        $detailPage = $this->settings['opmode_detailpage'];
+        $detailPage = $this->settings['opmode_detailpage'] ?? 0;
         if (empty($detailPage)) {
             return $data['uid'];
         }
