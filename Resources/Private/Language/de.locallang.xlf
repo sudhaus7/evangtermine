@@ -35,6 +35,11 @@
 				<target>Modus</target>
 			</trans-unit>
 
+			<trans-unit id="pluginsheet.searchform">
+				<source></source>
+				<target>Einstellungen des Suchformulars</target>
+			</trans-unit>
+
 			<trans-unit id="feflexform.toggleAllFilters">
 				<source></source>
 				<target>Alle Filter ein-/ausblenden</target>
@@ -76,11 +81,13 @@
 			</trans-unit>
 
 			<trans-unit id="feflexform.regions">
-				<source>Regionen (Mehrfachauswahl möglich):</source>
+				<source></source>
+				<target>Regionen (Mehrfachauswahl möglich):</target>
 			</trans-unit>
 
 			<trans-unit id="feflexform.places">
-				<source>Orte (Mehrfachauswahl möglich):</source>
+				<source></source>
+				<target>Orte (Mehrfachauswahl möglich):</target>
 			</trans-unit>
 
 			<trans-unit id="feflexform.itemsPerPage">

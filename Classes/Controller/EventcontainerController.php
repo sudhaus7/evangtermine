@@ -50,6 +50,7 @@ use Doctrine\DBAL\DBALException;
 use Doctrine\DBAL\Driver\Exception;
 use TYPO3\CMS\Core\Cache\CacheManager;
 use TYPO3\CMS\Core\Cache\Exception\NoSuchCacheException;
+use TYPO3\CMS\Core\Database\ConnectionPool;
 use TYPO3\CMS\Core\Messaging\AbstractMessage;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 use TYPO3\CMS\Extbase\Configuration\BackendConfigurationManager;
@@ -186,6 +187,7 @@ class EventcontainerController extends ActionController
                 $this->etkeys->getPageID()
             );
 
+            $data = $this->configurationManager->getContentObject()->data;
             $this->view->assignMultiple([
                 'events' => $events ?? [],
                 'nrOfEvents' => $nrOfEvents,
@@ -197,7 +199,9 @@ class EventcontainerController extends ActionController
                 'placeList' => $this->eventRepository->findAllPlacesWithEtKeys($this->settings, $this->currentPluginUid),
                 'regionList' => $this->eventRepository->findAllRegionsWithEtKeys($this->settings, $this->currentPluginUid),
                 'pagerdata' => $this->pager->getPgr(),
-                'data' => $this->configurationManager->getContentObject()->data,
+                'data' => $data,
+                'detailPage' => $this->getDetailPage(),
+                'detailPagePluginUid' => $this->getDetailPagePluginUid($data),
             ]);
 
             $content = $this->view->render();
@@ -209,8 +213,11 @@ class EventcontainerController extends ActionController
     }
 
     /**
-     * @throws NoSuchCacheException
+     * @return mixed|string
+     * @throws DBALException
+     * @throws Exception
      * @throws InvalidNumberOfConstraintsException
+     * @throws NoSuchCacheException
      * @throws UnexpectedTypeException
      */
     public function teaserAction()
@@ -229,6 +236,8 @@ class EventcontainerController extends ActionController
             $this->view->assign('events', $events);
             $this->view->assign('pageId', $GLOBALS['TSFE']->id);
             $this->view->assign('data', $this->configurationManager->getContentObject()->data);
+            $this->view->assign('detailPage', $this->getDetailPage());
+            $this->view->assign('detailPagePluginUid', $this->getDetailPagePluginUid($data));
             $content = $this->view->render();
             $cache->set($cacheKey, $content);
         }
@@ -314,6 +323,96 @@ class EventcontainerController extends ActionController
         $this->view->setPartialRootPaths($partialRootPaths);
         $this->view->setLayoutRootPaths($layoutRootPaths);
         return $this->view;
+    }
+
+    /**
+     * @throws DBALException
+     * @throws Exception
+     */
+    protected function getDetailPage(): int
+    {
+        $detailPage = $this->settings['opmode_detailpage'];
+        if (empty($detailPage)) {
+            return 0;
+        }
+
+        $connectionPool = GeneralUtility::makeInstance(ConnectionPool::class);
+        $queryBuilder = $connectionPool->getQueryBuilderForTable('tt_content');
+        $queryBuilder->select('*')
+            ->from('tt_content')
+            ->where(
+                $queryBuilder->expr()->eq('pid', $queryBuilder->createNamedParameter((int)$detailPage, \PDO::PARAM_INT)),
+                $queryBuilder->expr()->eq('list_type', $queryBuilder->createNamedParameter('evangtermine_detail'))
+            );
+        $result = $queryBuilder->executeQuery()->fetchAssociative();
+
+        if (empty($result)) {
+            $queryBuilder = $connectionPool->getQueryBuilderForTable('tt_content');
+            $queryBuilder->select('*')
+                ->from('tt_content')
+                ->where(
+                    $queryBuilder->expr()->eq('pid', $queryBuilder->createNamedParameter((int)$detailPage, \PDO::PARAM_INT)),
+                    $queryBuilder->expr()->eq('list_type', $queryBuilder->createNamedParameter('evangtermine_list'))
+                );
+            $result = $queryBuilder->executeQuery()->fetchAssociative();
+
+            if (empty($result)) {
+                return 0;
+            }
+
+            $flexFormArray = GeneralUtility::xml2array($result['pi_flexform']);
+            $detailPage = $flexFormArray['data']['opmode']['lDEF']['settings.opmode_detailpage']['vDEF'] ?? null;
+            if (is_numeric($detailPage)) {
+                return (int)$detailPage;
+            }
+        }
+        return (int)$detailPage;
+    }
+
+    /**
+     *
+     * @throws Exception
+     * @throws DBALException
+     */
+    protected function getDetailPagePluginUid(array $data): int
+    {
+        $detailPage = $this->settings['opmode_detailpage'];
+        if (empty($detailPage)) {
+            return $data['uid'];
+        }
+
+        $connectionPool = GeneralUtility::makeInstance(ConnectionPool::class);
+        $queryBuilder = $connectionPool->getQueryBuilderForTable('tt_content');
+        $queryBuilder->select('*')
+            ->from('tt_content')
+            ->where(
+                $queryBuilder->expr()->eq('pid', $queryBuilder->createNamedParameter((int)$detailPage, \PDO::PARAM_INT)),
+                $queryBuilder->expr()->eq('list_type', $queryBuilder->createNamedParameter('evangtermine_detail'))
+            );
+        $result = $queryBuilder->executeQuery()->fetchAssociative();
+
+        if (!empty($result)) {
+            return (int)$result['uid'];
+        }
+
+        $queryBuilder = $connectionPool->getQueryBuilderForTable('tt_content');
+        $queryBuilder->select('*')
+            ->from('tt_content')
+            ->where(
+                $queryBuilder->expr()->eq('pid', $queryBuilder->createNamedParameter((int)$detailPage, \PDO::PARAM_INT)),
+                $queryBuilder->expr()->eq('list_type', $queryBuilder->createNamedParameter('evangtermine_list'))
+            );
+        $result = $queryBuilder->executeQuery()->fetchAssociative();
+
+        if (!empty($result)) {
+            $flexFormArray = GeneralUtility::xml2array($result['pi_flexform']);
+            $detailPage = $flexFormArray['data']['opmode']['lDEF']['settings.opmode_detailpage']['vDEF'] ?? null;
+            if (is_numeric($detailPage)) {
+                return (int)$detailPage;
+            }
+            return (int)$result['uid'];
+        }
+        return 0;
     }
 
     protected function ifContentIsNotEmpty(string $content, array $events): bool
