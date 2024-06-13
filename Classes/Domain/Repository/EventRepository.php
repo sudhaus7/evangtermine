@@ -59,11 +59,11 @@ class EventRepository extends Repository
 
         $queryConstraints = $this->setConstraints($query, $etKeys, $eventUids);
 
-        // if search word
+        // if search word or vid
         $searchWordConstraint = [];
-        if (!empty($etKeys->getQ()) && $etKeys->getQ() != 'none') {
-            $eventsWithSearchWord = $this->filterWithSearchWord($etKeys);
-            $searchWordConstraint = $this->setSearchWordConstraint($query, $eventsWithSearchWord);
+        if ((!empty($etKeys->getQ()) && $etKeys->getQ() != 'none') || !empty($etKeys->getVid())) {
+            $eventsWithSearchWord = $this->filterWithSearchWordAndVid($etKeys);
+            $searchWordConstraint = $this->setSearchWordAndVidConstraint($query, $eventsWithSearchWord);
         }
         $queryConstraints = array_merge($queryConstraints, $searchWordConstraint);
 
@@ -98,7 +98,7 @@ class EventRepository extends Repository
         return $query->execute()->count();
     }
 
-    public function filterWithSearchWord(EtKeys $etKeys): array
+    public function filterWithSearchWordAndVid(EtKeys $etKeys): array
     {
         $etKeysForApiQuery = clone $etKeys;
         $etKeysForApiQuery->setItemsPerPage(99999);
@@ -167,7 +167,6 @@ class EventRepository extends Repository
         if (!empty($eventUids)) {
             $queryConstraints = array_merge($queryConstraints, $this->setUidConstraint($query, $eventUids));
         }
-        $queryConstraints = array_merge($queryConstraints, $this->setVid($query, $etKeys));
         $queryConstraints = array_merge($queryConstraints, $this->setHighlightConstraint($query, $etKeys));
         $queryConstraints = array_merge($queryConstraints, $this->setCategoryConstraint($query, $etKeys));
         $queryConstraints = array_merge($queryConstraints, $this->setPeopleConstraint($query, $etKeys));
@@ -179,7 +178,7 @@ class EventRepository extends Repository
     /**
      * @throws UnexpectedTypeException
      */
-    public function setSearchWordConstraint(Query $query, array $ids): array
+    public function setSearchWordAndVidConstraint(Query $query, array $ids): array
     {
         $queryConstraints = [];
         $queryConstraints[] = $query->in('id', $ids);

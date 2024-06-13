@@ -235,7 +235,7 @@ class EventcontainerController extends ActionController
 
             $this->view->assign('events', $events);
             $this->view->assign('pageId', $GLOBALS['TSFE']->id);
-            $this->view->assign('data', $this->configurationManager->getContentObject()->data);
+            $this->view->assign('data', $data);
             $this->view->assign('detailPage', $this->getDetailPage());
             $this->view->assign('detailPagePluginUid', $this->getDetailPagePluginUid($data));
             $content = $this->view->render();
@@ -272,6 +272,7 @@ class EventcontainerController extends ActionController
                 $this->view->assign('eventhost', $extconf->getExtConfArray()['host']);
                 $this->view->assign('categoryList', $this->eventRepository->findAllCategoriesWithEtKeys($this->settings));
                 $this->view->assign('groupList', $this->eventRepository->findAllGroupsWithEtKeys($this->settings));
+                $this->view->assign('data', $this->configurationManager->getContentObject()->data);
 
                 if (!empty($event)) {
                     $this->eventDispatcher->dispatch(
