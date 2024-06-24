@@ -201,8 +201,8 @@
 			</trans-unit>
 
 			<trans-unit id="noEventsFound">
-				<source>No events found!</source>
-				<target>Keine Veranstaltungen gefunden!</target>
+				<source>No events are currently planned.</source>
+				<target>Aktuell sind keine Termine geplant.</target>
 			</trans-unit>
 
 		</body>
