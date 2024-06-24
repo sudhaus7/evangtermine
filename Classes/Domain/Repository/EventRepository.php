@@ -85,7 +85,6 @@ class EventRepository extends Repository
                 'title' => QueryInterface::ORDER_ASCENDING,
             ]
         );
-
         // get events
         $events = $query->execute();
         return $events->toArray();
@@ -181,7 +180,12 @@ class EventRepository extends Repository
     public function setSearchWordAndVidConstraint(Query $query, array $ids): array
     {
         $queryConstraints = [];
-        $queryConstraints[] = $query->in('id', $ids);
+        if (empty($ids)) {
+            // set to -9999 to prevent an error but still find no events
+            $queryConstraints[] = $query->in('id', [-9999]);
+        } else {
+            $queryConstraints[] = $query->in('id', $ids);
+        }
         return $queryConstraints;
     }
 
@@ -339,7 +343,7 @@ class EventRepository extends Repository
     {
         $connectionPool = GeneralUtility::makeInstance(ConnectionPool::class);
         $queryBuilder = $connectionPool->getQueryBuilderForTable('tx_evangtermine_domain_model_event');
-        $queryBuilder->select('region','event_subregion_id','event_region2_id','event_region3_id','place_region','attributes')
+        $queryBuilder->select('region', 'event_subregion_id', 'event_region2_id', 'event_region3_id', 'place_region', 'attributes')
             ->from('tx_evangtermine_domain_model_event')
             ->where(
                 $queryBuilder->expr()->like('attributes', $queryBuilder->createNamedParameter('%' . $queryBuilder->escapeLikeWildcards($id) . '%', Connection::PARAM_STR))

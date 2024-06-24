@@ -305,7 +305,7 @@ class EventcontainerController extends ActionController
 
     protected function setView(string $actionName)
     {
-        $backendConfigurationManager = GeneralUtility::makeInstance( BackendConfigurationManager::class);
+        $backendConfigurationManager = GeneralUtility::makeInstance(BackendConfigurationManager::class);
         $typoscript = $backendConfigurationManager->getTypoScriptSetup();
         $pluginConfiguration = $typoscript['plugin.']['tx_evangtermine.']['view.'] ?? [];
         if (empty($pluginConfiguration)) {
@@ -371,7 +371,6 @@ class EventcontainerController extends ActionController
     }
 
     /**
-     *
      * @throws Exception
      * @throws DBALException
      */
