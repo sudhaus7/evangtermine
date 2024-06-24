@@ -8,7 +8,6 @@ use TYPO3\CMS\Core\Utility\GeneralUtility;
 
 class ToggleAllFilters extends AbstractNode
 {
-
     public function render(): array
     {
         $pageRenderer = GeneralUtility::makeInstance(PageRenderer::class);
@@ -18,7 +17,7 @@ class ToggleAllFilters extends AbstractNode
         }
 
         return [
-            'html' => ''
+            'html' => '',
         ];
     }
 }
