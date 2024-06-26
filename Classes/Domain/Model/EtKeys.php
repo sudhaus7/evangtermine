@@ -704,6 +704,8 @@ class EtKeys extends AbstractValueObject
     {
         foreach (get_object_vars($this) as $key => $value) {
             if (in_array($key, $this->allowedKeys) && $value !== null) {
+
+                $value = $this->convertDateFormatToGermanFormat($key, $value);
                 $parBlocks[] = $key . '=' . urlencode(utf8_decode($value));
             }
         }
@@ -761,5 +763,30 @@ class EtKeys extends AbstractValueObject
             $mthd = 'set' . ucfirst($key);
             $this->$mthd($val);
         }
+    }
+
+    /**
+     * @param $key
+     * @param $value
+     * @return mixed|string
+     */
+    protected function convertDateFormatToGermanFormat($key, $value)
+    {
+        if ($key == 'date') {
+            $valueArray = explode('-', $value);
+            if (count($valueArray) == 3) {
+                if (strlen($valueArray[0]) == 4) {
+                    $year = $valueArray[0];
+                    $month = $valueArray[1];
+                    $day = $valueArray[2];
+                } else {
+                    $day = $valueArray[0];
+                    $month = $valueArray[1];
+                    $year = $valueArray[2];
+                }
+                $value = $day . '.' . $month . '.' . $year;
+            }
+        }
+        return $value;
     }
 }
