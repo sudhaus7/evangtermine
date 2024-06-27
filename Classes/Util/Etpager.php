@@ -44,13 +44,13 @@ namespace ArbkomEKvW\Evangtermine\Util;
 class Etpager
 {
     // pager bar size (number of page fields to click on)
-    const pgrbSize = 5;
+    public const pgrbSize = 5;
 
     // Steps between fields in self::pgrbSize
-    const pgrbSteps = 4;
+    public const pgrbSteps = 4;
 
     // Steps from pagebar border to pagebar center
-    const pgrbBorderToCenter = 2;
+    public const pgrbBorderToCenter = 2;
 
     /**
      * pager data for display in view

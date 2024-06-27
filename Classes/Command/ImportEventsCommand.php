@@ -35,7 +35,9 @@ use Symfony\Component\Console\Helper\ProgressBar;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
+
 use function sys_get_temp_dir;
+
 use TYPO3\CMS\Core\Configuration\Exception\ExtensionConfigurationExtensionNotConfiguredException;
 use TYPO3\CMS\Core\Configuration\Exception\ExtensionConfigurationPathDoesNotExistException;
 use TYPO3\CMS\Core\Configuration\ExtensionConfiguration;
@@ -59,7 +61,7 @@ class ImportEventsCommand extends Command implements LoggerAwareInterface
 {
     use LoggerAwareTrait;
 
-    const ITEMS_PER_PAGE = 100;
+    public const ITEMS_PER_PAGE = 100;
 
     protected ConnectionPool $connectionPool;
     protected RequestFactory $requestFactory;
@@ -184,9 +186,9 @@ class ImportEventsCommand extends Command implements LoggerAwareInterface
             $item = (array)$item;
             $item['attributes'] = json_encode($attributes);
             $item['hash'] = $hash;
-            if (strpos($item['END'], '0000-00-00') !== false) {
+            if (str_contains($item['END'], '0000-00-00')) {
                 $startArray = explode(' ', $item['START']);
-                if (strpos($item['END'], '0000-00-00 00:00:00') !== false) {
+                if (str_contains($item['END'], '0000-00-00 00:00:00')) {
                     $item['END'] = null;
                 } else {
                     $endArray = explode(' ', $item['END']);
@@ -306,7 +308,7 @@ class ImportEventsCommand extends Command implements LoggerAwareInterface
         $newItems = new SplObjectStorage();
 
         $totalItems = $metaData->totalItems;
-        $pages = ceil($totalItems/self::ITEMS_PER_PAGE);
+        $pages = ceil($totalItems / self::ITEMS_PER_PAGE);
         $this->logger->info(sprintf('Fetching %d items in %d pages ', $totalItems, $pages));
         $progressBar = new ProgressBar($output, $pages);
         $urlset = [];
@@ -346,7 +348,7 @@ class ImportEventsCommand extends Command implements LoggerAwareInterface
                                  ->select(
                                      [ 'hash' ],
                                      'tx_evangtermine_domain_model_event',
-                                     ['id'=>$id]
+                                     ['id' => $id]
                                  );
             $row = $res->fetchAssociative();
             if (!$row || $row['hash'] !== $hash) {

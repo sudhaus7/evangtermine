@@ -50,38 +50,38 @@ class EtKeys extends AbstractValueObject
      * @var array
      */
     private array $allowedKeys = [
-            'vid',
-            'region',
-            'aid',
-            'kk',
-            'eventtype',
-            'highlight',
-            'people',
-            'person',
-            'place',
-            'bf',
-            'ipm',
-            'cha',
-            'lang',
-            'itemsPerPage',
-            'pageID',
-            'q',
-            'd',
-            'month',
-            'date',
-            'year',
-            'start',
-            'end',
-            'dest',
-            'own',
-            'menue1',
-            'menue2',
-            'zip',
-            'yesno1',
-            'yesno2',
-            'until',
-            'encoding',
-            'redius',
+        'vid',
+        'region',
+        'aid',
+        'kk',
+        'eventtype',
+        'highlight',
+        'people',
+        'person',
+        'place',
+        'bf',
+        'ipm',
+        'cha',
+        'lang',
+        'itemsPerPage',
+        'pageID',
+        'q',
+        'd',
+        'month',
+        'date',
+        'year',
+        'start',
+        'end',
+        'dest',
+        'own',
+        'menue1',
+        'menue2',
+        'zip',
+        'yesno1',
+        'yesno2',
+        'until',
+        'encoding',
+        'redius',
     ];
 
     /**
@@ -704,7 +704,6 @@ class EtKeys extends AbstractValueObject
     {
         foreach (get_object_vars($this) as $key => $value) {
             if (in_array($key, $this->allowedKeys) && $value !== null) {
-
                 $value = $this->convertDateFormatToGermanFormat($key, $value);
                 $parBlocks[] = $key . '=' . urlencode(utf8_decode($value));
             }

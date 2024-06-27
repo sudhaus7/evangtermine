@@ -25,9 +25,9 @@ use TYPO3\CMS\Extbase\Persistence\Repository;
  */
 class EventRepository extends Repository
 {
-    const LAT_IN_KM = 111.1;
-    const LON_IN_KM = 73;
-    const REGION_FIELDS = [
+    public const LAT_IN_KM = 111.1;
+    public const LON_IN_KM = 73;
+    public const REGION_FIELDS = [
         /*'region',*/
         'event_subregion_id',
         /*'event_region2_id',

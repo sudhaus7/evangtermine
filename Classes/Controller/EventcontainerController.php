@@ -299,9 +299,7 @@ class EventcontainerController extends ActionController
     /**
      * action genericinfo
      */
-    public function genericinfoAction()
-    {
-    }
+    public function genericinfoAction() {}
 
     protected function setView(string $actionName)
     {
@@ -420,7 +418,7 @@ class EventcontainerController extends ActionController
         if (empty($events)) {
             return false;
         }
-        if (!empty($content) && strpos($content, 'Diese Veranstaltung existiert nicht.') === false) {
+        if (!empty($content) && !str_contains($content, 'Diese Veranstaltung existiert nicht.')) {
             return true;
         }
         return false;
@@ -432,7 +430,7 @@ class EventcontainerController extends ActionController
 
         $cookies = [];
         foreach ($_COOKIE as $key => $cookie) {
-            if (strpos($key, 'etpluginuid') === 0) {
+            if (str_starts_with($key, 'etpluginuid')) {
                 $cookies[] = $cookie;
             }
         }

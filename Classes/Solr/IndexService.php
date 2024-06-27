@@ -145,7 +145,7 @@ class IndexService implements LoggerAwareInterface
                 GeneralUtility::makeInstance(ConnectionPool::class)->getConnectionForTable('tx_solr_indexqueue_item')
                               ->delete(
                                   'tx_solr_indexqueue_item',
-                                  ['uid'=>$itemToDelete['uid']]
+                                  ['uid' => $itemToDelete['uid']]
                               );
                 try {
                     $strategy = GeneralUtility::makeInstance(EventStrategy::class);
@@ -192,7 +192,7 @@ where (pages.uid=%1$d or p1.uid=%1$d or p2.uid=%1$d or p3.uid=%1$d or p4.uid=%1$
 		', (int)$site->getRootPageId()));
 
         while ($row = $result->fetchAssociative()) {
-            $pageIds[]=$row['uid'];
+            $pageIds[] = $row['uid'];
         }
         return $pageIds;
     }
