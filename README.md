@@ -23,5 +23,5 @@ Evangelische Kirche von Westfalen
 Das Landeskirchenamt
 Arbeitsbereich Kommunikation
 
-Contact: christoph.roth@ekvw.de
+Contact: Sudhaus7, info@sudhaus7.de
 
