@@ -170,7 +170,7 @@ class EventcontainerController extends ActionController
         $content = $cache->get($cacheKey);
 
         if (empty($content)) {
-            list($query, $queryConstraints) = $this->eventRepository->prepareFindByEtKeysQuery($this->etkeys);
+            [$query, $queryConstraints] = $this->eventRepository->prepareFindByEtKeysQuery($this->etkeys);
             $nrOfEvents = 0;
             if (!empty($query)) {
                 try {
@@ -230,7 +230,7 @@ class EventcontainerController extends ActionController
         $content = $cache->get($cacheKey);
 
         if (empty($content)) {
-            list($query, $queryConstraints) = $this->eventRepository->prepareFindByEtKeysQuery($this->etkeys);
+            [$query, $queryConstraints] = $this->eventRepository->prepareFindByEtKeysQuery($this->etkeys);
             $events = $this->eventRepository->findByEtKeys($query, $this->etkeys);
 
             $this->view->assign('events', $events);
@@ -376,7 +376,10 @@ class EventcontainerController extends ActionController
     {
         $detailPage = $this->settings['opmode_detailpage'] ?? 0;
         if (empty($detailPage)) {
-            return $data['uid'];
+			if (is_array($data) && isset($data['uid'])) {
+				return $data['uid'];
+			}
+			return 0;
         }
 
         $connectionPool = GeneralUtility::makeInstance(ConnectionPool::class);
