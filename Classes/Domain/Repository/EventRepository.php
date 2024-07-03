@@ -61,7 +61,7 @@ class EventRepository extends Repository
 
         // if search word or vid
         $searchWordConstraint = [];
-        if ((!empty($etKeys->getQ()) && $etKeys->getQ() != 'none') || !empty($etKeys->getVid())) {
+        if ((!empty($etKeys->getQ()) && $etKeys->getQ() != 'none') || (!empty($etKeys->getVid()) && $etKeys->getVid() != 'all')) {
             $eventsWithSearchWord = $this->filterWithSearchWordAndVid($etKeys);
             $searchWordConstraint = $this->setSearchWordAndVidConstraint($query, $eventsWithSearchWord);
         }
@@ -473,14 +473,18 @@ class EventRepository extends Repository
         $connectionPool = GeneralUtility::makeInstance(ConnectionPool::class);
         $queryBuilder = $connectionPool->getQueryBuilderForTable('tx_evangtermine_domain_model_event');
 
-        if (!empty($settings['etkey_places'] ?? '') && ($settings['etkey_places'] ?? '') !== 'all') {
+        $etkeyPlaces = $settings['etkey_places'] ?? '';
+        if (is_array($etkeyPlaces) && isset($etkeyPlaces[0])) {
+            $etkeyPlaces = $etkeyPlaces[0];
+        }
+        if (!empty($etkeyPlaces ?? '') && ($etkeyPlaces ?? '') !== 'all') {
             $queryBuilder->select('place_id', 'place_zip', 'place_city')
                 ->from('tx_evangtermine_domain_model_event')
                 ->where(
                     $queryBuilder->expr()
                         ->in(
                             'place_id',
-                            $queryBuilder->createNamedParameter(explode(',', $settings['etkey_places']), Connection::PARAM_STR_ARRAY)
+                            $queryBuilder->createNamedParameter(explode(',', $etkeyPlaces), Connection::PARAM_STR_ARRAY)
                         )
                 )
                 ->orderBy('place_zip');
@@ -574,8 +578,12 @@ class EventRepository extends Repository
         $regions['alleBezirke'] = 'Alle Kirchenbezirke';
         $regions['alleKreise'] = 'Alle Kirchenkreise';
 
-        if (!empty($settings['etkey_regions'] ?? '') && ($settings['etkey_regions'] ?? '') !== 'all') {
-            $regionsFromSettings = explode(',', $settings['etkey_regions']);
+        $etkeyRegions = $settings['etkey_regions'] ?? '';
+        if (is_array($etkeyRegions) && isset($etkeyRegions[0])) {
+            $etkeyRegions = $etkeyRegions[0];
+        }
+        if (!empty($etkeyRegions ?? '') && ($etkeyRegions ?? '') !== 'all') {
+            $regionsFromSettings = explode(',', $etkeyRegions);
             $regions = [];
             foreach ($regionsFromSettings as $region) {
                 $regions[$region] = $region;
@@ -605,8 +613,8 @@ class EventRepository extends Repository
                 }
             }
             if (
-                $settings['etkey_regions'] !== 'alleBezirke' &&
-                $settings['etkey_regions'] !== 'alleKreise'
+                $etkeyRegions !== 'alleBezirke' &&
+                $etkeyRegions !== 'alleKreise'
             ) {
                 return $regions;
             }
