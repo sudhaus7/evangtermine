@@ -65,10 +65,12 @@ class SettingsUtility
         if (isset($settingsArray['evt_addprms']) && $settingsArray['evt_addprms'] != '') {
             $addprms = explode('&', $settingsArray['evt_addprms']);
             foreach ($addprms as $keyval) {
-                [$key, $value] = explode('=', trim($keyval));
-                $targetMethod = 'set' . ucfirst(trim($key));
-                if (method_exists($etks, $targetMethod)) {
-                    $etks->{$targetMethod}(trim($value));
+                if (str_contains($keyval, '=')) {
+                    [$key, $value] = explode('=', trim($keyval));
+                    $targetMethod = 'set' . ucfirst(trim($key));
+                    if (method_exists($etks, $targetMethod)) {
+                        $etks->{$targetMethod}(trim($value));
+                    }
                 }
             }
         }
