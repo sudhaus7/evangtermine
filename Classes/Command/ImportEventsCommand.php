@@ -1,18 +1,5 @@
 <?php
 
-/*
- * This file is part of the TYPO3 project.
- * (c) 2022 B-Factor GmbH
- *          Sudhaus7
- *
- * For the full copyright and license information, please view
- * the LICENSE file that was distributed with this source code.
- * The TYPO3 project - inspiring people to share!
- * @copyright 2022 B-Factor GmbH https://b-factor.de/
- * @author Frank Berger <fberger@b-factor.de>
- * @author Daniel Simon <dsimon@b-factor.de>
- */
-
 namespace ArbkomEKvW\Evangtermine\Command;
 
 use ArbkomEKvW\Evangtermine\Domain\Model\Categorylist;
@@ -23,7 +10,6 @@ use ArbkomEKvW\Evangtermine\Util\FieldMapping;
 use ArbkomEKvW\Evangtermine\Util\UrlUtility;
 use DateTime;
 use DateTimeZone;
-use Doctrine\DBAL\DBALException;
 use Doctrine\DBAL\Driver\Exception;
 use Psr\Log\LoggerAwareInterface;
 use Psr\Log\LoggerAwareTrait;
@@ -74,18 +60,14 @@ class ImportEventsCommand extends Command implements LoggerAwareInterface
     protected array $extConfig;
     protected string $host;
     protected string $fileNameForRunCheck;
-    protected string $imageFolder;
     protected array $months = [];
     protected array $allIds = [];
 
     /**
-     * @throws ExistingTargetFolderException
-     * @throws InsufficientFolderAccessPermissionsException
      * @throws ExtensionConfigurationPathDoesNotExistException
      * @throws ExtensionConfigurationExtensionNotConfiguredException
-     * @throws InsufficientFolderWritePermissionsException
      */
-    public function initialize(InputInterface $input, OutputInterface $output)
+    public function initialize(InputInterface $input, OutputInterface $output): void
     {
         $this->connectionPool = GeneralUtility::makeInstance(ConnectionPool::class);
         $this->requestFactory = GeneralUtility::makeInstance(RequestFactory::class);
@@ -93,7 +75,7 @@ class ImportEventsCommand extends Command implements LoggerAwareInterface
         $this->groupList = GeneralUtility::makeInstance(Grouplist::class)->getItemslist();
         $this->dataHandler = GeneralUtility::makeInstance(DataHandler::class);
         $this->extConfig  = GeneralUtility::makeInstance(ExtensionConfiguration::class)->get('evangtermine');
-        if (version_compare(TYPO3_version, '11.0.0', '<')) {
+        if (version_compare(\TYPO3\CMS\Core\Utility\GeneralUtility::makeInstance(\TYPO3\CMS\Core\Information\Typo3Version::class)->getVersion(), '11.0.0', '<')) {
             $this->storageRepository = GeneralUtility::makeInstance(\ArbkomEKvW\Evangtermine\Resource\StorageRepository::class);
         } else {
             $this->storageRepository = GeneralUtility::makeInstance(StorageRepository::class);
@@ -108,20 +90,13 @@ class ImportEventsCommand extends Command implements LoggerAwareInterface
             'slug',
             $GLOBALS['TCA']['tx_evangtermine_domain_model_event']['columns']['slug']['config']
         );
-        $this->imageFolder = $this->extConfig['imageFolder'];
-        // create image folder if not there yet
-        try {
-            $this->storage->getFolder($this->imageFolder);
-        } catch (\Exception $e) {
-            $this->storage->createFolder($this->imageFolder);
-        }
         $this->host = $this->extConfig['host'];
         $this->fileNameForRunCheck = sys_get_temp_dir() . '/evangelischeTermine_' . sha1($this->host) . '.txt';
 
         $this->logger = GeneralUtility::makeInstance(LogManager::class)->getLogger(__CLASS__);
     }
 
-    public function configure()
+    public function configure(): void
     {
         $this->setDescription('Import events from one of the APIs of the Evangelische Kirche')
             ->addOption('debug', null, InputOption::VALUE_NONE, 'Use the Console Logger (add -vv or -vvv to actually get the messages)')
@@ -133,9 +108,9 @@ class ImportEventsCommand extends Command implements LoggerAwareInterface
      * @param InputInterface $input
      * @param OutputInterface $output
      * @return int
-     * @throws DBALException
      * @throws Exception
      * @throws SiteNotFoundException
+     * @throws \Doctrine\DBAL\Exception
      */
     public function execute(InputInterface $input, OutputInterface $output): int
     {
@@ -164,11 +139,11 @@ class ImportEventsCommand extends Command implements LoggerAwareInterface
 
     /**
      * @param OutputInterface $output
-     * @throws DBALException
      * @throws Exception
      * @throws SiteNotFoundException
+     * @throws \Doctrine\DBAL\Exception
      */
-    protected function importAllEvents(OutputInterface $output)
+    protected function importAllEvents(OutputInterface $output): void
     {
         $this->logger->info('Fetching Items');
         $items = $this->getItems($output);
@@ -213,30 +188,18 @@ class ImportEventsCommand extends Command implements LoggerAwareInterface
             foreach ($fields as $key => $field) {
                 $value = $item[$field];
                 if (!empty($value)) {
-                    switch ($field) {
-                        case '_event_EVENTTYPE':
-                            $event[$key] =  $this->setCategories($value);
-                            break;
-                        case '_event_PEOPLE':
-                            $event[$key] =  $this->setPeople($value);
-                            break;
-                        case '_event_HIGHLIGHT':
-                            $event[$key] =  $this->setHighlight($value);
-                            break;
-                        default:
-                            $event[$key] = $value;
-                            break;
-                    }
+                    $event[$key] = match ($field) {
+                        '_event_EVENTTYPE' => $this->setCategories($value),
+                        '_event_PEOPLE' => $this->setPeople($value),
+                        '_event_HIGHLIGHT' => $this->setHighlight($value),
+                        default => $value,
+                    };
                 }
             }
 
             $queryBuilder = $this->connectionPool->getQueryBuilderForTable('tx_evangtermine_domain_model_event');
             $uid = $queryBuilder->select('uid')
-                ->from('tx_evangtermine_domain_model_event')
-                ->where(
-                    $queryBuilder->expr()->eq('id', $queryBuilder->createNamedParameter($event['id']))
-                )
-                ->execute()
+                ->from('tx_evangtermine_domain_model_event')->where($queryBuilder->expr()->eq('id', $queryBuilder->createNamedParameter($event['id'])))->executeQuery()
                 ->fetchOne();
 
             if (!empty($uid)) {
@@ -253,7 +216,7 @@ class ImportEventsCommand extends Command implements LoggerAwareInterface
                     }
                     $queryBuilder->set($key, $eventItem);
                 }
-                $queryBuilder->execute();
+                $queryBuilder->executeStatement();
             } else {
                 $event['slug'] = $this->createSlug($event, 'id' . mt_rand());
                 $this->connectionPool->getConnectionForTable('tx_evangtermine_domain_model_event')
@@ -291,6 +254,7 @@ class ImportEventsCommand extends Command implements LoggerAwareInterface
      * @param OutputInterface $output
      *
      * @return SplObjectStorage<SimpleXMLElement>
+     * @throws \Doctrine\DBAL\Exception
      */
     protected function getItems(OutputInterface $output): SplObjectStorage
     {
@@ -331,7 +295,7 @@ class ImportEventsCommand extends Command implements LoggerAwareInterface
     }
 
     /**
-     * @throws Exception
+     * @throws \Doctrine\DBAL\Exception
      */
     protected function getNewItems(SplObjectStorage $newItems, array $items, string $key): void
     {
@@ -386,21 +350,16 @@ class ImportEventsCommand extends Command implements LoggerAwareInterface
     }
 
     /**
-     * @throws DBALException
-     * @throws Exception
+     * @throws \Doctrine\DBAL\Exception
      */
-    protected function insertImage(array $event, string $itemField, string $eventField)
+    protected function insertImage(array $event, string $itemField, string $eventField): void
     {
         $queryBuilder = $this->connectionPool->getQueryBuilderForTable('tx_evangtermine_domain_model_event');
         $statement = $queryBuilder->select('*')
-                                  ->from('tx_evangtermine_domain_model_event')
-                                  ->where(
-                                      $queryBuilder->expr()->eq('id', $queryBuilder->createNamedParameter($event['id']))
-                                  )
-                                  ->execute();
+                                  ->from('tx_evangtermine_domain_model_event')->where($queryBuilder->expr()->eq('id', $queryBuilder->createNamedParameter($event['id'])))->executeQuery();
         $eventFromDB = $statement->fetchAssociative();
         if (!empty($itemField)) {
-            if (substr($itemField, 0, 2) === '//') {
+            if (str_starts_with($itemField, '//')) {
                 $itemField = 'https:' . $itemField;
             }
         }
@@ -414,16 +373,12 @@ class ImportEventsCommand extends Command implements LoggerAwareInterface
 
     protected function setHighlight(string $highlight): int
     {
-        switch ($highlight) {
-            case 'low':
-                return 1;
-            case 'high':
-                return 2;
-            case 'rhigh':
-                return 3;
-            default:
-                return 0;
-        }
+        return match ($highlight) {
+            'low' => 1,
+            'high' => 2,
+            'rhigh' => 3,
+            default => 0,
+        };
     }
 
     protected function setCategories(string $categories): string
@@ -459,48 +414,8 @@ class ImportEventsCommand extends Command implements LoggerAwareInterface
     }
 
     /**
-     * @throws InsufficientFolderAccessPermissionsException
      * @throws Exception
-     * @throws DBALException
-     */
-    protected function deleteImages()
-    {
-        $folder = $this->storage->getFolder($this->extConfig['imageFolder']);
-        $files = $this->storage->getFilesInFolder($folder);
-
-        /** @var File $file */
-        foreach ($files as $file) {
-            $uid = $file->getUid();
-            if (empty($uid)) {
-                continue;
-            }
-
-            $queryBuilder = $this->connectionPool->getQueryBuilderForTable('tx_evangtermine_domain_model_event');
-            $queryBuilder->select('tx_evangtermine_domain_model_event.*')
-                ->from('tx_evangtermine_domain_model_event')
-                ->join(
-                    'tx_evangtermine_domain_model_event',
-                    'sys_file_reference',
-                    'sys_file_reference',
-                    $queryBuilder->expr()->eq('sys_file_reference.uid_foreign', $queryBuilder->quoteIdentifier('tx_evangtermine_domain_model_event.uid'))
-                )
-                ->where(
-                    $queryBuilder->expr()->eq('sys_file_reference.uid_local', $queryBuilder->createNamedParameter($uid)),
-                    $queryBuilder->expr()->eq('sys_file_reference.tablenames', $queryBuilder->createNamedParameter('tx_evangtermine_domain_model_event'))
-                );
-
-            $statement = $queryBuilder->execute();
-            $result = $statement->fetchAssociative();
-
-            if (!$result) {
-                $file->delete();
-            }
-        }
-    }
-
-    /**
-     * @throws DBALException
-     * @throws Exception
+     * @throws \Doctrine\DBAL\Exception
      */
     protected function deleteEvents(OutputInterface $output): void
     {
@@ -526,8 +441,7 @@ class ImportEventsCommand extends Command implements LoggerAwareInterface
 
     /**
      * @param OutputInterface $output
-     * @throws DBALException
-     * @throws Exception
+     * @throws \Doctrine\DBAL\Exception
      */
     protected function deleteEventsThatAreNotInApiAnymore(OutputInterface $output): void
     {
@@ -561,6 +475,7 @@ class ImportEventsCommand extends Command implements LoggerAwareInterface
      * @param array $urls
      * @param OutputInterface $output
      * @param SplObjectStorage $newItems
+     * @throws \Doctrine\DBAL\Exception
      */
     protected function getEventsFromApi(array $urls, OutputInterface $output, SplObjectStorage $newItems): void
     {
@@ -605,7 +520,7 @@ class ImportEventsCommand extends Command implements LoggerAwareInterface
         return false;
     }
 
-    protected function removeFileForRunCheck()
+    protected function removeFileForRunCheck(): void
     {
         unlink($this->fileNameForRunCheck);
     }

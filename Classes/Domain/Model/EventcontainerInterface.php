@@ -48,19 +48,19 @@ interface EventcontainerInterface
      *
      * @return int
     */
-    public function getNumberOfItems();
+    public function getNumberOfItems(): int;
 
     /**
      * sets the number of items in result
      * @param int $numItems
      */
-    public function setNumberOfItems($numItems);
+    public function setNumberOfItems(int $numItems);
 
     /**
      * returns items array
      * @return array $items
      */
-    public function getItems();
+    public function getItems(): array;
 
     /**
      * sets items array
@@ -73,5 +73,5 @@ interface EventcontainerInterface
      * transform XML into array and load item attributes
      * @param string $xmlString
      */
-    public function loadXML($xmlString);
+    public function loadXML(string $xmlString);
 }

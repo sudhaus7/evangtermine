@@ -42,7 +42,7 @@ use TYPO3Fluid\Fluid\Core\ViewHelper\AbstractViewHelper;
 
 class AttrViewHelper extends AbstractViewHelper
 {
-    public function initializeArguments()
+    public function initializeArguments(): void
     {
         $this->registerArgument('on', 'object', 'SimpleXMLElement object to look up attribute on', true);
         $this->registerArgument('name', 'string', 'name of attribute to look up', true);
@@ -51,7 +51,7 @@ class AttrViewHelper extends AbstractViewHelper
     /**
      * @return string
      */
-    public function render()
+    public function render(): string
     {
         if (get_class($this->arguments['on']) == 'SimpleXMLElement') {
             return $this->arguments['on'][$this->arguments['name']];

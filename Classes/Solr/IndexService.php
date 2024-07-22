@@ -5,11 +5,13 @@ namespace ArbkomEKvW\Evangtermine\Solr;
 use ApacheSolrForTypo3\Solr\ConnectionManager;
 use ApacheSolrForTypo3\Solr\Domain\Site\Site as SolrSite;
 use ApacheSolrForTypo3\Solr\Domain\Site\SiteRepository;
+use ApacheSolrForTypo3\Solr\Exception\InvalidArgumentException;
 use ApacheSolrForTypo3\Solr\IndexQueue\Queue;
 use ArbkomEKvW\Evangtermine\Domain\Model\EtKeys;
 use ArbkomEKvW\Evangtermine\Domain\Model\Event;
 use ArbkomEKvW\Evangtermine\Domain\Repository\EventRepository;
 use ArbkomEKvW\Evangtermine\Util\SettingsUtility;
+use Doctrine\DBAL\Exception;
 use Psr\Log\LoggerAwareInterface;
 use Psr\Log\LoggerAwareTrait;
 use TYPO3\CMS\Core\Database\ConnectionPool;
@@ -17,6 +19,7 @@ use TYPO3\CMS\Core\Service\FlexFormService;
 use TYPO3\CMS\Core\Site\Entity\Site;
 use TYPO3\CMS\Core\Site\SiteFinder;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
+use TYPO3\CMS\Extbase\Persistence\Generic\Exception\UnexpectedTypeException;
 use TYPO3\CMS\Extbase\Persistence\QueryInterface;
 
 class IndexService implements LoggerAwareInterface
@@ -48,7 +51,7 @@ class IndexService implements LoggerAwareInterface
         $this->connectionManager = $connectionManager;
     }
 
-    public function indexForAllSites()
+    public function indexForAllSites(): void
     {
         $sites = $this->siteFinder->getAllSites();
         foreach ($sites as $site) {
@@ -62,6 +65,12 @@ class IndexService implements LoggerAwareInterface
         }
     }
 
+    /**
+     * @throws UnexpectedTypeException
+     * @throws InvalidArgumentException
+     * @throws \Doctrine\DBAL\Driver\Exception
+     * @throws Exception
+     */
     public function indexForSite(Site $site): void
     {
         /** @var SolrSite $solrSite */
@@ -124,22 +133,19 @@ class IndexService implements LoggerAwareInterface
         }
     }
 
+    /**
+     * @throws Exception
+     */
     protected function collectGarbage(array $idsToIndex, SolrSite $solrSite): void
     {
         if (!empty($idsToIndex)) {
             $query = GeneralUtility::makeInstance(ConnectionPool::class)
                                    ->getQueryBuilderForTable('tx_solr_indexqueue_item');
             $stmt  = $query->select('*')
-                           ->from('tx_solr_indexqueue_item')
-                           ->where(
-                               $query->expr()->notIn('item_uid', $idsToIndex),
-                               $query->expr()->eq(
-                                   'item_type',
-                                   $query->createNamedParameter('tx_evangtermine_domain_model_event')
-                               ),
-                               $query->expr()->eq('root', $solrSite->getRootPageId())
-                           )
-                           ->execute();
+                           ->from('tx_solr_indexqueue_item')->where($query->expr()->notIn('item_uid', $idsToIndex), $query->expr()->eq(
+                               'item_type',
+                               $query->createNamedParameter('tx_evangtermine_domain_model_event')
+                           ), $query->expr()->eq('root', $solrSite->getRootPageId()))->executeQuery();
 
             while ($itemToDelete = $stmt->fetchAssociative()) {
                 GeneralUtility::makeInstance(ConnectionPool::class)->getConnectionForTable('tx_solr_indexqueue_item')
@@ -160,21 +166,21 @@ class IndexService implements LoggerAwareInterface
         }
     }
 
+    /**
+     * @throws Exception
+     */
     protected function getAllPluginsInSite(Site $site): array
     {
         $pageIds = $this->getAllPagesInSite($site);
         $query = GeneralUtility::makeInstance(ConnectionPool::class)->getQueryBuilderForTable('tt_content');
         $stmt = $query->select('*')
-                      ->from('tt_content')
-                      ->where(
-                          $query->expr()->eq('CType', $query->createNamedParameter('list')),
-                          $query->expr()->eq('list_type', $query->createNamedParameter('evangtermine_list')),
-                          $query->expr()->in('pid', $pageIds)
-                      )
-                      ->execute();
+                      ->from('tt_content')->where($query->expr()->eq('CType', $query->createNamedParameter('list')), $query->expr()->eq('list_type', $query->createNamedParameter('evangtermine_list')), $query->expr()->in('pid', $pageIds))->executeQuery();
         return $stmt->fetchAllAssociative();
     }
 
+    /**
+     * @throws Exception
+     */
     protected function getAllPagesInSite(Site $site): array
     {
         $pageIds = [];

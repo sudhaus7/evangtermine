@@ -40,7 +40,6 @@ namespace ArbkomEKvW\Evangtermine\Util;
 
 use ArbkomEKvW\Evangtermine\Domain\Repository\EventRepository;
 use DateTime;
-use Doctrine\DBAL\DBALException;
 use Doctrine\DBAL\Driver\Exception;
 use RuntimeException;
 use TYPO3\CMS\Core\Cache\CacheManager;
@@ -77,7 +76,7 @@ class CategoryUtil
      *
      * @param array $configuration
      */
-    public function getCategories(array &$configuration)
+    public function getCategories(array &$configuration): void
     {
         $cacheKey = 'categories-' . $this->dateString;
 
@@ -100,7 +99,7 @@ class CategoryUtil
      *
      * @param array $configuration
      */
-    public function getGroups(array &$configuration)
+    public function getGroups(array &$configuration): void
     {
         $cacheKey = 'groups-' . $this->dateString;
 
@@ -118,10 +117,9 @@ class CategoryUtil
 
     /**
      * @param array $configuration
-     * @throws DBALException
      * @throws Exception
      */
-    public function getRegions(array &$configuration)
+    public function getRegions(array &$configuration): void
     {
         $cacheKey = 'regions-' . $this->dateString;
         // $this->cache->get can be false!!!!
@@ -142,10 +140,9 @@ class CategoryUtil
 
     /**
      * @param array $configuration
-     * @throws DBALException
-     * @throws Exception
+     * @throws \Doctrine\DBAL\Exception
      */
-    public function getPlaces(array &$configuration)
+    public function getPlaces(array &$configuration): void
     {
         $cacheKey = 'places-' . $this->dateString;
         // $this->cache->get can be false!!!!

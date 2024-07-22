@@ -85,7 +85,7 @@ class Eventcontainer extends AbstractEntity implements EventcontainerInterface
      * sets the number of items in result
      * @param int $numItems
      */
-    public function setNumberOfItems($numItems)
+    public function setNumberOfItems(int $numItems): void
     {
         $this->numberOfItems = $numItems;
     }
@@ -104,7 +104,7 @@ class Eventcontainer extends AbstractEntity implements EventcontainerInterface
      *
      * @param array $items
      */
-    public function setItems(array $items)
+    public function setItems(array $items): void
     {
         $this->items = $items;
     }
@@ -114,7 +114,7 @@ class Eventcontainer extends AbstractEntity implements EventcontainerInterface
         return $this->metaData;
     }
 
-    public function setMetaData($metaData)
+    public function setMetaData($metaData): void
     {
         $this->metaData = $metaData ?? null;
     }
@@ -139,7 +139,7 @@ class Eventcontainer extends AbstractEntity implements EventcontainerInterface
      * transform XML into array and load item attributes
      * @param string $xmlString
      */
-    public function loadXML($xmlString)
+    public function loadXML(string $xmlString): void
     {
         $xmlString = trim($xmlString);
 
@@ -168,7 +168,7 @@ class Eventcontainer extends AbstractEntity implements EventcontainerInterface
     /**
      * set values to empty
      */
-    private function reset()
+    private function reset(): void
     {
         $this->setNumberOfItems(0);
         $this->setItems([]);

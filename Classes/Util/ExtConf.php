@@ -52,7 +52,7 @@ class ExtConf implements SingletonInterface
      * Unserialized extConf Data
      * @var array
      */
-    private $extConfArray;
+    private mixed $extConfArray;
 
     /**
      * constructor
@@ -66,7 +66,7 @@ class ExtConf implements SingletonInterface
      * returns extConf data array
      * @return array
      */
-    public function getExtConfArray()
+    public function getExtConfArray(): array
     {
         return $this->extConfArray;
     }

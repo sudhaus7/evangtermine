@@ -18,14 +18,10 @@ $EM_CONF[$_EXTKEY] = [
     'author' => 'Frank Berger',
     'author_email' => 'fberger@sudhaus7.de',
     'state' => 'stable',
-    'internal' => '',
-    'uploadfolder' => '0',
-    'createDirs' => '',
-    'clearCacheOnLoad' => 0,
     'version' => '2.2.7',
     'constraints' => [
         'depends' => [
-            'typo3' => '10.4.0-11.9.99',
+            'typo3' => '12.4.0-12.4.99',
         ],
         'conflicts' => [
         ],

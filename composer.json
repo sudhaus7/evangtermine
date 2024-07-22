@@ -26,21 +26,21 @@
         }
     ],
     "require": {
-        "php": ">=7.2",
+		"php": "8.0.*||8.1.*||8.2.*||8.3",
         "ext-SimpleXML": "*",
         "ext-mbstring": "*",
-        "typo3/cms-core": ">=10.4.0  <=11.9.99"
-    },
+		"typo3/cms-core": "12.4.*"
+	},
 	"require-dev": {
-		"typo3/cms-backend": "^11.5",
-		"typo3/cms-frontend": "^11.5",
-		"typo3/cms-tstemplate": "^11.5",
-		"typo3/cms-install": "^11.5",
+		"typo3/cms-backend": "12.4.*",
+		"typo3/cms-frontend": "12.4.*",
+		"typo3/cms-tstemplate": "12.4.*",
+		"typo3/cms-install": "12.4.*",
 		"friendsoftypo3/phpstan-typo3": "*",
 		"vimeo/psalm": "^4.10",
-		"typo3/cms-lowlevel": "^11.5",
+		"typo3/cms-lowlevel": "12.4.*",
 		"helhum/typo3-console": "*",
-		"typo3/coding-standards": "^0.5.5"
+		"typo3/coding-standards": "^0.7"
 	},
     "autoload": {
         "psr-4": {

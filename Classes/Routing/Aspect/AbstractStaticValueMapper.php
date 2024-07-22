@@ -8,7 +8,7 @@ use TYPO3\CMS\Core\Routing\Aspect\StaticValueMapper;
 
 abstract class AbstractStaticValueMapper extends StaticValueMapper
 {
-    protected function changeString(string $string)
+    protected function changeString(string $string): array|string
     {
         $string = str_replace(' ', '-', $string);
         $string = str_replace('--', '', $string);

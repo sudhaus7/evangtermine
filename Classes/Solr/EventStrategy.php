@@ -7,7 +7,7 @@ use ApacheSolrForTypo3\Solr\System\Solr\SolrConnection;
 
 class EventStrategy extends AbstractStrategy
 {
-    protected $myEnableCommitsSetting = true;
+    protected bool $myEnableCommitsSetting = true;
 
     /**
      * @var SolrConnection[]
@@ -15,7 +15,7 @@ class EventStrategy extends AbstractStrategy
     protected array  $mySolrConnections = [];
     protected string $mySiteHash = '';
 
-    protected function removeGarbageOfByStrategy(string $table, int $uid)
+    protected function removeGarbageOfByStrategy(string $table, int $uid): void
     {
         $this->deleteRecordInAllSolrConnections(
             'tx_evangtermine_domain_model_event',

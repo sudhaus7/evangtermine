@@ -64,7 +64,7 @@ class Etpager
      * @param mixed $itemsPerPage
      * @param $currentPage
      */
-    public function up($totalItems, $itemsPerPage, $currentPage)
+    public function up($totalItems, $itemsPerPage, $currentPage): void
     {
         // Number of Events in result
         if (is_object($totalItems)) {
@@ -91,7 +91,7 @@ class Etpager
         }
     }
 
-    private function getPagerBarLimits()
+    private function getPagerBarLimits(): void
     {
         // current page is near end of pagelist
         if (($this->pgr['pages'] - self::pgrbSize) < $this->pgr['current']) {
@@ -114,7 +114,7 @@ class Etpager
         }
     }
 
-    private function getBrowserTriggers()
+    private function getBrowserTriggers(): void
     {
         if ($this->pgr['pgrBarBegin'] >= self::pgrbBorderToCenter) {
             $this->pgr['lBrowser'] = 1;

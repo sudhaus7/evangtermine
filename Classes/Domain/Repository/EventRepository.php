@@ -7,14 +7,12 @@ use ArbkomEKvW\Evangtermine\Domain\Model\EtKeys;
 use ArbkomEKvW\Evangtermine\Domain\Model\Grouplist;
 use ArbkomEKvW\Evangtermine\Services\OsmService;
 use ArbkomEKvW\Evangtermine\Util\SettingsUtility;
-use Doctrine\DBAL\DBALException;
 use Doctrine\DBAL\Driver\Exception;
 use TYPO3\CMS\Core\Cache\CacheManager;
 use TYPO3\CMS\Core\Cache\Exception\NoSuchCacheException;
 use TYPO3\CMS\Core\Database\Connection;
 use TYPO3\CMS\Core\Database\ConnectionPool;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
-use TYPO3\CMS\Extbase\Persistence\Generic\Exception\InvalidNumberOfConstraintsException;
 use TYPO3\CMS\Extbase\Persistence\Generic\Exception\UnexpectedTypeException;
 use TYPO3\CMS\Extbase\Persistence\Generic\Query;
 use TYPO3\CMS\Extbase\Persistence\QueryInterface;
@@ -38,9 +36,7 @@ class EventRepository extends Repository
     /**
      * @param EtKeys $etKeys
      * @return array|null
-     * @throws DBALException
      * @throws Exception
-     * @throws InvalidNumberOfConstraintsException
      * @throws UnexpectedTypeException
      */
     public function prepareFindByEtKeysQuery(EtKeys $etKeys): ?array
@@ -155,9 +151,7 @@ class EventRepository extends Repository
      * @param EtKeys $etKeys
      * @param array|null $eventUids
      * @return array
-     * @throws DBALException
      * @throws Exception
-     * @throws InvalidNumberOfConstraintsException
      * @throws UnexpectedTypeException
      */
     public function setConstraints(QueryInterface $query, EtKeys $etKeys, ?array $eventUids): array
@@ -232,9 +226,6 @@ class EventRepository extends Repository
         return $queryConstraints;
     }
 
-    /**
-     * @throws InvalidNumberOfConstraintsException
-     */
     public function setCategoryConstraint(Query $query, EtKeys $etKeys): array
     {
         $queryConstraints = [];
@@ -257,9 +248,6 @@ class EventRepository extends Repository
         return $queryConstraints;
     }
 
-    /**
-     * @throws InvalidNumberOfConstraintsException
-     */
     public function setPeopleConstraint(Query $query, EtKeys $etKeys): array
     {
         $queryConstraints = [];
@@ -290,9 +278,8 @@ class EventRepository extends Repository
      * @param Query $query
      * @param EtKeys $etKeys
      * @return array
-     * @throws DBALException
      * @throws Exception
-     * @throws InvalidNumberOfConstraintsException
+     * @throws \Doctrine\DBAL\Exception
      */
     public function setRegionConstraint(Query $query, EtKeys $etKeys): array
     {
@@ -336,8 +323,7 @@ class EventRepository extends Repository
     }
 
     /**
-     * @throws DBALException
-     * @throws Exception
+     * @throws \Doctrine\DBAL\Exception
      */
     protected function getRegionById(int $id): ?string
     {
@@ -348,7 +334,7 @@ class EventRepository extends Repository
             ->where(
                 $queryBuilder->expr()->like('attributes', $queryBuilder->createNamedParameter('%' . $queryBuilder->escapeLikeWildcards($id) . '%', Connection::PARAM_STR))
             );
-        $result = $queryBuilder->execute()->fetchAllAssociative();
+        $result = $queryBuilder->executeQuery()->fetchAllAssociative();
         if (empty($result)) {
             return null;
         }
@@ -363,9 +349,6 @@ class EventRepository extends Repository
         return null;
     }
 
-    /**
-     * @throws InvalidNumberOfConstraintsException
-     */
     public function setPlaceConstraint(Query $query, EtKeys $etKeys): array
     {
         $queryConstraints = [];
@@ -391,9 +374,6 @@ class EventRepository extends Repository
         return $queryConstraints;
     }
 
-    /**
-     * @throws InvalidNumberOfConstraintsException
-     */
     public function setTimeConstraint(Query $query, EtKeys $etKeys): array
     {
         $queryConstraints = [];
@@ -462,8 +442,7 @@ class EventRepository extends Repository
      * @param array|null $settings
      * @param array|null $uids
      * @return array
-     * @throws DBALException
-     * @throws Exception
+     * @throws \Doctrine\DBAL\Exception
      */
     public function findAllPlaces(?array $settings = null, ?array $uids = null): array
     {
@@ -488,7 +467,7 @@ class EventRepository extends Repository
                         )
                 )
                 ->orderBy('place_zip');
-            $statement = $queryBuilder->execute();
+            $statement = $queryBuilder->executeQuery();
             $placesFromDB = $statement->fetchAllAssociative();
 
             foreach ($placesFromDB as $place) {
@@ -514,7 +493,7 @@ class EventRepository extends Repository
             );
         }
         $queryBuilder->orderBy('place_zip');
-        $placesFromDB = $queryBuilder->execute()->fetchAllAssociative();
+        $placesFromDB = $queryBuilder->executeQuery()->fetchAllAssociative();
         foreach ($placesFromDB as $place) {
             $places[$place['place_id']] = $place['place_zip'] . ' ' . $place['place_city'];
         }
@@ -525,9 +504,8 @@ class EventRepository extends Repository
      * @param array|null $settings
      * @param int $pluginUid
      * @return array
-     * @throws DBALException
-     * @throws Exception
      * @throws NoSuchCacheException
+     * @throws \Doctrine\DBAL\Exception
      */
     public function findAllPlacesWithEtKeys(?array $settings = null, int $pluginUid = 0): array
     {
@@ -569,7 +547,6 @@ class EventRepository extends Repository
 
     /**
      * @throws Exception
-     * @throws DBALException
      */
     public function findAllRegions(?array $settings = null): array
     {
@@ -619,7 +596,7 @@ class EventRepository extends Repository
                 return $regions;
             }
         } else {
-            if (TYPO3_MODE !== 'BE') {
+            if (!\TYPO3\CMS\Core\Http\ApplicationType::fromRequest($GLOBALS['TYPO3_REQUEST'])->isBackend()) {
                 unset($regions['alleBezirke']);
                 unset($regions['alleKreise']);
             }
@@ -636,7 +613,6 @@ class EventRepository extends Repository
      * @param array|null $settings
      * @param int $pluginUid
      * @return array
-     * @throws DBALException
      * @throws Exception
      * @throws NoSuchCacheException
      */
@@ -680,8 +656,7 @@ class EventRepository extends Repository
     }
 
     /**
-     * @throws Exception
-     * @throws DBALException
+     * @throws \Doctrine\DBAL\Exception
      */
     public function getRegionsFromDB(): array
     {
@@ -695,7 +670,7 @@ class EventRepository extends Repository
 
         $queryBuilder->groupBy('region')
             ->orderBy('region');
-        $statement = $queryBuilder->execute();
+        $statement = $queryBuilder->executeQuery();
         return $statement->fetchAllAssociative();
     }
 
@@ -814,7 +789,7 @@ class EventRepository extends Repository
     /**
      * @param array|null $settings
      * @return array
-     * @throws InvalidNumberOfConstraintsException
+     * @throws Exception
      * @throws UnexpectedTypeException
      */
     protected function prepareQuery(?array $settings): array

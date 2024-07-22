@@ -50,7 +50,7 @@ class SettingsUtility
      * @param array $settingsArray
      * @param EtKeys $etks
      */
-    public function fetchParamsFromSettings(array $settingsArray, EtKeys $etks)
+    public function fetchParamsFromSettings(array $settingsArray, EtKeys $etks): void
     {
         foreach ($settingsArray as $key => $value) {
             if (substr($key, 0, 6) == 'etkey_' && $value != '') {
@@ -81,7 +81,7 @@ class SettingsUtility
      * @param array $requestParams
      * @param EtKeys $etks
      */
-    public function fetchParamsFromRequest(array $requestParams, EtKeys $etks)
+    public function fetchParamsFromRequest(array $requestParams, EtKeys $etks): void
     {
         foreach ($requestParams as $key => $value) {
             if (empty($value) || $value == '0' || $value == 'all') {

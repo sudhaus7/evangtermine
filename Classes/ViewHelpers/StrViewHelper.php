@@ -49,7 +49,7 @@ use TYPO3Fluid\Fluid\Core\ViewHelper\AbstractViewHelper;
  */
 class StrViewHelper extends AbstractViewHelper
 {
-    public function initializeArguments()
+    public function initializeArguments(): void
     {
         $this->registerArgument('on', 'object', 'Object for toString', true);
     }
@@ -57,7 +57,7 @@ class StrViewHelper extends AbstractViewHelper
     /**
      * @return string
      */
-    public function render()
+    public function render(): string
     {
         if ($this->arguments['on']) {
             return $this->arguments['on']->__toString();

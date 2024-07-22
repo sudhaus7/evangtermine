@@ -13,31 +13,6 @@
 
 namespace ArbkomEKvW\Evangtermine\Controller;
 
-/***************************************************************
- *
- *  Copyright notice
- *
- *  (c) 2021 Christoph Roth <christoph.roth@ekvw.de>, Evangelische Kirche von Westfalen
- *
- *  All rights reserved
- *
- *  This script is part of the TYPO3 project. The TYPO3 project is
- *  free software; you can redistribute it and/or modify
- *  it under the terms of the GNU General Public License as published by
- *  the Free Software Foundation; either version 3 of the License, or
- *  (at your option) any later version.
- *
- *  The GNU General Public License can be found at
- *  http://www.gnu.org/copyleft/gpl.html.
- *
- *  This script is distributed in the hope that it will be useful,
- *  but WITHOUT ANY WARRANTY; without even the implied warranty of
- *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- *  GNU General Public License for more details.
- *
- *  This copyright notice MUST APPEAR in all copies of the script!
- ***************************************************************/
-
 use ArbkomEKvW\Evangtermine\Domain\Model\EtKeys;
 use ArbkomEKvW\Evangtermine\Domain\Model\Event;
 use ArbkomEKvW\Evangtermine\Domain\Repository\EventcontainerRepository;
@@ -46,19 +21,18 @@ use ArbkomEKvW\Evangtermine\Event\ModifyEvangTermineShowActionViewEvent;
 use ArbkomEKvW\Evangtermine\Util\Etpager;
 use ArbkomEKvW\Evangtermine\Util\ExtConf;
 use ArbkomEKvW\Evangtermine\Util\SettingsUtility;
-use Doctrine\DBAL\DBALException;
 use Doctrine\DBAL\Driver\Exception;
+use Psr\Http\Message\ResponseInterface;
 use TYPO3\CMS\Core\Cache\CacheManager;
 use TYPO3\CMS\Core\Cache\Exception\NoSuchCacheException;
 use TYPO3\CMS\Core\Database\ConnectionPool;
-use TYPO3\CMS\Core\Messaging\AbstractMessage;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 use TYPO3\CMS\Extbase\Configuration\BackendConfigurationManager;
 use TYPO3\CMS\Extbase\Mvc\Controller\ActionController;
 use TYPO3\CMS\Extbase\Mvc\Exception\InvalidControllerNameException;
-use TYPO3\CMS\Extbase\Mvc\Exception\StopActionException;
-use TYPO3\CMS\Extbase\Persistence\Generic\Exception\InvalidNumberOfConstraintsException;
+use TYPO3\CMS\Extbase\Mvc\Request;
 use TYPO3\CMS\Extbase\Persistence\Generic\Exception\UnexpectedTypeException;
+use TYPO3\CMS\Extbase\Utility\DebuggerUtility;
 use TYPO3\CMS\Fluid\Core\Rendering\RenderingContext;
 use TYPO3\CMS\Fluid\View\TemplatePaths;
 use TYPO3\CMS\Fluid\View\TemplateView;
@@ -85,39 +59,18 @@ class EventcontainerController extends ActionController
 
     private Etpager $pager;
 
-    /**
-     * @param SettingsUtility $settingsUtility
-     */
-    public function injectSettingsUtility(SettingsUtility $settingsUtility)
-    {
-        $this->settingsUtility = $settingsUtility;
-    }
-
-    /**
-     * @param EventcontainerRepository $eventcontainerRepository
-     */
-    public function injectEventcontainerRepository(EventcontainerRepository $eventcontainerRepository)
-    {
-        $this->eventcontainerRepository = $eventcontainerRepository;
-    }
-
-    /**
-     * @param EventRepository $eventRepository
-     */
-    public function injectEventRepository(EventRepository $eventRepository)
-    {
-        $this->eventRepository = $eventRepository;
-    }
-
-    public function __construct(CacheManager $cacheManager)
+    public function __construct(CacheManager $cacheManager, SettingsUtility $settingsUtility, EventcontainerRepository $eventcontainerRepository, EventRepository $eventRepository)
     {
         $this->cacheManager = $cacheManager;
         $this->date = new \DateTime();
+        $this->settingsUtility = $settingsUtility;
+        $this->eventcontainerRepository = $eventcontainerRepository;
+        $this->eventRepository = $eventRepository;
     }
 
-    protected function initializeAction()
+    protected function initializeAction(): void
     {
-        $this->currentPluginUid = $this->configurationManager->getContentObject()->data['uid'];
+        $this->currentPluginUid = $this->request->getAttribute('currentContentObject')->data['uid'];
         $this->etkeys = GeneralUtility::makeInstance(EtKeys::class);
         $this->pager = GeneralUtility::makeInstance(Etpager::class);
     }
@@ -142,12 +95,13 @@ class EventcontainerController extends ActionController
      * - update session
      * - retrieve XML data
      * - hand it to view
+     * @return ResponseInterface
      * @throws Exception
-     * @throws DBALException
-     * @throws InvalidNumberOfConstraintsException
-     * @throws NoSuchCacheException|UnexpectedTypeException
+     * @throws NoSuchCacheException
+     * @throws UnexpectedTypeException
+     * @throws \Doctrine\DBAL\Exception
      */
-    public function listAction()
+    public function listAction(): \Psr\Http\Message\ResponseInterface
     {
         $requestArguments = $this->request->getArguments();
         $formArguments = $requestArguments['etkeysForm'] ?? [];
@@ -190,7 +144,7 @@ class EventcontainerController extends ActionController
                 $this->etkeys->getPageID()
             );
 
-            $data = $this->configurationManager->getContentObject()->data;
+            $data = $this->request->getAttribute('currentContentObject')->data;
             $this->view->assignMultiple([
                 'events' => $events ?? [],
                 'nrOfEvents' => $nrOfEvents,
@@ -212,21 +166,19 @@ class EventcontainerController extends ActionController
                 $cache->set($cacheKey, $content);
             }
         }
-        return $content;
+        return $this->htmlResponse($content);
     }
 
     /**
-     * @return mixed|string
-     * @throws DBALException
      * @throws Exception
-     * @throws InvalidNumberOfConstraintsException
      * @throws NoSuchCacheException
      * @throws UnexpectedTypeException
+     * @throws \Doctrine\DBAL\Exception
      */
-    public function teaserAction()
+    public function teaserAction(): \Psr\Http\Message\ResponseInterface
     {
         $this->etkeys = $this->getNewFromSettings();
-        $data = $this->configurationManager->getContentObject()->data;
+        $data = $this->request->getAttribute('currentContentObject')->data;
 
         $cache = $this->cacheManager->getCache('evangtermine_event_teaser');
         $cacheKey = $this->getCacheKey('', $data['uid']);
@@ -244,23 +196,20 @@ class EventcontainerController extends ActionController
             $content = $this->view->render();
             $cache->set($cacheKey, $content);
         }
-        return $content;
+        return $this->htmlResponse($content);
     }
 
     /**
      * action show
-     * @return mixed|string|void
-     * @throws DBALException
      * @throws Exception
-     * @throws InvalidNumberOfConstraintsException
      * @throws NoSuchCacheException
-     * @throws StopActionException
      * @throws UnexpectedTypeException
      * @throws InvalidControllerNameException
+     * @throws \Doctrine\DBAL\Exception
      */
-    public function showAction()
+    public function showAction(): \Psr\Http\Message\ResponseInterface
     {
-        $data = $this->configurationManager->getContentObject()->data;
+        $data = $this->request->getAttribute('currentContentObject')->data;
 
         // If the current plugin is a 'detail' plugin, or if it is the plugin in which the user clicked on a link.
         // We need this for multiple evang. Termine plugins on one site.
@@ -276,7 +225,7 @@ class EventcontainerController extends ActionController
                 $this->view->assign('eventhost', $extconf->getExtConfArray()['host']);
                 $this->view->assign('categoryList', $this->eventRepository->findAllCategoriesWithEtKeys($this->settings));
                 $this->view->assign('groupList', $this->eventRepository->findAllGroupsWithEtKeys($this->settings));
-                $this->view->assign('data', $this->configurationManager->getContentObject()->data);
+                $this->view->assign('data', $this->request->getAttribute('currentContentObject')->data);
 
                 if (!empty($event)) {
                     $this->eventDispatcher->dispatch(
@@ -284,30 +233,29 @@ class EventcontainerController extends ActionController
                     );
                 }
             } else {
-                $this->addFlashMessage('Keine Event-ID übergeben', '', AbstractMessage::ERROR);
+                $this->addFlashMessage('Keine Event-ID übergeben', '', \TYPO3\CMS\Core\Type\ContextualFeedbackSeverity::ERROR);
                 $this->redirect('genericinfo');
             }
         } else {
             // render content of teaser or list
             if ($data['list_type'] == 'evangtermine_teaser') {
-                $content = $this->teaserAction();
+                return $this->teaserAction();
             } else {
-                $this->request->setArguments([]);
                 $this->view = $this->setView('list');
-                $content = $this->listAction();
+                return $this->listAction();
             }
-            return $content;
         }
+        return $this->htmlResponse();
     }
 
     /**
      * action genericinfo
      */
-    public function genericinfoAction() {}
+    public function genericinfoAction(): \Psr\Http\Message\ResponseInterface
+    {
+        return $this->htmlResponse();
+    }
 
-    /**
-     * @throws InvalidControllerNameException
-     */
     protected function setView(string $actionName)
     {
         $backendConfigurationManager = GeneralUtility::makeInstance(BackendConfigurationManager::class);
@@ -338,8 +286,7 @@ class EventcontainerController extends ActionController
     }
 
     /**
-     * @throws DBALException
-     * @throws Exception
+     * @throws \Doctrine\DBAL\Exception
      */
     protected function getDetailPage(): int
     {
@@ -382,8 +329,7 @@ class EventcontainerController extends ActionController
     }
 
     /**
-     * @throws Exception
-     * @throws DBALException
+     * @throws \Doctrine\DBAL\Exception
      */
     protected function getDetailPagePluginUid(array $data): int
     {

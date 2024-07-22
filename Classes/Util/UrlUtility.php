@@ -50,7 +50,7 @@ class UrlUtility
      * @param string $url
      * @return string
      */
-    public static function loadUrl($url): string
+    public static function loadUrl(string $url): string
     {
         if (function_exists('curl_init')) {
             $ch = curl_init($url);

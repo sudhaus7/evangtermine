@@ -66,10 +66,7 @@ class EventcontainerRepository extends Repository implements SingletonInterface
      */
     protected string $xmlSourceUrl = '';
 
-    /**
-     * @param ExtConf
-     */
-    public function injectExtConf(ExtConf $extConf)
+    public function __construct(\ArbkomEKvW\Evangtermine\Util\ExtConf $extConf)
     {
         $this->extConf = $extConf;
     }

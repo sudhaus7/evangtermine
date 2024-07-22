@@ -1,31 +1,10 @@
 <?php
 
-if (!defined('TYPO3_MODE')) {
+if (!defined('TYPO3')) {
     die('Access denied.');
 }
 
 $extensionkey = 'evangtermine';
-
-\TYPO3\CMS\Extbase\Utility\ExtensionUtility::registerPlugin(
-    $extensionkey,
-    'List',
-    'Evangelische Termine - Liste'
-);
-
-\TYPO3\CMS\Extbase\Utility\ExtensionUtility::registerPlugin(
-    $extensionkey,
-    'Detail',
-    'Evangelische Termine - Detail'
-);
-
-\TYPO3\CMS\Extbase\Utility\ExtensionUtility::registerPlugin(
-    $extensionkey,
-    'Teaser',
-    'Evangelische Termine - Teaser'
-);
-\TYPO3\CMS\Core\Utility\ExtensionManagementUtility::addStaticFile($extensionkey, 'Configuration/TypoScript', 'Evangelische Termine');
-
-\TYPO3\CMS\Core\Utility\ExtensionManagementUtility::addStaticFile($extensionkey, 'Configuration/TypoScript/Solr', 'Evangelische Termine SOLR Index');
 
 // Activate Flexforms
 $pluginSignature = 'evangtermine_list';

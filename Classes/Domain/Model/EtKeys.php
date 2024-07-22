@@ -305,7 +305,7 @@ class EtKeys extends AbstractValueObject
         return $this->vid;
     }
 
-    public function setVid($vid)
+    public function setVid($vid): void
     {
         $this->vid = $vid;
     }
@@ -315,7 +315,7 @@ class EtKeys extends AbstractValueObject
         return $this->region;
     }
 
-    public function setRegion($region)
+    public function setRegion($region): void
     {
         $this->region = $region;
     }
@@ -325,7 +325,7 @@ class EtKeys extends AbstractValueObject
         return $this->regions;
     }
 
-    public function setRegions($regions)
+    public function setRegions($regions): void
     {
         if (is_array($regions)) {
             $regions = implode(',', $regions);
@@ -338,7 +338,7 @@ class EtKeys extends AbstractValueObject
         return $this->place;
     }
 
-    public function setPlace($place)
+    public function setPlace($place): void
     {
         $this->place = $place;
     }
@@ -348,7 +348,7 @@ class EtKeys extends AbstractValueObject
         return $this->places;
     }
 
-    public function setPlaces($places)
+    public function setPlaces($places): void
     {
         if (is_array($places)) {
             $places = implode(',', $places);
@@ -361,7 +361,7 @@ class EtKeys extends AbstractValueObject
         return $this->aid;
     }
 
-    public function setAid($aid)
+    public function setAid($aid): void
     {
         $this->aid = $aid;
     }
@@ -371,7 +371,7 @@ class EtKeys extends AbstractValueObject
         return $this->kk;
     }
 
-    public function setKk($kk)
+    public function setKk($kk): void
     {
         $this->kk = $kk;
     }
@@ -381,7 +381,7 @@ class EtKeys extends AbstractValueObject
         return $this->eventtype;
     }
 
-    public function setEventtype($eventtype)
+    public function setEventtype($eventtype): void
     {
         $this->eventtype = $eventtype;
     }
@@ -391,7 +391,7 @@ class EtKeys extends AbstractValueObject
         return $this->highlight;
     }
 
-    public function setHighlight($highlight)
+    public function setHighlight($highlight): void
     {
         $this->highlight = $highlight;
     }
@@ -401,7 +401,7 @@ class EtKeys extends AbstractValueObject
         return $this->people;
     }
 
-    public function setPeople($people)
+    public function setPeople($people): void
     {
         $this->people = $people;
     }
@@ -411,7 +411,7 @@ class EtKeys extends AbstractValueObject
         return $this->person;
     }
 
-    public function setPerson($person)
+    public function setPerson($person): void
     {
         $this->person = $person;
     }
@@ -421,7 +421,7 @@ class EtKeys extends AbstractValueObject
         return $this->bf;
     }
 
-    public function setBf($bf)
+    public function setBf($bf): void
     {
         $this->bf = $bf;
     }
@@ -431,7 +431,7 @@ class EtKeys extends AbstractValueObject
         return $this->ipm;
     }
 
-    public function setIpm($ipm)
+    public function setIpm($ipm): void
     {
         $this->ipm = $ipm;
     }
@@ -441,7 +441,7 @@ class EtKeys extends AbstractValueObject
         return $this->cha;
     }
 
-    public function setCha($cha)
+    public function setCha($cha): void
     {
         $this->cha = $cha;
     }
@@ -451,7 +451,7 @@ class EtKeys extends AbstractValueObject
         return $this->lang;
     }
 
-    public function setLang($lang)
+    public function setLang($lang): void
     {
         $this->lang = $lang;
     }
@@ -461,7 +461,7 @@ class EtKeys extends AbstractValueObject
         return $this->itemsPerPage;
     }
 
-    public function setItemsPerPage($itemsPerPage)
+    public function setItemsPerPage($itemsPerPage): void
     {
         $this->itemsPerPage = $itemsPerPage;
     }
@@ -481,7 +481,7 @@ class EtKeys extends AbstractValueObject
         return $this->pageID;
     }
 
-    public function setPageID($pageID)
+    public function setPageID($pageID): void
     {
         $this->pageID = $pageID;
     }
@@ -491,7 +491,7 @@ class EtKeys extends AbstractValueObject
         return $this->q;
     }
 
-    public function setQ($q)
+    public function setQ($q): void
     {
         $this->q = $q;
     }
@@ -501,7 +501,7 @@ class EtKeys extends AbstractValueObject
         return $this->d;
     }
 
-    public function setD($d)
+    public function setD($d): void
     {
         $this->d = $d;
     }
@@ -511,7 +511,7 @@ class EtKeys extends AbstractValueObject
         return $this->month;
     }
 
-    public function setMonth($month)
+    public function setMonth($month): void
     {
         $this->month = $month;
     }
@@ -521,7 +521,7 @@ class EtKeys extends AbstractValueObject
         return $this->date;
     }
 
-    public function setDate($date)
+    public function setDate($date): void
     {
         $this->date = $date;
         if ($date != '') {
@@ -539,7 +539,7 @@ class EtKeys extends AbstractValueObject
         return $this->year;
     }
 
-    public function setYear($year)
+    public function setYear($year): void
     {
         $this->year = $year;
     }
@@ -549,7 +549,7 @@ class EtKeys extends AbstractValueObject
         return $this->start;
     }
 
-    public function setStart($start)
+    public function setStart($start): void
     {
         $this->start = $start;
     }
@@ -559,7 +559,7 @@ class EtKeys extends AbstractValueObject
         return $this->end;
     }
 
-    public function setEnd($end)
+    public function setEnd($end): void
     {
         $this->end = $end;
     }
@@ -569,7 +569,7 @@ class EtKeys extends AbstractValueObject
         return $this->dest;
     }
 
-    public function setDest($dest)
+    public function setDest($dest): void
     {
         $this->dest = $dest;
     }
@@ -579,7 +579,7 @@ class EtKeys extends AbstractValueObject
         return $this->own;
     }
 
-    public function setOwn($own)
+    public function setOwn($own): void
     {
         $this->own = $own;
     }
@@ -589,7 +589,7 @@ class EtKeys extends AbstractValueObject
         return $this->menue1;
     }
 
-    public function setMenue1($menue1)
+    public function setMenue1($menue1): void
     {
         $this->menue1 = $menue1;
     }
@@ -599,7 +599,7 @@ class EtKeys extends AbstractValueObject
         return $this->menue2;
     }
 
-    public function setMenue2($menue2)
+    public function setMenue2($menue2): void
     {
         $this->menue2 = $menue2;
     }
@@ -609,7 +609,7 @@ class EtKeys extends AbstractValueObject
         return $this->zip;
     }
 
-    public function setZip($zip)
+    public function setZip($zip): void
     {
         $this->zip = $zip;
     }
@@ -619,7 +619,7 @@ class EtKeys extends AbstractValueObject
         return $this->yesno1;
     }
 
-    public function setYesno1($yesno1)
+    public function setYesno1($yesno1): void
     {
         $this->yesno1 = $yesno1;
     }
@@ -629,7 +629,7 @@ class EtKeys extends AbstractValueObject
         return $this->yesno2;
     }
 
-    public function setYesno2($yesno2)
+    public function setYesno2($yesno2): void
     {
         $this->yesno2 = $yesno2;
     }
@@ -639,7 +639,7 @@ class EtKeys extends AbstractValueObject
         return $this->until;
     }
 
-    public function setUntil($until)
+    public function setUntil($until): void
     {
         $this->until = $until;
     }
@@ -649,7 +649,7 @@ class EtKeys extends AbstractValueObject
         return $this->encoding;
     }
 
-    public function setEncoding($encoding)
+    public function setEncoding($encoding): void
     {
         $this->encoding = $encoding;
     }
@@ -659,7 +659,7 @@ class EtKeys extends AbstractValueObject
         return $this->ID;
     }
 
-    public function setID($ID)
+    public function setID($ID): void
     {
         $this->ID = $ID;
     }
@@ -718,7 +718,7 @@ class EtKeys extends AbstractValueObject
     /**
      * Set all reset values
      */
-    public function setResetValues()
+    public function setResetValues(): void
     {
         $this->setVid('all');
         $this->setRegion('all');
@@ -754,7 +754,7 @@ class EtKeys extends AbstractValueObject
      * set all values from json string
      * @param string $jsString
      */
-    public function initFromJson(string $jsString)
+    public function initFromJson(string $jsString): void
     {
         $values = (array)json_decode($jsString);
 

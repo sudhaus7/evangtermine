@@ -50,7 +50,7 @@ class TagViewHelper extends AbstractViewHelper
     // this is new in TYPO3 8.x
     protected $escapeOutput = false;
 
-    public function initializeArguments()
+    public function initializeArguments(): void
     {
         $this->registerArgument('name', 'string', 'name of tag to generate', false, 'span');
         $this->registerArgument('class', 'string', 'class name for tag', false);
