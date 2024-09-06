@@ -478,7 +478,7 @@ class EventRepository extends Repository
             $etkeyPlaces = $etkeyPlaces[0];
         }
         if (!empty($etkeyPlaces ?? '') && ($etkeyPlaces ?? '') !== 'all') {
-            $queryBuilder->select('place_id', 'place_zip', 'place_city')
+            $queryBuilder->select('place_id', 'place_zip', 'place_city', 'place_name')
                 ->from('tx_evangtermine_domain_model_event')
                 ->where(
                     $queryBuilder->expr()
@@ -492,12 +492,12 @@ class EventRepository extends Repository
             $placesFromDB = $statement->fetchAllAssociative();
 
             foreach ($placesFromDB as $place) {
-                $places[$place['place_id']] = $place['place_zip'] . ' ' . $place['place_city'];
+                $places[$place['place_id']] = $place['place_zip'] . ' ' . $place['place_city'] . ', ' . $place['place_name'];
             }
             return $places;
         }
 
-        $queryBuilder->select('uid', 'place_id', 'place_zip', 'place_city')
+        $queryBuilder->select('uid', 'place_id', 'place_zip', 'place_city', 'place_name')
             ->from('tx_evangtermine_domain_model_event')
             ->where(
                 $queryBuilder->expr()->neq('place_zip', $queryBuilder->createNamedParameter('')),
@@ -516,7 +516,7 @@ class EventRepository extends Repository
         $queryBuilder->orderBy('place_zip');
         $placesFromDB = $queryBuilder->execute()->fetchAllAssociative();
         foreach ($placesFromDB as $place) {
-            $places[$place['place_id']] = $place['place_zip'] . ' ' . $place['place_city'];
+            $places[$place['place_id']] = $place['place_zip'] . ' ' . $place['place_city'] . ', ' . $place['place_name'];
         }
         return $places;
     }
