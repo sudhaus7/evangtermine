@@ -166,14 +166,13 @@ class EventcontainerController extends ActionController
                 $this->settingsUtility->fetchParamsFromRequest($formArguments, $this->etkeys);
             }
         }
-
         $requestArgumentsHash = sha1(\json_encode($requestArguments));
         $cache = $this->cacheManager->getCache('evangtermine_event_list');
         $cacheKey = $this->getCacheKey($requestArgumentsHash, $this->currentPluginUid);
         $content = $cache->get($cacheKey);
 
         if (empty($content)) {
-            [$query, $queryConstraints] = $this->eventRepository->prepareFindByEtKeysQuery($this->etkeys);
+            [$query, $queryConstraints] = $this->eventRepository->prepareFindByEtKeysQuery($this->etkeys, $this->settings['evt_addprms'] ?? '');
             $nrOfEvents = 0;
             if (!empty($query)) {
                 try {
@@ -233,7 +232,7 @@ class EventcontainerController extends ActionController
         $content = $cache->get($cacheKey);
 
         if (empty($content)) {
-            [$query, $queryConstraints] = $this->eventRepository->prepareFindByEtKeysQuery($this->etkeys);
+            [$query, $queryConstraints] = $this->eventRepository->prepareFindByEtKeysQuery($this->etkeys, $this->settings['evt_addprms'] ?? '');
             $events = $this->eventRepository->findByEtKeys($query, $this->etkeys);
 
             $this->view->assign('events', $events);
