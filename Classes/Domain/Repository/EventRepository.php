@@ -35,11 +35,12 @@ class EventRepository extends Repository
 
     /**
      * @param EtKeys $etKeys
+     * @param string $additionParams
      * @return array|null
      * @throws Exception
      * @throws UnexpectedTypeException
      */
-    public function prepareFindByEtKeysQuery(EtKeys $etKeys): ?array
+    public function prepareFindByEtKeysQuery(EtKeys $etKeys, string $additionParams = ''): ?array
     {
         [$eventUids, $filtered] = $this->preSelect($etKeys);
 
@@ -57,8 +58,8 @@ class EventRepository extends Repository
 
         // if search word or vid
         $searchWordConstraint = [];
-        if ((!empty($etKeys->getQ()) && $etKeys->getQ() != 'none') || (!empty($etKeys->getVid()) && $etKeys->getVid() != 'all')) {
-            $eventsWithSearchWord = $this->filterWithSearchWordAndVid($etKeys);
+        if ((!empty($etKeys->getQ()) && $etKeys->getQ() != 'none') || (!empty($etKeys->getVid()) && $etKeys->getVid() != 'all') || !empty($additionParams)) {
+            $eventsWithSearchWord = $this->filterWithSearchWordAndVidAndAdditionalParams($etKeys, $additionParams);
             $searchWordConstraint = $this->setSearchWordAndVidConstraint($query, $eventsWithSearchWord);
         }
         $queryConstraints = array_merge($queryConstraints, $searchWordConstraint);
@@ -93,11 +94,22 @@ class EventRepository extends Repository
         return $query->execute()->count();
     }
 
-    public function filterWithSearchWordAndVid(EtKeys $etKeys): array
+    public function filterWithSearchWordAndVidAndAdditionalParams(EtKeys $etKeys, string $additionParams = ''): array
     {
         $etKeysForApiQuery = clone $etKeys;
         $etKeysForApiQuery->setItemsPerPage(99999);
         $etKeysForApiQuery->setPageID(1);
+
+        $additionParamsArray = explode('&', $additionParams);
+        foreach ($additionParamsArray as $additionParam) {
+            if (str_contains($additionParam, '=')) {
+                [$key, $value] = explode('=', $additionParam);
+                $targetMethod = 'set' . ucfirst(trim($key));
+                if (method_exists($etKeysForApiQuery, $targetMethod)) {
+                    $etKeysForApiQuery->{$targetMethod}(trim($value));
+                }
+            }
+        }
         $eventContainerRepository = GeneralUtility::makeInstance(EventcontainerRepository::class);
         $result = $eventContainerRepository->findByEtKeys($etKeysForApiQuery);
 

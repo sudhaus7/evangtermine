@@ -127,7 +127,7 @@ class EventcontainerController extends ActionController
         $content = $cache->get($cacheKey);
 
         if (empty($content)) {
-            [$query, $queryConstraints] = $this->eventRepository->prepareFindByEtKeysQuery($this->etkeys);
+            [$query, $queryConstraints] = $this->eventRepository->prepareFindByEtKeysQuery($this->etkeys, $this->settings['evt_addprms'] ?? '');
             $nrOfEvents = 0;
             if (!empty($query)) {
                 try {
@@ -185,7 +185,7 @@ class EventcontainerController extends ActionController
         $content = $cache->get($cacheKey);
 
         if (empty($content)) {
-            [$query, $queryConstraints] = $this->eventRepository->prepareFindByEtKeysQuery($this->etkeys);
+            [$query, $queryConstraints] = $this->eventRepository->prepareFindByEtKeysQuery($this->etkeys, $this->settings['evt_addprms'] ?? '');
             $events = $this->eventRepository->findByEtKeys($query, $this->etkeys);
 
             $this->view->assign('events', $events);
