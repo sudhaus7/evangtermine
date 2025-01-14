@@ -34,6 +34,7 @@ use TYPO3\CMS\Extbase\Mvc\Request;
 use TYPO3\CMS\Extbase\Persistence\Generic\Exception\UnexpectedTypeException;
 use TYPO3\CMS\Extbase\Utility\DebuggerUtility;
 use TYPO3\CMS\Fluid\Core\Rendering\RenderingContext;
+use TYPO3\CMS\Fluid\Core\Rendering\RenderingContextFactory;
 use TYPO3\CMS\Fluid\View\TemplatePaths;
 use TYPO3\CMS\Fluid\View\TemplateView;
 
@@ -59,13 +60,16 @@ class EventcontainerController extends ActionController
 
     private Etpager $pager;
 
-    public function __construct(CacheManager $cacheManager, SettingsUtility $settingsUtility, EventcontainerRepository $eventcontainerRepository, EventRepository $eventRepository)
+    private RenderingContext $renderingContext;
+
+    public function __construct(CacheManager $cacheManager, SettingsUtility $settingsUtility, EventcontainerRepository $eventcontainerRepository, EventRepository $eventRepository, RenderingContextFactory $renderingContextFactory)
     {
         $this->cacheManager = $cacheManager;
         $this->date = new \DateTime();
         $this->settingsUtility = $settingsUtility;
         $this->eventcontainerRepository = $eventcontainerRepository;
         $this->eventRepository = $eventRepository;
+        $this->renderingContextFactory = $renderingContextFactory;
     }
 
     protected function initializeAction(): void
@@ -272,7 +276,7 @@ class EventcontainerController extends ActionController
             return $this->view;
         }
 
-        $renderingContext = GeneralUtility::makeInstance(RenderingContext::class);
+        $renderingContext = $this->renderingContextFactory->create();
         $renderingContext->setControllerName('Eventcontainer');
         $renderingContext->setControllerAction($actionName);
 
