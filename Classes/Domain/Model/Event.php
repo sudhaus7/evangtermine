@@ -175,6 +175,45 @@ class Event extends AbstractEntity
         $this->datum2 = $datum2;
     }
 
+    public function getMonth(): string
+    {
+        $start = $this->getStart();
+        // add 2 hours so that we still get the right month when the server clock is set to GMT
+        $timestamp = $start->getTimestamp() + 2 * 60 * 60;
+        $start = new \DateTime();
+        $start->setTimestamp($timestamp);
+        if (class_exists('IntlCalendar') && class_exists('IntlDateFormatter')) {
+            $calendar = \IntlCalendar::fromDateTime($start);
+            return \IntlDateFormatter::formatObject($calendar, 'MMMM', 'de_DE');
+        } else {
+            $months = [
+                'Januar',
+                'Februar',
+                'März',
+                'April',
+                'Mai',
+                'Juni',
+                'Juli',
+                'August',
+                'September',
+                'Oktober',
+                'November',
+                'Dezember',
+            ];
+            $monthKey = ((int)$start->format('n') - 1);
+            if ($monthKey >= 0) {
+                return $months[$monthKey];
+            }
+        }
+        return '';
+    }
+
+    public function getYear(): int
+    {
+        $start = $this->getStart();
+        return (int)$start->format('Y');
+    }
+
     public function getMonthbar(): string
     {
         return $this->monthbar;

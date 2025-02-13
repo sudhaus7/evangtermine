@@ -23,9 +23,10 @@
             <f:if condition="{events}">
                 <f:then>
                     <f:for each="{events}" as="event" iteration="iterator">
-                        <f:if condition="{event.monthbar}">
-                            <div class="monthbar">{event.monthbar}</div>
+                        <f:if condition="{event.month} != {monthOfLastEvent}">
+                            <div class="monthbar">{event.month} {event.year}</div>
                         </f:if>
+                        <f:variable name="monthOfLastEvent">{event.month}</f:variable>
 
                         <f:if condition="{iterator.isOdd}">
                             <f:then><div class="et_content_row odd"><f:render section="event" arguments="{_all}"/></div></f:then>
