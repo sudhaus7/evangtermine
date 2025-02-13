@@ -124,9 +124,10 @@ class ImportEventsCommand extends Command implements LoggerAwareInterface
     public function configure()
     {
         $this->setDescription('Import events from one of the APIs of the Evangelische Kirche')
+            ->addOption('vids', null, InputOption::VALUE_OPTIONAL, 'Only import events with these vids ("Veranstalter-Ids", comma-separated)')
             ->addOption('debug', null, InputOption::VALUE_NONE, 'Use the Console Logger (add -vv or -vvv to actually get the messages)')
             ->addOption('removelock', null, InputOption::VALUE_NONE, 'Remove the lock file')
-             ->setHelp('vendor/bin/typo3 evangtermine:importevents');
+            ->setHelp('vendor/bin/typo3 evangtermine:importevents');
     }
 
     /**
@@ -149,7 +150,7 @@ class ImportEventsCommand extends Command implements LoggerAwareInterface
             $this->logger = new ConsoleLogger($output);
         }
 
-        $this->importAllEvents($output);
+        $this->importAllEvents($input, $output);
 
         if (ExtensionManagementUtility::isLoaded('solr')) {
             $this->logger->info('starting Solr Index');
@@ -163,15 +164,21 @@ class ImportEventsCommand extends Command implements LoggerAwareInterface
     }
 
     /**
+     * @param InputInterface $input
      * @param OutputInterface $output
      * @throws DBALException
      * @throws Exception
      * @throws SiteNotFoundException
      */
-    protected function importAllEvents(OutputInterface $output)
+    protected function importAllEvents(InputInterface $input, OutputInterface $output)
     {
         $this->logger->info('Fetching Items');
-        $items = $this->getItems($output);
+        $items = $this->getItems($input, $output);
+
+        if ($items->count() == 0) {
+            return;
+        }
+
         $this->logger->info('Cleanup Items');
         $this->deleteEvents($output);
 
@@ -288,14 +295,17 @@ class ImportEventsCommand extends Command implements LoggerAwareInterface
     }
 
     /**
+     * @param InputInterface $input
      * @param OutputInterface $output
      *
      * @return SplObjectStorage<SimpleXMLElement>
      */
-    protected function getItems(OutputInterface $output): SplObjectStorage
+    protected function getItems(InputInterface $input, OutputInterface $output): SplObjectStorage
     {
         $urlForMetaData = 'https://' . $this->host . '/Veranstalter/xml.php?itemsPerPage=0&highlight=all';
         $urlMainPart = 'https://' . $this->host . '/Veranstalter/xml.php?itemsPerPage=' . self::ITEMS_PER_PAGE . '&highlight=all';
+
+        list($urlForMetaData, $urlMainPart) = $this->limitRequestToVids($input, $urlForMetaData, $urlMainPart);
 
         // URL abfragen, nur IPv4 Auflösung
         $rawXml = UrlUtility::loadUrl($urlForMetaData);
@@ -608,5 +618,29 @@ class ImportEventsCommand extends Command implements LoggerAwareInterface
     protected function removeFileForRunCheck()
     {
         unlink($this->fileNameForRunCheck);
+    }
+
+    /**
+     * @param InputInterface $input
+     * @param string $urlForMetaData
+     * @param string $urlMainPart
+     * @return string[]
+     */
+    protected function limitRequestToVids(InputInterface $input, string $urlForMetaData, string $urlMainPart): array
+    {
+        $vids = $input->getOption('vids');
+        $vidsArray = explode(',', $vids);
+        $vidString = '';
+        foreach ($vidsArray as $vid) {
+            if (is_numeric(trim($vid))) {
+                $vidString .= $vid . ',';
+            }
+        }
+        if (!empty($vidString)) {
+            $vidString = '&vid=' . rtrim($vidString, ',');
+            $urlForMetaData .= $vidString;
+            $urlMainPart .= $vidString;
+        }
+        return array($urlForMetaData, $urlMainPart);
     }
 }
