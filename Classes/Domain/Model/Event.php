@@ -178,6 +178,10 @@ class Event extends AbstractEntity
     public function getMonth(): string
     {
         $start = $this->getStart();
+        // add 2 hours so that we still get the right month when the server clock is set to GMT
+        $timestamp = $start->getTimestamp() + 2 * 60 * 60;
+        $start = new \DateTime();
+        $start->setTimestamp($timestamp);
         if (class_exists('IntlCalendar') && class_exists('IntlDateFormatter')) {
             $calendar = \IntlCalendar::fromDateTime($start);
             return \IntlDateFormatter::formatObject($calendar, 'MMMM', 'de_DE');
