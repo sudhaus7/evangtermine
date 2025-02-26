@@ -69,6 +69,18 @@
 				<source>Regions (Multiple selections possible):</source>
 			</trans-unit>
 
+			<trans-unit id="feflexform.regions2">
+				<source>Regions 2 (Multiple selections possible):</source>
+			</trans-unit>
+
+			<trans-unit id="feflexform.regions3">
+				<source>Regions 3 (Multiple selections possible):</source>
+			</trans-unit>
+
+			<trans-unit id="feflexform.subregions">
+				<source>Subregions (Multiple selections possible):</source>
+			</trans-unit>
+
 			<trans-unit id="feflexform.places">
 				<source>Places (Multiple selections possible):</source>
 			</trans-unit>

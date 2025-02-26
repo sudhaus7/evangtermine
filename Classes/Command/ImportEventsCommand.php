@@ -265,8 +265,8 @@ class ImportEventsCommand extends Command implements LoggerAwareInterface
      */
     protected function getItems(InputInterface $input, OutputInterface $output): SplObjectStorage
     {
-        $urlForMetaData = 'https://' . $this->host . '/Veranstalter/xml.php?itemsPerPage=0&highlight=all';
-        $urlMainPart = 'https://' . $this->host . '/Veranstalter/xml.php?itemsPerPage=' . self::ITEMS_PER_PAGE . '&highlight=all';
+        $urlForMetaData = 'https://' . $this->host . '/Veranstalter/xml.php?itemsPerPage=0&highlight=all&dest=all';
+        $urlMainPart = 'https://' . $this->host . '/Veranstalter/xml.php?itemsPerPage=' . self::ITEMS_PER_PAGE . '&highlight=all&dest=all';
 
         list($urlForMetaData, $urlMainPart) = $this->limitRequestToVids($input, $urlForMetaData, $urlMainPart);
 
