@@ -46,6 +46,7 @@ use RuntimeException;
 use TYPO3\CMS\Core\Cache\CacheManager;
 use TYPO3\CMS\Core\Cache\Exception\NoSuchCacheException;
 use TYPO3\CMS\Core\Cache\Frontend\VariableFrontend;
+use TYPO3\CMS\Core\Database\ConnectionPool;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 
 /**
@@ -138,6 +139,86 @@ class CategoryUtil
             $this->cache->set($cacheKey, $regions);
         }
         $configuration['items'] = $regions;
+    }
+
+    /**
+     * @param array $configuration
+     * @return void
+     * @throws DBALException
+     * @throws Exception
+     * @throws \Doctrine\DBAL\Exception
+     */
+    public function getRegions2(array &$configuration): void
+    {
+        $cacheKey = 'regions2-' . $this->dateString;
+        if (!$regions2 = $this->cache->get($cacheKey)) {
+            $regions2 = $this->getDistinctEntries('tx_evangtermine_domain_model_event', 'event_region2_id');
+            $this->cache->set($cacheKey, $regions2);
+        }
+        $configuration['items'] = $regions2;
+    }
+
+    /**
+     * @param array $configuration
+     * @return void
+     * @throws DBALException
+     * @throws Exception
+     * @throws \Doctrine\DBAL\Exception
+     */
+    public function getRegions3(array &$configuration): void
+    {
+        $cacheKey = 'regions3-' . $this->dateString;
+        if (!$regions3 = $this->cache->get($cacheKey)) {
+            $regions3 = $this->getDistinctEntries('tx_evangtermine_domain_model_event', 'event_region3_id');
+            $this->cache->set($cacheKey, $regions3);
+        }
+        $configuration['items'] = $regions3;
+    }
+
+    /**
+     * @param array $configuration
+     * @return void
+     * @throws DBALException
+     * @throws Exception
+     * @throws \Doctrine\DBAL\Exception
+     */
+    public function getSubregions(array &$configuration): void
+    {
+        $cacheKey = 'subregions-' . $this->dateString;
+        if (!$subregions = $this->cache->get($cacheKey)) {
+            $subregions = $this->getDistinctEntries('tx_evangtermine_domain_model_event', 'event_subregion_id');
+            $this->cache->set($cacheKey, $subregions);
+        }
+        $configuration['items'] = $subregions;
+    }
+
+    /**
+     * @throws \Doctrine\DBAL\Exception
+     * @throws Exception|DBALException
+     */
+    private function getDistinctEntries(string $table, string $field): array
+    {
+        $queryBuilder = GeneralUtility::makeInstance(ConnectionPool::class)->getQueryBuilderForTable($table);
+        $queryBuilder->select($field)
+            ->from($table)
+            ->groupBy($field);
+        $subregions = $queryBuilder->executeQuery()->fetchAllAssociative();
+        $items = [];
+        $items[] = [
+            0 => 'Alle',
+            1 => 'all',
+        ];
+        foreach ($subregions as $subregion) {
+            $entry = $subregion[$field];
+            if (empty($entry)) {
+                continue;
+            }
+            $items[] = [
+                0 => $entry,
+                1 => $entry,
+            ];
+        }
+        return $items;
     }
 
     /**

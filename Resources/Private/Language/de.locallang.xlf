@@ -85,6 +85,21 @@
 				<target>Regionen (Mehrfachauswahl möglich):</target>
 			</trans-unit>
 
+			<trans-unit id="feflexform.regions2">
+				<source>Regions 2 (Multiple selections possible):</source>
+				<target>Regionen 2 (Mehrfachauswahl möglich):</target>
+			</trans-unit>
+
+			<trans-unit id="feflexform.regions3">
+				<source>Regions 3 (Multiple selections possible):</source>
+				<target>Regionen 3 (Mehrfachauswahl möglich):</target>
+			</trans-unit>
+
+			<trans-unit id="feflexform.subregions">
+				<source>Subregions (Multiple selections possible):</source>
+				<target>Unterregionen (Mehrfachauswahl möglich):</target>
+			</trans-unit>
+
 			<trans-unit id="feflexform.places">
 				<source></source>
 				<target>Orte (Mehrfachauswahl möglich):</target>

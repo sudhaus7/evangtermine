@@ -181,6 +181,9 @@ class EventRepository extends Repository
         $queryConstraints = array_merge($queryConstraints, $this->setCategoryConstraint($query, $etKeys));
         $queryConstraints = array_merge($queryConstraints, $this->setPeopleConstraint($query, $etKeys));
         $queryConstraints = array_merge($queryConstraints, $this->setRegionConstraint($query, $etKeys));
+        $queryConstraints = array_merge($queryConstraints, $this->setSubregionsConstraint($query, $etKeys));
+        $queryConstraints = array_merge($queryConstraints, $this->setRegion2Constraint($query, $etKeys));
+        $queryConstraints = array_merge($queryConstraints, $this->setRegion3Constraint($query, $etKeys));
         $queryConstraints = array_merge($queryConstraints, $this->setPlaceConstraint($query, $etKeys));
         return array_merge($queryConstraints, $this->setTimeConstraint($query, $etKeys));
     }
@@ -344,6 +347,21 @@ class EventRepository extends Repository
             $queryConstraints[] = $query->logicalOr(...$possibleRegions);
         }
         return $queryConstraints;
+    }
+
+    public function setSubregionsConstraint(Query $query, EtKeys $etKeys): array
+    {
+        return $this->setOtherRegionsConstraint($query, $etKeys->getSubregions(), 'event_subregion_id');
+    }
+
+    public function setRegion2Constraint(Query $query, EtKeys $etKeys): array
+    {
+        return $this->setOtherRegionsConstraint($query, $etKeys->getRegion2(), 'event_region2_id');
+    }
+
+    public function setRegion3Constraint(Query $query, EtKeys $etKeys): array
+    {
+        return $this->setOtherRegionsConstraint($query, $etKeys->getRegion3(), 'event_region3_id');
     }
 
     /**
@@ -845,5 +863,27 @@ class EventRepository extends Repository
         $clonedQuery = clone $query;
         $clonedQueryConstraints = $queryConstraints;
         return [$query, $queryConstraints, $clonedQuery, $clonedQueryConstraints];
+    }
+
+    /**
+     * @param Query $query
+     * @param string $subregions
+     * @param string $field
+     * @return array
+     */
+    protected function setOtherRegionsConstraint(Query $query, string $subregions, string $field): array
+    {
+        $queryConstraints = [];
+        $allowedSubregions = [];
+        foreach (explode(',', $subregions) as $subregion) {
+            if (empty($subregion) || $subregion == 'all' || $subregion == 'Alle') {
+                continue;
+            }
+            $allowedSubregions[] = $query->equals($field, $subregion);
+        }
+        if (!empty($allowedSubregions)) {
+            $queryConstraints[] = $query->logicalOr(...$allowedSubregions);
+        }
+        return $queryConstraints;
     }
 }

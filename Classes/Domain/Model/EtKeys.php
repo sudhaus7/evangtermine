@@ -103,6 +103,22 @@ class EtKeys extends AbstractValueObject
     protected string $regions = '';
 
     /**
+     * subregions
+     * @var string
+     */
+    protected string $subregions = '';
+
+    /**
+     * @var string
+     */
+    protected string $region2 = '';
+
+    /**
+     * @var string
+     */
+    protected string $region3 = '';
+
+    /**
      * aid (group admin)
      * @var string
      */
@@ -331,6 +347,45 @@ class EtKeys extends AbstractValueObject
             $regions = implode(',', $regions);
         }
         $this->regions = $regions;
+    }
+
+    public function getSubregions(): string
+    {
+        return $this->subregions;
+    }
+
+    public function setSubregions($subregions): void
+    {
+        if (is_array($subregions)) {
+            $subregions = implode(',', $subregions);
+        }
+        $this->subregions = $subregions ?? '';
+    }
+
+    public function getRegion2(): string
+    {
+        return $this->region2;
+    }
+
+    public function setRegion2($region2): void
+    {
+        if (is_array($region2)) {
+            $region2 = implode(',', $region2);
+        }
+        $this->region2 = $region2 ?? '';
+    }
+
+    public function getRegion3(): string
+    {
+        return $this->region3;
+    }
+
+    public function setRegion3($region3): void
+    {
+        if (is_array($region3)) {
+            $region3 = implode(',', $region3);
+        }
+        $this->region3 = $region3 ?? '';
     }
 
     public function getPlace(): string

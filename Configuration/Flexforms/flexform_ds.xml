@@ -90,6 +90,42 @@
                             </config>
                         </TCEforms>
                     </settings.etkey_regions>
+                    <settings.etkey_subregions>
+                        <TCEforms>
+                            <label>LLL:EXT:evangtermine/Resources/Private/Language/locallang.xlf:feflexform.subregions</label>
+                            <config>
+                                <type>select</type>
+                                <renderType>selectSingleBox</renderType>
+                                <size>6</size>
+                                <itemsProcFunc>ArbkomEKvW\Evangtermine\Util\CategoryUtil->getSubregions</itemsProcFunc>
+                                <default>all</default>
+                            </config>
+                        </TCEforms>
+                    </settings.etkey_subregions>
+                    <settings.etkey_region2>
+                        <TCEforms>
+                            <label>LLL:EXT:evangtermine/Resources/Private/Language/locallang.xlf:feflexform.regions2</label>
+                            <config>
+                                <type>select</type>
+                                <renderType>selectSingleBox</renderType>
+                                <size>6</size>
+                                <itemsProcFunc>ArbkomEKvW\Evangtermine\Util\CategoryUtil->getRegions2</itemsProcFunc>
+                                <default>all</default>
+                            </config>
+                        </TCEforms>
+                    </settings.etkey_region2>
+                    <settings.etkey_region3>
+                        <TCEforms>
+                            <label>LLL:EXT:evangtermine/Resources/Private/Language/locallang.xlf:feflexform.regions3</label>
+                            <config>
+                                <type>select</type>
+                                <renderType>selectSingleBox</renderType>
+                                <size>6</size>
+                                <itemsProcFunc>ArbkomEKvW\Evangtermine\Util\CategoryUtil->getRegions3</itemsProcFunc>
+                                <default>all</default>
+                            </config>
+                        </TCEforms>
+                    </settings.etkey_region3>
                     <settings.etkey_places>
                         <TCEforms>
                             <label>LLL:EXT:evangtermine/Resources/Private/Language/locallang.xlf:feflexform.places</label>
