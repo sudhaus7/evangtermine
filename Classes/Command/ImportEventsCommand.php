@@ -36,6 +36,10 @@ use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 
+use TYPO3\CMS\Core\Resource\Exception\ExistingTargetFolderException;
+use TYPO3\CMS\Core\Resource\Exception\InsufficientFolderAccessPermissionsException;
+use TYPO3\CMS\Core\Resource\Exception\InsufficientFolderWritePermissionsException;
+use TYPO3\CMS\Core\Site\SiteFinder;
 use function sys_get_temp_dir;
 
 use TYPO3\CMS\Core\Configuration\Exception\ExtensionConfigurationExtensionNotConfiguredException;
@@ -48,10 +52,6 @@ use TYPO3\CMS\Core\DataHandling\SlugHelper;
 use TYPO3\CMS\Core\Exception\SiteNotFoundException;
 use TYPO3\CMS\Core\Http\RequestFactory;
 use TYPO3\CMS\Core\Log\LogManager;
-use TYPO3\CMS\Core\Resource\Exception\ExistingTargetFolderException;
-use TYPO3\CMS\Core\Resource\Exception\InsufficientFolderAccessPermissionsException;
-use TYPO3\CMS\Core\Resource\Exception\InsufficientFolderWritePermissionsException;
-use TYPO3\CMS\Core\Resource\File;
 use TYPO3\CMS\Core\Resource\ResourceStorage;
 use TYPO3\CMS\Core\Resource\StorageRepository;
 use TYPO3\CMS\Core\Utility\ExtensionManagementUtility;
@@ -77,15 +77,28 @@ class ImportEventsCommand extends Command implements LoggerAwareInterface
     protected string $imageFolder;
     protected array $months = [];
     protected array $allIds = [];
+    protected bool $setRedirects = false;
+    protected array $pagesWithPlugin = [];
+    protected string $detailPageSlugPart = '/termindetails';
+
+    public function __construct(
+        private readonly SiteFinder $siteFinder
+    ) {
+        parent::__construct();
+    }
 
     /**
+     * @throws Exception
+     * @throws DBALException
+     * @throws InsufficientFolderWritePermissionsException
      * @throws ExistingTargetFolderException
      * @throws InsufficientFolderAccessPermissionsException
+     * @throws SiteNotFoundException
      * @throws ExtensionConfigurationPathDoesNotExistException
      * @throws ExtensionConfigurationExtensionNotConfiguredException
-     * @throws InsufficientFolderWritePermissionsException
+     * @throws \Doctrine\DBAL\Exception
      */
-    public function initialize(InputInterface $input, OutputInterface $output)
+    public function initialize(InputInterface $input, OutputInterface $output): void
     {
         $this->connectionPool = GeneralUtility::makeInstance(ConnectionPool::class);
         $this->requestFactory = GeneralUtility::makeInstance(RequestFactory::class);
@@ -118,10 +131,13 @@ class ImportEventsCommand extends Command implements LoggerAwareInterface
         $this->host = $this->extConfig['host'];
         $this->fileNameForRunCheck = sys_get_temp_dir() . '/evangelischeTermine_' . sha1($this->host) . '.txt';
 
+        $this->setRedirects = $this->extConfig['setRedirects'] ?? false;
+        $this->pagesWithPlugin = $this->getPagesWithPlugin();
+
         $this->logger = GeneralUtility::makeInstance(LogManager::class)->getLogger(__CLASS__);
     }
 
-    public function configure()
+    public function configure(): void
     {
         $this->setDescription('Import events from one of the APIs of the Evangelische Kirche')
             ->addOption('vids', null, InputOption::VALUE_OPTIONAL, 'Only import events with these vids ("Veranstalter-Ids", comma-separated)')
@@ -170,7 +186,7 @@ class ImportEventsCommand extends Command implements LoggerAwareInterface
      * @throws Exception
      * @throws SiteNotFoundException
      */
-    protected function importAllEvents(InputInterface $input, OutputInterface $output)
+    protected function importAllEvents(InputInterface $input, OutputInterface $output): void
     {
         $this->logger->info('Fetching Items');
         $items = $this->getItems($input, $output);
@@ -285,12 +301,15 @@ class ImportEventsCommand extends Command implements LoggerAwareInterface
 
     /**
      * @throws SiteNotFoundException
+     * @throws DBALException
      */
     protected function createSlug(array $event, $uid): string
     {
         $state = RecordStateFactory::forName('tx_evangtermine_domain_model_event')
             ->fromArray($event, $event['pid'], $uid);
         $slug = $this->slugHelper->generate($event, $event['pid']);
+
+        $this->deleteRedirectEntries($slug);
         return $this->slugHelper->buildSlugForUniqueInTable($slug, $state);
     }
 
@@ -299,6 +318,7 @@ class ImportEventsCommand extends Command implements LoggerAwareInterface
      * @param OutputInterface $output
      *
      * @return SplObjectStorage<SimpleXMLElement>
+     * @throws Exception
      */
     protected function getItems(InputInterface $input, OutputInterface $output): SplObjectStorage
     {
@@ -525,6 +545,7 @@ class ImportEventsCommand extends Command implements LoggerAwareInterface
         $events = $statement->fetchAllAssociative();
 
         foreach ($events as $event) {
+            $this->createRedirectEntries($event['slug'] ?? '');
             $this->connectionPool->getConnectionForTable('tx_evangtermine_domain_model_event')
                 ->delete(
                     'tx_evangtermine_domain_model_event', // from
@@ -555,6 +576,7 @@ class ImportEventsCommand extends Command implements LoggerAwareInterface
         $progressBar = new ProgressBar($output, count($events));
 
         foreach ($events as $event) {
+            $this->createRedirectEntries($event['slug'] ?? '');
             $this->logger->debug(sprintf('Deleting %s %s', $event['uid'], $event['title']));
             // delete the event if it is not found in the API
             $this->connectionPool->getConnectionForTable('tx_evangtermine_domain_model_event')
@@ -567,10 +589,57 @@ class ImportEventsCommand extends Command implements LoggerAwareInterface
         $progressBar->finish();
     }
 
+    protected function createRedirectEntries(string $slug): void
+    {
+        if (!$this->setRedirects) {
+            return;
+        }
+        if (empty($slug)) {
+            return;
+        }
+        foreach ($this->pagesWithPlugin as $page) {
+            $sysRedirectData = [
+                'pid' => $page['uid'],
+                'updatedon' => time(),
+                'createdon' => time(),
+                'createdby' => 0,
+                'target_statuscode' => 301,
+                'source_host' => $page['domain'],
+                'source_path' => $page['slug'] . $page['detailPageSlugPart'] . $slug,
+                'target' => sprintf('t3://page?uid=%d&_language=0', $page['uid']),
+            ];
+            $this->connectionPool->getConnectionForTable('sys_redirect')
+                ->insert(
+                    'sys_redirect',
+                    $sysRedirectData,
+                );
+        }
+    }
+
+    /**
+     * @throws DBALException
+     */
+    protected function deleteRedirectEntries(string $slug): void
+    {
+        if (!$this->setRedirects) {
+            return;
+        }
+        if (empty($slug)) {
+            return;
+        }
+        $queryBuilder = $this->connectionPool->getQueryBuilderForTable('sys_redirect');
+        $queryBuilder->delete('sys_redirect')
+            ->where(
+                $queryBuilder->expr()->like('source_path', $queryBuilder->createNamedParameter('%' . $queryBuilder->escapeLikeWildcards($this->detailPageSlugPart . $slug))),
+            );
+        $queryBuilder->executeStatement();
+    }
+
     /**
      * @param array $urls
      * @param OutputInterface $output
      * @param SplObjectStorage $newItems
+     * @throws Exception
      */
     protected function getEventsFromApi(array $urls, OutputInterface $output, SplObjectStorage $newItems): void
     {
@@ -615,7 +684,7 @@ class ImportEventsCommand extends Command implements LoggerAwareInterface
         return false;
     }
 
-    protected function removeFileForRunCheck()
+    protected function removeFileForRunCheck(): void
     {
         unlink($this->fileNameForRunCheck);
     }
@@ -629,7 +698,7 @@ class ImportEventsCommand extends Command implements LoggerAwareInterface
     protected function limitRequestToVids(InputInterface $input, string $urlForMetaData, string $urlMainPart): array
     {
         $vids = $input->getOption('vids');
-        $vidsArray = explode(',', $vids);
+        $vidsArray = explode(',', $vids ?? '');
         $vidString = '';
         foreach ($vidsArray as $vid) {
             if (is_numeric(trim($vid))) {
@@ -642,5 +711,46 @@ class ImportEventsCommand extends Command implements LoggerAwareInterface
             $urlMainPart .= $vidString;
         }
         return array($urlForMetaData, $urlMainPart);
+    }
+
+    /**
+     * @throws \Doctrine\DBAL\Exception
+     * @throws SiteNotFoundException
+     * @throws DBALException
+     * @throws Exception
+     */
+    protected function getPagesWithPlugin(): array
+    {
+        $queryBuilder = $this->connectionPool->getQueryBuilderForTable('tt_content');
+        $queryBuilder->select('*')
+            ->from('tt_content')
+            ->where(
+                $queryBuilder->expr()->eq('list_type', $queryBuilder->createNamedParameter('evangtermine_list'))
+            );
+        $plugins = $queryBuilder->executeQuery()->fetchAllAssociative();
+        $pages = [];
+        foreach ($plugins as $plugin) {
+            $site = $this->siteFinder->getSiteByPageId($plugin['pid']);
+            $host = $site->getBase()->getHost();
+            if (!empty($host)) {
+                $pages[$plugin['pid']] = [
+                    'uid' => $plugin['pid'],
+                    'rootPageUid' => $site->getRootPageId(),
+                    'domain' => $host,
+                    'detailPageSlugPart' => $this->detailPageSlugPart,
+                ];
+            }
+        }
+        foreach ($pages as $pageUid => $page) {
+            $queryBuilder = $this->connectionPool->getQueryBuilderForTable('pages');
+            $queryBuilder->select('*')
+                ->from('pages')
+                ->where(
+                    $queryBuilder->expr()->eq('uid', $queryBuilder->createNamedParameter($pageUid))
+                );
+            $pageData = $queryBuilder->executeQuery()->fetchAssociative();
+            $pages[$pageUid]['slug'] = $pageData['slug'];
+        }
+        return $pages;
     }
 }
