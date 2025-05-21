@@ -185,26 +185,26 @@ class Event extends AbstractEntity
         if (class_exists('IntlCalendar') && class_exists('IntlDateFormatter')) {
             $calendar = \IntlCalendar::fromDateTime($start);
             return \IntlDateFormatter::formatObject($calendar, 'MMMM', 'de_DE');
-        } else {
-            $months = [
-                'Januar',
-                'Februar',
-                'März',
-                'April',
-                'Mai',
-                'Juni',
-                'Juli',
-                'August',
-                'September',
-                'Oktober',
-                'November',
-                'Dezember',
-            ];
-            $monthKey = ((int)$start->format('n') - 1);
-            if ($monthKey >= 0) {
-                return $months[$monthKey];
-            }
         }
+        $months = [
+            'Januar',
+            'Februar',
+            'März',
+            'April',
+            'Mai',
+            'Juni',
+            'Juli',
+            'August',
+            'September',
+            'Oktober',
+            'November',
+            'Dezember',
+        ];
+        $monthKey = ((int)$start->format('n') - 1);
+        if ($monthKey >= 0) {
+            return $months[$monthKey];
+        }
+
         return '';
     }
 

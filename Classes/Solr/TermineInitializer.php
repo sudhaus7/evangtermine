@@ -6,8 +6,9 @@ use ApacheSolrForTypo3\Solr\IndexQueue\Initializer\AbstractInitializer;
 
 class TermineInitializer extends AbstractInitializer
 {
-    public function initialize(): bool
+    // The ImportEventsCommand saves the events with pid=0 therefore we return always 0 as the only pid
+    protected function getPages(): array
     {
-        return false;
+        return [0];
     }
 }

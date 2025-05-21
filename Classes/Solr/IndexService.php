@@ -88,11 +88,11 @@ class IndexService implements LoggerAwareInterface
                 $this->settingsUtility->fetchParamsFromSettings($flex['settings'], $etkeys);
 
                 /** @var QueryInterface $query */
-                [ $query, $queryConstraints ] = $this->eventRepository->prepareFindByEtKeysQuery($etkeys);
+                [$query, $queryConstraints] = $this->eventRepository->prepareFindByEtKeysQuery($etkeys);
                 $result = $query->execute();
                 /** @var Event $event */
                 foreach ($result as $event) {
-                    if (! in_array($event->getUid(), $idsToIndex)) {
+                    if (!in_array($event->getUid(), $idsToIndex)) {
                         $idsToIndex[] = $event->getUid();
                     }
                 }
@@ -102,32 +102,31 @@ class IndexService implements LoggerAwareInterface
             foreach ($idsToIndex as $itemUid) {
                 if ($this->queue->containsItem('tx_evangtermine_domain_model_event', $itemUid)) {
                     GeneralUtility::makeInstance(ConnectionPool::class)
-                                  ->getConnectionForTable('tx_solr_indexqueue_item')
-                                  ->update(
-                                      'tx_solr_indexqueue_item',
-                                      [
-                                          'changed' => time(),
-
-                                      ],
-                                      [
-                                          'item_uid'  => $itemUid,
-                                          'item_type' => 'tx_evangtermine_domain_model_event',
-                                          'root'      => $solrSite->getRootPageId(),
-                                      ]
-                                  );
+                        ->getConnectionForTable('tx_solr_indexqueue_item')
+                        ->update(
+                        'tx_solr_indexqueue_item',
+                            [
+                                'changed' => time(),
+                            ],
+                            [
+                                'item_uid'  => $itemUid,
+                                'item_type' => 'tx_evangtermine_domain_model_event',
+                                'root'      => $solrSite->getRootPageId(),
+                            ]
+                        );
                 } else {
                     GeneralUtility::makeInstance(ConnectionPool::class)
-                                  ->getConnectionForTable('tx_solr_indexqueue_item')
-                                  ->insert(
-                                      'tx_solr_indexqueue_item',
-                                      [
-                                          'item_uid'               => $itemUid,
-                                          'item_type'              => 'tx_evangtermine_domain_model_event',
-                                          'indexing_configuration' => 'tx_evangtermine_domain_model_event',
-                                          'root'                   => $solrSite->getRootPageId(),
-                                          'changed'                => time(),
-                                      ]
-                                  );
+                        ->getConnectionForTable('tx_solr_indexqueue_item')
+                        ->insert(
+                        'tx_solr_indexqueue_item',
+                            [
+                                'item_uid'               => $itemUid,
+                                'item_type'              => 'tx_evangtermine_domain_model_event',
+                                'indexing_configuration' => 'tx_evangtermine_domain_model_event',
+                                'root'                   => $solrSite->getRootPageId(),
+                                'changed'                => time(),
+                            ]
+                        );
                 }
             }
         }
@@ -159,7 +158,7 @@ class IndexService implements LoggerAwareInterface
                     $strategy->setMySiteHash($solrSite->getSiteHash());
                     $strategy->setMyEnableCommitsSetting($solrSite->getSolrConfiguration()->getEnableCommits());
                     $strategy->removeGarbageOf('', $itemToDelete['item_uid']);
-                } catch(\Exception $e) {
+                } catch (\Exception $e) {
                     $this->logger->error($e->getMessage());
                 }
             }

@@ -34,10 +34,6 @@ use TYPO3\CMS\Core\DataHandling\SlugHelper;
 use TYPO3\CMS\Core\Exception\SiteNotFoundException;
 use TYPO3\CMS\Core\Http\RequestFactory;
 use TYPO3\CMS\Core\Log\LogManager;
-use TYPO3\CMS\Core\Resource\Exception\ExistingTargetFolderException;
-use TYPO3\CMS\Core\Resource\Exception\InsufficientFolderAccessPermissionsException;
-use TYPO3\CMS\Core\Resource\Exception\InsufficientFolderWritePermissionsException;
-use TYPO3\CMS\Core\Resource\File;
 use TYPO3\CMS\Core\Resource\ResourceStorage;
 use TYPO3\CMS\Core\Resource\StorageRepository;
 use TYPO3\CMS\Core\Utility\ExtensionManagementUtility;
@@ -554,6 +550,6 @@ class ImportEventsCommand extends Command implements LoggerAwareInterface
             $urlForMetaData .= $vidString;
             $urlMainPart .= $vidString;
         }
-        return array($urlForMetaData, $urlMainPart);
+        return [$urlForMetaData, $urlMainPart];
     }
 }

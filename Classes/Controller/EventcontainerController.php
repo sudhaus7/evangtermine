@@ -32,7 +32,6 @@ use TYPO3\CMS\Extbase\Mvc\Controller\ActionController;
 use TYPO3\CMS\Extbase\Mvc\Exception\InvalidControllerNameException;
 use TYPO3\CMS\Extbase\Mvc\Request;
 use TYPO3\CMS\Extbase\Persistence\Generic\Exception\UnexpectedTypeException;
-use TYPO3\CMS\Extbase\Utility\DebuggerUtility;
 use TYPO3\CMS\Fluid\Core\Rendering\RenderingContext;
 use TYPO3\CMS\Fluid\Core\Rendering\RenderingContextFactory;
 use TYPO3\CMS\Fluid\View\TemplatePaths;
@@ -244,10 +243,9 @@ class EventcontainerController extends ActionController
             // render content of teaser or list
             if ($data['list_type'] == 'evangtermine_teaser') {
                 return $this->teaserAction();
-            } else {
-                $this->view = $this->setView('list');
-                return $this->listAction();
             }
+            $this->view = $this->setView('list');
+            return $this->listAction();
         }
         return $this->htmlResponse();
     }
