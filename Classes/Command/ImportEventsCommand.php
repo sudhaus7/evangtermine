@@ -22,6 +22,7 @@ use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 
+use TYPO3\CMS\Core\Site\SiteFinder;
 use function sys_get_temp_dir;
 
 use TYPO3\CMS\Core\Configuration\Exception\ExtensionConfigurationExtensionNotConfiguredException;
@@ -58,10 +59,22 @@ class ImportEventsCommand extends Command implements LoggerAwareInterface
     protected string $fileNameForRunCheck;
     protected array $months = [];
     protected array $allIds = [];
+    protected array $pagesWithPlugin = [];
+    protected bool $setRedirects = false;
+    protected string $redirectDescription = 'Vom Evangelische Termine-Import angelegt';
+    protected string $detailPageSlugPart = '/termindetails';
+
+    public function __construct(
+        private readonly SiteFinder $siteFinder
+    ) {
+        parent::__construct();
+    }
 
     /**
      * @throws ExtensionConfigurationPathDoesNotExistException
      * @throws ExtensionConfigurationExtensionNotConfiguredException
+     * @throws \Doctrine\DBAL\Exception
+     * @throws SiteNotFoundException
      */
     public function initialize(InputInterface $input, OutputInterface $output): void
     {
@@ -71,7 +84,7 @@ class ImportEventsCommand extends Command implements LoggerAwareInterface
         $this->groupList = GeneralUtility::makeInstance(Grouplist::class)->getItemslist();
         $this->dataHandler = GeneralUtility::makeInstance(DataHandler::class);
         $this->extConfig  = GeneralUtility::makeInstance(ExtensionConfiguration::class)->get('evangtermine');
-        if (version_compare(\TYPO3\CMS\Core\Utility\GeneralUtility::makeInstance(\TYPO3\CMS\Core\Information\Typo3Version::class)->getVersion(), '11.0.0', '<')) {
+        if (version_compare(GeneralUtility::makeInstance(\TYPO3\CMS\Core\Information\Typo3Version::class)->getVersion(), '11.0.0', '<')) {
             $this->storageRepository = GeneralUtility::makeInstance(\ArbkomEKvW\Evangtermine\Resource\StorageRepository::class);
         } else {
             $this->storageRepository = GeneralUtility::makeInstance(StorageRepository::class);
@@ -89,7 +102,12 @@ class ImportEventsCommand extends Command implements LoggerAwareInterface
         $this->host = $this->extConfig['host'];
         $this->fileNameForRunCheck = sys_get_temp_dir() . '/evangelischeTermine_' . sha1($this->host) . '.txt';
 
-        $this->logger = GeneralUtility::makeInstance(LogManager::class)->getLogger(__CLASS__);
+        $this->setRedirects = $this->extConfig['setRedirects'] ?? false;
+        $this->pagesWithPlugin = $this->getPagesWithPlugin();
+
+        /** @var LogManager $logManager */
+        $logManager = GeneralUtility::makeInstance(LogManager::class);
+        $this->logger = $logManager->getLogger(__CLASS__);
     }
 
     public function configure(): void
@@ -98,7 +116,7 @@ class ImportEventsCommand extends Command implements LoggerAwareInterface
             ->addOption('vids', null, InputOption::VALUE_OPTIONAL, 'Only import events with these vids ("Veranstalter-Ids", comma-separated)')
             ->addOption('debug', null, InputOption::VALUE_NONE, 'Use the Console Logger (add -vv or -vvv to actually get the messages)')
             ->addOption('removelock', null, InputOption::VALUE_NONE, 'Remove the lock file')
-             ->setHelp('vendor/bin/typo3 evangtermine:importevents');
+            ->setHelp('vendor/bin/typo3 evangtermine:importevents');
     }
 
     /**
@@ -249,6 +267,8 @@ class ImportEventsCommand extends Command implements LoggerAwareInterface
         $state = RecordStateFactory::forName('tx_evangtermine_domain_model_event')
             ->fromArray($event, $event['pid'], $uid);
         $slug = $this->slugHelper->generate($event, $event['pid']);
+
+        $this->deleteRedirectEntries($slug);
         return $this->slugHelper->buildSlugForUniqueInTable($slug, $state);
     }
 
@@ -314,11 +334,11 @@ class ImportEventsCommand extends Command implements LoggerAwareInterface
             $this->allIds[] = $id;
             $hash = sha1($item->asXML());
             $res = GeneralUtility::makeInstance(ConnectionPool::class)->getConnectionForTable('tx_evangtermine_domain_model_event')
-                                 ->select(
-                                     [ 'hash' ],
-                                     'tx_evangtermine_domain_model_event',
-                                     ['id' => $id]
-                                 );
+                ->select(
+                    [ 'hash' ],
+                    'tx_evangtermine_domain_model_event',
+                    ['id' => $id]
+                );
             $row = $res->fetchAssociative();
             if (!$row || $row['hash'] !== $hash) {
                 //new or updated
@@ -361,7 +381,7 @@ class ImportEventsCommand extends Command implements LoggerAwareInterface
     {
         $queryBuilder = $this->connectionPool->getQueryBuilderForTable('tx_evangtermine_domain_model_event');
         $statement = $queryBuilder->select('*')
-                                  ->from('tx_evangtermine_domain_model_event')->where($queryBuilder->expr()->eq('id', $queryBuilder->createNamedParameter($event['id'])))->executeQuery();
+            ->from('tx_evangtermine_domain_model_event')->where($queryBuilder->expr()->eq('id', $queryBuilder->createNamedParameter($event['id'])))->executeQuery();
         $eventFromDB = $statement->fetchAssociative();
         if (!empty($itemField)) {
             if (str_starts_with($itemField, '//')) {
@@ -369,11 +389,11 @@ class ImportEventsCommand extends Command implements LoggerAwareInterface
             }
         }
         $this->connectionPool->getConnectionForTable('tx_evangtermine_domain_model_event')
-         ->update(
-             'tx_evangtermine_domain_model_event',
-             [$eventField => $itemField],
-             ['uid' => $eventFromDB['uid']]
-         );
+            ->update(
+                'tx_evangtermine_domain_model_event',
+                [$eventField => $itemField],
+                ['uid' => $eventFromDB['uid']]
+            );
     }
 
     protected function setHighlight(string $highlight): int
@@ -424,7 +444,7 @@ class ImportEventsCommand extends Command implements LoggerAwareInterface
     protected function deleteEvents(OutputInterface $output): void
     {
         $queryBuilder = $this->connectionPool->getQueryBuilderForTable('tx_evangtermine_domain_model_event');
-        $statement = $queryBuilder->select('uid')
+        $statement = $queryBuilder->select('*')
             ->from('tx_evangtermine_domain_model_event')
             ->where(
                 $queryBuilder->expr()->lte('start', time()),
@@ -434,6 +454,7 @@ class ImportEventsCommand extends Command implements LoggerAwareInterface
         $events = $statement->fetchAllAssociative();
 
         foreach ($events as $event) {
+            $this->createRedirectEntries($event['slug'] ?? '');
             $this->connectionPool->getConnectionForTable('tx_evangtermine_domain_model_event')
                 ->delete(
                     'tx_evangtermine_domain_model_event', // from
@@ -463,7 +484,8 @@ class ImportEventsCommand extends Command implements LoggerAwareInterface
         $progressBar = new ProgressBar($output, count($events));
 
         foreach ($events as $event) {
-            $this->logger->debug(sprintf('Deleting %s %s', $event['uid'], $event['title']));
+            $this->createRedirectEntries($event['slug'] ?? '');
+            $this->logger->debug(sprintf('Deleting %s %s', $event['uid'] ?? '', $event['title'] ?? ''));
             // delete the event if it is not found in the API
             $this->connectionPool->getConnectionForTable('tx_evangtermine_domain_model_event')
                 ->delete(
@@ -473,6 +495,53 @@ class ImportEventsCommand extends Command implements LoggerAwareInterface
             $progressBar->advance();
         }
         $progressBar->finish();
+    }
+
+    protected function createRedirectEntries(string $slug): void
+    {
+        if (!$this->setRedirects) {
+            return;
+        }
+        if (empty($slug)) {
+            return;
+        }
+        foreach ($this->pagesWithPlugin as $page) {
+            $sysRedirectData = [
+                'pid' => $page['uid'],
+                'updatedon' => time(),
+                'createdon' => time(),
+                'createdby' => 0,
+                'target_statuscode' => 301,
+                'source_host' => $page['domain'],
+                'source_path' => $page['slug'] . $page['detailPageSlugPart'] . $slug,
+                'target' => sprintf('t3://page?uid=%d&_language=0', $page['uid']),
+                'description' => $this->redirectDescription,
+            ];
+            $this->connectionPool->getConnectionForTable('sys_redirect')
+                ->insert(
+                    'sys_redirect',
+                    $sysRedirectData,
+                );
+        }
+    }
+
+    protected function deleteRedirectEntries(string $slug): void
+    {
+        if (!$this->setRedirects) {
+            return;
+        }
+        if (empty($slug)) {
+            return;
+        }
+        if (!empty($this->redirectDescription)) {
+            $queryBuilder = $this->connectionPool->getQueryBuilderForTable('sys_redirect');
+            $queryBuilder->delete('sys_redirect')
+                ->where(
+                    $queryBuilder->expr()->like('source_path', $queryBuilder->createNamedParameter('%' . $queryBuilder->escapeLikeWildcards($this->detailPageSlugPart . $slug))),
+                    $queryBuilder->expr()->eq('description', $queryBuilder->createNamedParameter($this->redirectDescription))
+                );
+            $queryBuilder->executeStatement();
+        }
     }
 
     /**
@@ -538,7 +607,7 @@ class ImportEventsCommand extends Command implements LoggerAwareInterface
     protected function limitRequestToVids(InputInterface $input, string $urlForMetaData, string $urlMainPart): array
     {
         $vids = $input->getOption('vids');
-        $vidsArray = explode(',', $vids);
+        $vidsArray = explode(',', $vids ?? '');
         $vidString = '';
         foreach ($vidsArray as $vid) {
             if (is_numeric(trim($vid))) {
@@ -551,5 +620,44 @@ class ImportEventsCommand extends Command implements LoggerAwareInterface
             $urlMainPart .= $vidString;
         }
         return [$urlForMetaData, $urlMainPart];
+    }
+
+    /**
+     * @throws \Doctrine\DBAL\Exception
+     * @throws SiteNotFoundException
+     */
+    protected function getPagesWithPlugin(): array
+    {
+        $queryBuilder = $this->connectionPool->getQueryBuilderForTable('tt_content');
+        $queryBuilder->select('*')
+            ->from('tt_content')
+            ->where(
+                $queryBuilder->expr()->eq('list_type', $queryBuilder->createNamedParameter('evangtermine_list'))
+            );
+        $plugins = $queryBuilder->executeQuery()->fetchAllAssociative();
+        $pages = [];
+        foreach ($plugins as $plugin) {
+            $site = $this->siteFinder->getSiteByPageId($plugin['pid']);
+            $host = $site->getBase()->getHost();
+            if (!empty($host)) {
+                $pages[$plugin['pid']] = [
+                    'uid' => $plugin['pid'],
+                    'rootPageUid' => $site->getRootPageId(),
+                    'domain' => $host,
+                    'detailPageSlugPart' => $this->detailPageSlugPart,
+                ];
+            }
+        }
+        foreach ($pages as $pageUid => $page) {
+            $queryBuilder = $this->connectionPool->getQueryBuilderForTable('pages');
+            $queryBuilder->select('*')
+                ->from('pages')
+                ->where(
+                    $queryBuilder->expr()->eq('uid', $queryBuilder->createNamedParameter($pageUid))
+                );
+            $pageData = $queryBuilder->executeQuery()->fetchAssociative();
+            $pages[$pageUid]['slug'] = $pageData['slug'];
+        }
+        return $pages;
     }
 }

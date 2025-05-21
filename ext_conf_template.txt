@@ -6,3 +6,6 @@ mode = Veranstalter/xml.php
 
 # cat=basic; type=string; label=Speicherort der Bilder in der Dateiliste
 imageFolder = /evangtermine/
+
+# cat=basic; type=boolean; label=Weiterleitungen für alte Termine anlegen
+setRedirects = false
