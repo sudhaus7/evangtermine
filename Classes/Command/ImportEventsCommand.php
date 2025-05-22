@@ -637,15 +637,19 @@ class ImportEventsCommand extends Command implements LoggerAwareInterface
         $plugins = $queryBuilder->executeQuery()->fetchAllAssociative();
         $pages = [];
         foreach ($plugins as $plugin) {
-            $site = $this->siteFinder->getSiteByPageId($plugin['pid']);
-            $host = $site->getBase()->getHost();
-            if (!empty($host)) {
-                $pages[$plugin['pid']] = [
-                    'uid' => $plugin['pid'],
-                    'rootPageUid' => $site->getRootPageId(),
-                    'domain' => $host,
-                    'detailPageSlugPart' => $this->detailPageSlugPart,
-                ];
+            try {
+                $site = $this->siteFinder->getSiteByPageId($plugin['pid']);
+                $host = $site->getBase()->getHost();
+                if (!empty($host)) {
+                    $pages[$plugin['pid']] = [
+                        'uid' => $plugin['pid'],
+                        'rootPageUid' => $site->getRootPageId(),
+                        'domain' => $host,
+                        'detailPageSlugPart' => $this->detailPageSlugPart,
+                    ];
+                }
+            } catch (\Exception $e) {
+
             }
         }
         foreach ($pages as $pageUid => $page) {
@@ -656,7 +660,11 @@ class ImportEventsCommand extends Command implements LoggerAwareInterface
                     $queryBuilder->expr()->eq('uid', $queryBuilder->createNamedParameter($pageUid))
                 );
             $pageData = $queryBuilder->executeQuery()->fetchAssociative();
-            $pages[$pageUid]['slug'] = $pageData['slug'];
+            if (!empty($pageData['slug'])) {
+                $pages[$pageUid]['slug'] = $pageData['slug'];
+            } else {
+                unset($pages[$pageUid]);
+            }
         }
         return $pages;
     }
