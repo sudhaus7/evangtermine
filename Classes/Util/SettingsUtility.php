@@ -50,7 +50,7 @@ class SettingsUtility
      * @param array $settingsArray
      * @param EtKeys $etks
      */
-    public function fetchParamsFromSettings(array $settingsArray, EtKeys $etks)
+    public function fetchParamsFromSettings(array $settingsArray, EtKeys $etks): void
     {
         foreach ($settingsArray as $key => $value) {
             if (substr($key, 0, 6) == 'etkey_' && $value != '') {
@@ -81,7 +81,7 @@ class SettingsUtility
      * @param array $requestParams
      * @param EtKeys $etks
      */
-    public function fetchParamsFromRequest(array $requestParams, EtKeys $etks)
+    public function fetchParamsFromRequest(array $requestParams, EtKeys $etks): void
     {
         foreach ($requestParams as $key => $value) {
             if (empty($value) || $value == '0' || $value == 'all') {
@@ -90,6 +90,26 @@ class SettingsUtility
             $targetMethod = 'set' . ucfirst($key);
             if (method_exists($etks, $targetMethod)) {
                 $etks->{$targetMethod}($value);
+            }
+        }
+    }
+
+    public function setDestination(array &$settingsArray): void
+    {
+        $stringForOnlyInternEvents = 'dest=öffentlich';
+        $addParams = $settingsArray['evt_addprms'] ?? '';
+        if (empty($addParams)) {
+            $settingsArray['evt_addprms'] = $stringForOnlyInternEvents;
+        } else {
+            $addParamsArray = explode('&', $settingsArray['evt_addprms']);
+            $destFound = false;
+            foreach ($addParamsArray as $addParam) {
+                if (str_starts_with($addParam, 'dest=')) {
+                    $destFound = true;
+                }
+            }
+            if (!$destFound) {
+                $settingsArray['evt_addprms'] .= '&' . $stringForOnlyInternEvents;
             }
         }
     }

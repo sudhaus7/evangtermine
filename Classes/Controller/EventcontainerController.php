@@ -122,6 +122,16 @@ class EventcontainerController extends ActionController
         $this->pager = GeneralUtility::makeInstance(Etpager::class);
     }
 
+    protected function initializeListAction(): void
+    {
+        $this->settingsUtility->setDestination($this->settings);
+    }
+
+    protected function initializeTeaserAction(): void
+    {
+        $this->settingsUtility->setDestination($this->settings);
+    }
+
     /**
      * create new Etkeys object and load Settings
      * @return EtKeys $etkeys
@@ -474,6 +484,26 @@ class EventcontainerController extends ActionController
             return true;
         }
         return false;
+    }
+
+    protected function setDestination(): void
+    {
+        $stringForOnlyInternEvents = 'dest=öffentlich';
+        $addParams = $this->settings['evt_addprms'] ?? '';
+        if (empty($addParams)) {
+            $this->settings['evt_addprms'] = $stringForOnlyInternEvents;
+        } else {
+            $addParamsArray = explode('&', $this->settings['evt_addprms']);
+            $destFound = false;
+            foreach ($addParamsArray as $addParam) {
+                if (str_starts_with($addParam, 'dest=')) {
+                    $destFound = true;
+                }
+            }
+            if (!$destFound) {
+                $this->settings['evt_addprms'] .= '&' . $stringForOnlyInternEvents;
+            }
+        }
     }
 
     /**
