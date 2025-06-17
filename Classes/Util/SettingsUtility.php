@@ -93,4 +93,24 @@ class SettingsUtility
             }
         }
     }
+
+    public function setDestination(array &$settingsArray): void
+    {
+        $stringForOnlyInternEvents = 'dest=öffentlich';
+        $addParams = $settingsArray['evt_addprms'] ?? '';
+        if (empty($addParams)) {
+            $settingsArray['evt_addprms'] = $stringForOnlyInternEvents;
+        } else {
+            $addParamsArray = explode('&', $settingsArray['evt_addprms']);
+            $destFound = false;
+            foreach ($addParamsArray as $addParam) {
+                if (str_starts_with($addParam, 'dest=')) {
+                    $destFound = true;
+                }
+            }
+            if (!$destFound) {
+                $settingsArray['evt_addprms'] .= '&' . $stringForOnlyInternEvents;
+            }
+        }
+    }
 }

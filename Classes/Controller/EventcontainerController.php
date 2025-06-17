@@ -78,6 +78,16 @@ class EventcontainerController extends ActionController
         $this->pager = GeneralUtility::makeInstance(Etpager::class);
     }
 
+    protected function initializeListAction(): void
+    {
+        $this->settingsUtility->setDestination($this->settings);
+    }
+
+    protected function initializeTeaserAction(): void
+    {
+        $this->settingsUtility->setDestination($this->settings);
+    }
+
     /**
      * create new Etkeys object and load Settings
      * @return EtKeys $etkeys
