@@ -102,9 +102,11 @@ CREATE TABLE tx_evangtermine_domain_model_event
 	user_image varchar(255) DEFAULT '' NOT NULL,
 	liturg_bez varchar(255) DEFAULT '' NOT NULL,
 	channels varchar(255) DEFAULT '' NOT NULL,
+	resources varchar(255) DEFAULT '' NOT NULL,
 	attributes text,
 	slug varchar(255) DEFAULT '' NOT NULL,
-    hash varchar(40) DEFAULT '' NOT NULL,
+	hash varchar(40) DEFAULT '' NOT NULL,
+	output_order text,
 
 	index index_start (start),
 	index index_end (end),
@@ -118,6 +120,6 @@ CREATE TABLE tx_evangtermine_domain_model_event
 	index index_place_zip (place_zip),
 	index index_place_city (place_city),
 	index index_slug (slug),
-    index index_id (id)
+	index index_id (id)
 );
 

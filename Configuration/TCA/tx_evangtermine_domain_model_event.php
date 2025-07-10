@@ -24,7 +24,7 @@ return [
     ],
     'palettes' => [
         'general' => [
-            'showitem' => 'hidden,--linebreak--,id,--linebreak--,hash,--linebreak--,title,--linebreak--,subtitle,--linebreak--,liturg_bez,--linebreak--,email,link,--linebreak--,short_description,--linebreak--,long_description,--linebreak--,image,caption,--linebreak--,highlight,--linebreak--,people,--linebreak--,categories,--linebreak--feedback_id,--linebreak--,poll_id,webform_linkname,--linebreak--,event_modified,--linebreak--,channels,--linebreak--,slug',
+            'showitem' => 'hidden,--linebreak--,id,--linebreak--,hash,--linebreak--,title,--linebreak--,subtitle,--linebreak--,liturg_bez,--linebreak--,email,link,--linebreak--,short_description,--linebreak--,long_description,--linebreak--,image,caption,--linebreak--,highlight,--linebreak--,people,--linebreak--,categories,--linebreak--feedback_id,--linebreak--,poll_id,webform_linkname,--linebreak--,event_modified,--linebreak--,channels,--linebreak--,resources,--linebreak--,slug',
         ],
         'date' => [
             'showitem' => 'start,end,--linebreak--,mode,--linebreak--,datum1,datum2,--linebreak--,monthbar,allday',
@@ -48,7 +48,7 @@ return [
             'showitem' => 'textbox1,textbox2,--linebreak--,textbox3,--linebreak--,textline1,textline2,--linebreak--,textline3,textline4,--linebreak--,textline5,textline6,--linebreak--,textline7,textline8',
         ],
         'attributes' => [
-            'showitem' => 'attributes',
+            'showitem' => 'attributes,output_order',
         ],
     ],
     'types' => [
@@ -1045,8 +1045,26 @@ return [
                 'readOnly' => true,
             ],
         ],
+        'resources' => [
+            'exclude' => 1,
+            'label' => 'Ressourcen',
+            'config' => [
+                'type' => 'input',
+                'eval' => 'trim',
+                'readOnly' => true,
+            ],
+        ],
         'attributes' => [
             'label' => 'Attribute',
+            'config' => [
+                'type' => 'text',
+                'cols' => 60,
+                'rows' => 5,
+                'readOnly' => true,
+            ],
+        ],
+        'output_order' => [
+            'label' => 'Ausgabereihenfolge',
             'config' => [
                 'type' => 'text',
                 'cols' => 60,

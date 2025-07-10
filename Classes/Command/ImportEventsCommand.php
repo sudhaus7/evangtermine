@@ -253,6 +253,8 @@ class ImportEventsCommand extends Command implements LoggerAwareInterface
                 }
             }
 
+            $event['output_order'] = $this->createOutputOrderEntry($item, $fields);
+
             $queryBuilder = $this->connectionPool->getQueryBuilderForTable('tx_evangtermine_domain_model_event');
             $uid = $queryBuilder->select('uid')
                 ->from('tx_evangtermine_domain_model_event')
@@ -297,6 +299,18 @@ class ImportEventsCommand extends Command implements LoggerAwareInterface
 
         $this->logger->debug(sprintf('Host %s: Import finished', $this->host));
         $progressBar->finish();
+    }
+
+    protected function createOutputOrderEntry(array $item, array $fields): string
+    {
+        $array = [];
+        foreach ($item['_inputmask_FIELDS'] ?? [] as $key => $value) {
+            $val = array_search($key, $fields);
+            if (!empty($val)) {
+                $array[] = $val;
+            }
+        }
+        return json_encode($array);
     }
 
     /**
