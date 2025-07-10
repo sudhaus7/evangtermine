@@ -112,7 +112,9 @@ class Event extends AbstractEntity
     protected string $userImage = '';
     protected string $liturgBez = '';
     protected string $channels = '';
+    protected string $resources = '';
     protected string $attributes = '';
+    protected string $outputOrder = '';
     protected string $slug = '';
 
     public function getId(): string
@@ -1174,6 +1176,16 @@ class Event extends AbstractEntity
         $this->channels = $channels;
     }
 
+    public function getResources(): string
+    {
+        return $this->resources;
+    }
+
+    public function setResources(string $resources): void
+    {
+        $this->resources = $resources;
+    }
+
     public function getAttributes(): string
     {
         return $this->attributes;
@@ -1196,6 +1208,24 @@ class Event extends AbstractEntity
     public function setAttributes(string $attributes): void
     {
         $this->attributes = $attributes;
+    }
+
+    public function getOutputOrder(): string
+    {
+        return $this->outputOrder;
+    }
+
+    public function setOutputOrder(string $outputOrder): void
+    {
+        $this->outputOrder = $outputOrder;
+    }
+
+    public function getOutputOrderAsArray(): array
+    {
+        if (empty($this->outputOrder)) {
+            return [];
+        }
+        return json_decode($this->outputOrder, true);
     }
 
     public function getSlug(): string
