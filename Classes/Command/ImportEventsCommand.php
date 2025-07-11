@@ -246,6 +246,9 @@ class ImportEventsCommand extends Command implements LoggerAwareInterface
                         case '_event_HIGHLIGHT':
                             $event[$key] =  $this->setHighlight($value);
                             break;
+                        case 'RESOURCES':
+                            $event[$key] =  $this->setResources($value);
+                            break;
                         default:
                             $event[$key] = $value;
                             break;
@@ -468,6 +471,25 @@ class ImportEventsCommand extends Command implements LoggerAwareInterface
             default:
                 return 0;
         }
+    }
+
+    protected function setResources(SimpleXMLElement $resources): string
+    {
+        $xmlObj = $resources->RES ?? null;
+        if (!empty($xmlObj)) {
+            $resourcesArray = [];
+
+            $attributes = ['name', 'descr', 'label', 'image'];
+            foreach ($attributes as $attribute) {
+                if (!empty($xmlObj->$attribute ?? '')) {
+                    $obj = $xmlObj->$attribute;
+                    $array = (array)$obj;
+                    $resourcesArray[$attribute] = $array[0] ?? '';
+                }
+            }
+            return json_encode($resourcesArray);
+        }
+        return '';
     }
 
     protected function setCategories(string $categories): string

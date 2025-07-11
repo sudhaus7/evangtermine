@@ -1186,6 +1186,14 @@ class Event extends AbstractEntity
         $this->resources = $resources;
     }
 
+    public function getResourcesAsArray(): array
+    {
+        if (empty($this->resources)) {
+            return [];
+        }
+        return json_decode($this->resources, true);
+    }
+
     public function getAttributes(): string
     {
         return $this->attributes;
