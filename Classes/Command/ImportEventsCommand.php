@@ -212,6 +212,7 @@ class ImportEventsCommand extends Command implements LoggerAwareInterface
                         '_event_EVENTTYPE' => $this->setCategories($value),
                         '_event_PEOPLE' => $this->setPeople($value),
                         '_event_HIGHLIGHT' => $this->setHighlight($value),
+                        'RESOURCES' => $this->setResources($value),
                         default => $value,
                     };
                 }
@@ -418,6 +419,25 @@ class ImportEventsCommand extends Command implements LoggerAwareInterface
             'rhigh' => 3,
             default => 0,
         };
+    }
+
+    protected function setResources(SimpleXMLElement $resources): string
+    {
+        $xmlObj = $resources->RES ?? null;
+        if (!empty($xmlObj)) {
+            $resourcesArray = [];
+
+            $attributes = ['name', 'descr', 'label', 'image'];
+            foreach ($attributes as $attribute) {
+                if (!empty($xmlObj->$attribute ?? '')) {
+                    $obj = $xmlObj->$attribute;
+                    $array = (array)$obj;
+                    $resourcesArray[$attribute] = $array[0] ?? '';
+                }
+            }
+            return json_encode($resourcesArray);
+        }
+        return '';
     }
 
     protected function setCategories(string $categories): string
