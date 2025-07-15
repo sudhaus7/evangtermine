@@ -325,9 +325,9 @@ class ImportEventsCommand extends Command implements LoggerAwareInterface
         $state = RecordStateFactory::forName('tx_evangtermine_domain_model_event')
             ->fromArray($event, $event['pid'], $uid);
         $slug = $this->slugHelper->generate($event, $event['pid']);
-
+        $slug = $this->slugHelper->buildSlugForUniqueInTable($slug, $state);
         $this->deleteRedirectEntries($slug);
-        return $this->slugHelper->buildSlugForUniqueInTable($slug, $state);
+        return $slug;
     }
 
     /**
