@@ -221,9 +221,11 @@ class ImportEventsCommand extends Command implements LoggerAwareInterface
             $event['output_order'] = $this->createOutputOrderEntry($item, $fields);
 
             $queryBuilder = $this->connectionPool->getQueryBuilderForTable('tx_evangtermine_domain_model_event');
-            $uid = $queryBuilder->select('uid')
-                ->from('tx_evangtermine_domain_model_event')->where($queryBuilder->expr()->eq('id', $queryBuilder->createNamedParameter($event['id'])))->executeQuery()
-                ->fetchOne();
+            $queryBuilder->select('uid')
+                ->from(
+                    'tx_evangtermine_domain_model_event')->where($queryBuilder->expr()->eq('id', $queryBuilder->createNamedParameter($event['id']))
+                );
+            $uid = $queryBuilder->executeQuery()->fetchOne();
 
             if (!empty($uid)) {
                 $event['slug'] = $this->createSlug($event, (int)$uid);
@@ -276,6 +278,7 @@ class ImportEventsCommand extends Command implements LoggerAwareInterface
 
     /**
      * @throws SiteNotFoundException
+     * @throws \Doctrine\DBAL\Exception
      */
     protected function createSlug(array $event, $uid): string
     {
@@ -283,7 +286,28 @@ class ImportEventsCommand extends Command implements LoggerAwareInterface
             ->fromArray($event, $event['pid'], $uid);
         $slug = $this->slugHelper->generate($event, $event['pid']);
         $slug = $this->slugHelper->buildSlugForUniqueInTable($slug, $state);
+        $slug = $this->checkSlugForDuplicates($slug, $uid);
         $this->deleteRedirectEntries($slug);
+        return $slug;
+    }
+
+    /**
+     * @throws \Doctrine\DBAL\Exception
+     */
+    private function checkSlugForDuplicates(string $slug, $uid): string
+    {
+        $queryBuilder = $this->connectionPool->getQueryBuilderForTable('tx_evangtermine_domain_model_event');
+        $queryBuilder->count('uid')
+            ->from('tx_evangtermine_domain_model_event')
+            ->where(
+                $queryBuilder->expr()->eq('slug', $queryBuilder->createNamedParameter($slug)),
+                $queryBuilder->expr()->neq('uid', $queryBuilder->createNamedParameter($uid))
+            );
+        $count = $queryBuilder->executeQuery()->fetchOne();
+
+        if ($count > 0) {
+            return $slug . mt_rand();
+        }
         return $slug;
     }
 
