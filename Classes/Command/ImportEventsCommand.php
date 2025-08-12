@@ -326,7 +326,25 @@ class ImportEventsCommand extends Command implements LoggerAwareInterface
             ->fromArray($event, $event['pid'], $uid);
         $slug = $this->slugHelper->generate($event, $event['pid']);
         $slug = $this->slugHelper->buildSlugForUniqueInTable($slug, $state);
+        $slug = $this->checkSlugForDuplicates($slug, $uid);
         $this->deleteRedirectEntries($slug);
+        return $slug;
+    }
+
+    private function checkSlugForDuplicates(string $slug, $uid): string
+    {
+        $queryBuilder = $this->connectionPool->getQueryBuilderForTable('tx_evangtermine_domain_model_event');
+        $queryBuilder->count('uid')
+            ->from('tx_evangtermine_domain_model_event')
+            ->where(
+                $queryBuilder->expr()->eq('slug', $queryBuilder->createNamedParameter($slug)),
+                $queryBuilder->expr()->neq('uid', $queryBuilder->createNamedParameter($uid))
+            );
+        $count = $queryBuilder->executeQuery()->fetchOne();
+
+        if ($count > 0) {
+            return $slug . mt_rand();
+        }
         return $slug;
     }
 
