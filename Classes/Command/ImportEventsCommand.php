@@ -131,7 +131,6 @@ class ImportEventsCommand extends Command implements LoggerAwareInterface
         $this->host = $this->extConfig['host'];
         $this->fileNameForRunCheck = sys_get_temp_dir() . '/evangelischeTermine_' . sha1($this->host) . '.txt';
 
-        $this->setRedirects = $this->extConfig['setRedirects'] ?? false;
         $this->pagesWithPlugin = $this->getPagesWithPlugin();
 
         $this->logger = GeneralUtility::makeInstance(LogManager::class)->getLogger(__CLASS__);
@@ -327,7 +326,7 @@ class ImportEventsCommand extends Command implements LoggerAwareInterface
         $slug = $this->slugHelper->generate($event, $event['pid']);
         $slug = $this->slugHelper->buildSlugForUniqueInTable($slug, $state);
         $slug = $this->checkSlugForDuplicates($slug, $uid);
-        $this->deleteRedirectEntries($slug);
+        //$this->deleteRedirectEntries($slug);
         return $slug;
     }
 
@@ -599,7 +598,7 @@ class ImportEventsCommand extends Command implements LoggerAwareInterface
         $events = $statement->fetchAllAssociative();
 
         foreach ($events as $event) {
-            $this->createRedirectEntries($event['slug'] ?? '');
+            //$this->createRedirectEntries($event['slug'] ?? '');
             $this->connectionPool->getConnectionForTable('tx_evangtermine_domain_model_event')
                 ->delete(
                     'tx_evangtermine_domain_model_event', // from
@@ -630,7 +629,7 @@ class ImportEventsCommand extends Command implements LoggerAwareInterface
         $progressBar = new ProgressBar($output, count($events));
 
         foreach ($events as $event) {
-            $this->createRedirectEntries($event['slug'] ?? '');
+            //$this->createRedirectEntries($event['slug'] ?? '');
             $this->logger->debug(sprintf('Deleting %s %s', $event['uid'], $event['title']));
             // delete the event if it is not found in the API
             $this->connectionPool->getConnectionForTable('tx_evangtermine_domain_model_event')
