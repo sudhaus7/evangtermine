@@ -81,6 +81,7 @@ class EtKeys extends AbstractValueObject
         'yesno2',
         'until',
         'encoding',
+        'ID',
         'redius',
     ];
 

@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * This file is part of the TYPO3 project.
  *
@@ -14,25 +16,20 @@
 namespace ArbkomEKvW\Evangtermine\Controller;
 
 use ArbkomEKvW\Evangtermine\Domain\Model\EtKeys;
-use ArbkomEKvW\Evangtermine\Domain\Model\Event;
-use ArbkomEKvW\Evangtermine\Domain\Repository\EventcontainerRepository;
-use ArbkomEKvW\Evangtermine\Domain\Repository\EventRepository;
 use ArbkomEKvW\Evangtermine\Event\ModifyEvangTermineShowActionViewEvent;
-use ArbkomEKvW\Evangtermine\Util\Etpager;
+use ArbkomEKvW\Evangtermine\Services\DetailPageService;
+use ArbkomEKvW\Evangtermine\Services\Events\EventsServiceInterface;
 use ArbkomEKvW\Evangtermine\Util\ExtConf;
 use ArbkomEKvW\Evangtermine\Util\SettingsUtility;
-use Doctrine\DBAL\Driver\Exception;
+use Doctrine\DBAL\Exception;
 use Psr\Http\Message\ResponseInterface;
 use TYPO3\CMS\Core\Cache\CacheManager;
 use TYPO3\CMS\Core\Cache\Exception\NoSuchCacheException;
-use TYPO3\CMS\Core\Database\ConnectionPool;
+use TYPO3\CMS\Core\Cache\Frontend\FrontendInterface;
+use TYPO3\CMS\Core\Type\ContextualFeedbackSeverity;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 use TYPO3\CMS\Extbase\Configuration\BackendConfigurationManager;
 use TYPO3\CMS\Extbase\Mvc\Controller\ActionController;
-use TYPO3\CMS\Extbase\Mvc\Exception\InvalidControllerNameException;
-use TYPO3\CMS\Extbase\Mvc\Request;
-use TYPO3\CMS\Extbase\Persistence\Generic\Exception\UnexpectedTypeException;
-use TYPO3\CMS\Fluid\Core\Rendering\RenderingContext;
 use TYPO3\CMS\Fluid\Core\Rendering\RenderingContextFactory;
 use TYPO3\CMS\Fluid\View\TemplatePaths;
 use TYPO3\CMS\Fluid\View\TemplateView;
@@ -44,8 +41,7 @@ class EventcontainerController extends ActionController
 {
     protected CacheManager $cacheManager;
     protected \DateTime $date;
-    protected EventcontainerRepository $eventcontainerRepository;
-    protected EventRepository $eventRepository;
+    protected RenderingContextFactory $renderingContextFactory;
 
     /**
      * Uid value of current tt_content record
@@ -56,26 +52,22 @@ class EventcontainerController extends ActionController
     private SettingsUtility $settingsUtility;
 
     private EtKeys $etkeys;
+    private ExtConf $extconf;
+    private bool $importEvents;
 
-    private Etpager $pager;
-
-    private RenderingContext $renderingContext;
-
-    public function __construct(CacheManager $cacheManager, SettingsUtility $settingsUtility, EventcontainerRepository $eventcontainerRepository, EventRepository $eventRepository, RenderingContextFactory $renderingContextFactory)
+    public function __construct(private readonly EventsServiceInterface $eventsService, private readonly DetailPageService $detailPageService, CacheManager $cacheManager, SettingsUtility $settingsUtility, RenderingContextFactory $renderingContextFactory)
     {
         $this->cacheManager = $cacheManager;
         $this->date = new \DateTime();
         $this->settingsUtility = $settingsUtility;
-        $this->eventcontainerRepository = $eventcontainerRepository;
-        $this->eventRepository = $eventRepository;
         $this->renderingContextFactory = $renderingContextFactory;
+        $this->extconf = GeneralUtility::makeInstance(ExtConf::class);
+        $this->importEvents = (bool)$this->extconf->getExtConfArray()['importEvents'];
     }
 
     protected function initializeAction(): void
     {
         $this->currentPluginUid = $this->request->getAttribute('currentContentObject')->data['uid'];
-        $this->etkeys = GeneralUtility::makeInstance(EtKeys::class);
-        $this->pager = GeneralUtility::makeInstance(Etpager::class);
     }
 
     protected function initializeListAction(): void
@@ -104,17 +96,15 @@ class EventcontainerController extends ActionController
 
     /**
      * action list
-     * - must collect all parameters (etKeys) from config-settings, session and request
+     * - must collect all parameters (etkeys) from config-settings, session and request
      * - update session
-     * - retrieve XML data
+     * - retrieve Event data (from XML or DB)
      * - hand it to view
      * @return ResponseInterface
-     * @throws Exception
      * @throws NoSuchCacheException
-     * @throws UnexpectedTypeException
-     * @throws \Doctrine\DBAL\Exception
+     * @throws Exception
      */
-    public function listAction(): \Psr\Http\Message\ResponseInterface
+    public function listAction(): ResponseInterface
     {
         $requestArguments = $this->request->getArguments();
         $formArguments = $requestArguments['etkeysForm'] ?? [];
@@ -140,55 +130,40 @@ class EventcontainerController extends ActionController
         $content = $cache->get($cacheKey);
 
         if (empty($content)) {
-            [$query, $queryConstraints] = $this->eventRepository->prepareFindByEtKeysQuery($this->etkeys, $this->settings['evt_addprms'] ?? '');
-            $nrOfEvents = 0;
-            if (!empty($query)) {
-                try {
-                    $events = $this->eventRepository->findByEtKeys($query, $this->etkeys);
-                    $nrOfEvents = $this->eventRepository->getNumberOfEventsByEtKeys($query);
-                } catch (\Exception $exception) {
-                }
-            }
-
-            // pager
-            $this->pager->up(
-                $nrOfEvents,
-                $this->etkeys->getItemsPerPage(),
-                $this->etkeys->getPageID()
-            );
-
             $data = $this->request->getAttribute('currentContentObject')->data;
+
+            [$events, $nrOfEvents] = $this->eventsService->getEvents($this->etkeys, $this->settings);
+            $pager = $this->eventsService->createPager($this->etkeys, $nrOfEvents);
+
+            // hand model data to the view
             $this->view->assignMultiple([
                 'events' => $events ?? [],
                 'nrOfEvents' => $nrOfEvents,
                 'etkeys' => $this->etkeys,
                 'pageId' => $GLOBALS['TSFE']->id,
                 'pluginUid' => $this->currentPluginUid,
-                'categoryList' => $this->eventRepository->findAllCategoriesWithEtKeys($this->settings, $this->currentPluginUid),
-                'groupList' => $this->eventRepository->findAllGroupsWithEtKeys($this->settings, $this->currentPluginUid),
-                'placeList' => $this->eventRepository->findAllPlacesWithEtKeys($this->settings, $this->currentPluginUid),
-                'regionList' => $this->eventRepository->findAllRegionsWithEtKeys($this->settings, $this->currentPluginUid),
-                'pagerdata' => $this->pager->getPgr(),
+                'categoryList' => $this->eventsService->getCategoryList($this->settings, $this->currentPluginUid),
+                'groupList' => $this->eventsService->getGroupList($this->settings, $this->currentPluginUid),
+                'placeList' => $this->eventsService->getPlaceList($this->settings, $this->currentPluginUid),
+                'regionList' => $this->eventsService->getRegionList($this->settings, $this->currentPluginUid),
+                'pagerdata' => $pager->getPgr(),
                 'data' => $data,
-                'detailPage' => $this->getDetailPage(),
-                'detailPagePluginUid' => $this->getDetailPagePluginUid($data),
+                'detailPage' => $this->detailPageService->getUid(),
+                'detailPagePluginUid' => $this->detailPageService->getPluginUid($data),
+                'importEvents' => $this->importEvents,
             ]);
 
             $content = $this->view->render();
-            if ($this->ifContentIsNotEmpty($content, $events ?? [])) {
-                $cache->set($cacheKey, $content);
-            }
+            $this->setCache($content, $events, $cache, $cacheKey);
         }
         return $this->htmlResponse($content);
     }
 
     /**
-     * @throws Exception
      * @throws NoSuchCacheException
-     * @throws UnexpectedTypeException
-     * @throws \Doctrine\DBAL\Exception
+     * @throws Exception
      */
-    public function teaserAction(): \Psr\Http\Message\ResponseInterface
+    public function teaserAction(): ResponseInterface
     {
         $this->etkeys = $this->getNewFromSettings();
         $data = $this->request->getAttribute('currentContentObject')->data;
@@ -198,55 +173,56 @@ class EventcontainerController extends ActionController
         $content = $cache->get($cacheKey);
 
         if (empty($content)) {
-            [$query, $queryConstraints] = $this->eventRepository->prepareFindByEtKeysQuery($this->etkeys, $this->settings['evt_addprms'] ?? '');
-            $events = $this->eventRepository->findByEtKeys($query, $this->etkeys);
+            [$events, $nrOfEvents] = $this->eventsService->getEvents($this->etkeys, $this->settings);
 
-            $this->view->assign('events', $events);
+            // hand model data to the view
+            $this->view->assign('events', $events ?? []);
             $this->view->assign('pageId', $GLOBALS['TSFE']->id);
             $this->view->assign('data', $data);
-            $this->view->assign('detailPage', $this->getDetailPage());
-            $this->view->assign('detailPagePluginUid', $this->getDetailPagePluginUid($data));
+            $this->view->assign('detailPage', $this->detailPageService->getUid());
+            $this->view->assign('detailPagePluginUid', $this->detailPageService->getPluginUid($data));
+            $this->view->assign('importEvents', $this->importEvents);
+
             $content = $this->view->render();
-            $cache->set($cacheKey, $content);
+            $this->setCache($content, $events, $cache, $cacheKey);
         }
         return $this->htmlResponse($content);
     }
 
     /**
      * action show
-     * @throws Exception
      * @throws NoSuchCacheException
-     * @throws UnexpectedTypeException
-     * @throws InvalidControllerNameException
-     * @throws \Doctrine\DBAL\Exception
+     * @throws Exception
      */
-    public function showAction(): \Psr\Http\Message\ResponseInterface
+    public function showAction(): ResponseInterface
     {
         $data = $this->request->getAttribute('currentContentObject')->data;
 
         // If the current plugin is a 'detail' plugin, or if it is the plugin in which the user clicked on a link.
         // We need this for multiple evang. Termine plugins on one site.
         if ($this->pluginIsDetailPlugin($data)) {
-            $extconf = GeneralUtility::makeInstance(ExtConf::class);
-            $uid = $this->request->getArguments()['uid'] ?? null;
+            $uid = $this->request->getArguments()['uid'] ?? $this->request->getArguments()['ID'] ?? null;
             if (!empty($uid)) {
-                /** @var Event $event */
-                $event = $this->eventRepository->findByUid($uid);
+                [$event, $meta, $detailItems] = $this->eventsService->findByUid($uid);
 
                 // hand model data to the view
                 $this->view->assign('event', $event);
-                $this->view->assign('eventhost', $extconf->getExtConfArray()['host']);
-                $this->view->assign('categoryList', $this->eventRepository->findAllCategoriesWithEtKeys($this->settings));
-                $this->view->assign('groupList', $this->eventRepository->findAllGroupsWithEtKeys($this->settings));
-                $this->view->assign('data', $this->request->getAttribute('currentContentObject')->data);
+                $this->view->assign('meta', $meta);
+                $this->view->assign('detailitems', $detailItems);
+                $this->view->assign('eventhost', $this->extconf->getExtConfArray()['host']);
+                $this->view->assign('categoryList', $this->eventsService->getCategoryList($this->settings, $this->currentPluginUid));
+                $this->view->assign('groupList', $this->eventsService->getGroupList($this->settings, $this->currentPluginUid));
+                $this->view->assign('data', $data);
+                $this->view->assign('importEvents', $this->importEvents);
 
-                if (!empty($event)) {
-                    $this->eventDispatcher->dispatch(
+                if (!empty($event) && !empty($eventDispatcher)) {
+                    $eventDispatcher->dispatch(
                         new ModifyEvangTermineShowActionViewEvent($this->view, $event)
                     );
                 }
+
             } else {
-                $this->addFlashMessage('Keine Event-ID übergeben', '', \TYPO3\CMS\Core\Type\ContextualFeedbackSeverity::ERROR);
+                $this->addFlashMessage('Keine Event-ID übergeben', '', ContextualFeedbackSeverity::ERROR);
                 $this->redirect('genericinfo');
             }
         } else {
@@ -263,7 +239,7 @@ class EventcontainerController extends ActionController
     /**
      * action genericinfo
      */
-    public function genericinfoAction(): \Psr\Http\Message\ResponseInterface
+    public function genericinfoAction(): ResponseInterface
     {
         return $this->htmlResponse();
     }
@@ -295,96 +271,6 @@ class EventcontainerController extends ActionController
         $renderingContext->setTemplatePaths($templatePaths);
         $this->view = GeneralUtility::makeInstance(TemplateView::class, $renderingContext);
         return $this->view;
-    }
-
-    /**
-     * @throws \Doctrine\DBAL\Exception
-     */
-    protected function getDetailPage(): int
-    {
-        $detailPage = $this->settings['opmode_detailpage'] ?? 0;
-        if (empty($detailPage)) {
-            return 0;
-        }
-
-        $connectionPool = GeneralUtility::makeInstance(ConnectionPool::class);
-        $queryBuilder = $connectionPool->getQueryBuilderForTable('tt_content');
-        $queryBuilder->select('*')
-            ->from('tt_content')
-            ->where(
-                $queryBuilder->expr()->eq('pid', $queryBuilder->createNamedParameter((int)$detailPage, \PDO::PARAM_INT)),
-                $queryBuilder->expr()->eq('list_type', $queryBuilder->createNamedParameter('evangtermine_detail'))
-            );
-        $result = $queryBuilder->executeQuery()->fetchAssociative();
-
-        if (empty($result)) {
-            $queryBuilder = $connectionPool->getQueryBuilderForTable('tt_content');
-            $queryBuilder->select('*')
-                ->from('tt_content')
-                ->where(
-                    $queryBuilder->expr()->eq('pid', $queryBuilder->createNamedParameter((int)$detailPage, \PDO::PARAM_INT)),
-                    $queryBuilder->expr()->eq('list_type', $queryBuilder->createNamedParameter('evangtermine_list'))
-                );
-            $result = $queryBuilder->executeQuery()->fetchAssociative();
-
-            if (empty($result)) {
-                return 0;
-            }
-
-            $flexFormArray = GeneralUtility::xml2array($result['pi_flexform']);
-            $detailPage = $flexFormArray['data']['opmode']['lDEF']['settings.opmode_detailpage']['vDEF'] ?? null;
-            if (is_numeric($detailPage)) {
-                return (int)$detailPage;
-            }
-        }
-        return (int)$detailPage;
-    }
-
-    /**
-     * @throws \Doctrine\DBAL\Exception
-     */
-    protected function getDetailPagePluginUid(array $data): int
-    {
-        $detailPage = $this->settings['opmode_detailpage'] ?? 0;
-        if (empty($detailPage)) {
-            if (is_array($data) && isset($data['uid'])) {
-                return $data['uid'];
-            }
-            return 0;
-        }
-
-        $connectionPool = GeneralUtility::makeInstance(ConnectionPool::class);
-        $queryBuilder = $connectionPool->getQueryBuilderForTable('tt_content');
-        $queryBuilder->select('*')
-            ->from('tt_content')
-            ->where(
-                $queryBuilder->expr()->eq('pid', $queryBuilder->createNamedParameter((int)$detailPage, \PDO::PARAM_INT)),
-                $queryBuilder->expr()->eq('list_type', $queryBuilder->createNamedParameter('evangtermine_detail'))
-            );
-        $result = $queryBuilder->executeQuery()->fetchAssociative();
-
-        if (!empty($result)) {
-            return (int)$result['uid'];
-        }
-
-        $queryBuilder = $connectionPool->getQueryBuilderForTable('tt_content');
-        $queryBuilder->select('*')
-            ->from('tt_content')
-            ->where(
-                $queryBuilder->expr()->eq('pid', $queryBuilder->createNamedParameter((int)$detailPage, \PDO::PARAM_INT)),
-                $queryBuilder->expr()->eq('list_type', $queryBuilder->createNamedParameter('evangtermine_list'))
-            );
-        $result = $queryBuilder->executeQuery()->fetchAssociative();
-
-        if (!empty($result)) {
-            $flexFormArray = GeneralUtility::xml2array($result['pi_flexform']);
-            $detailPage = $flexFormArray['data']['opmode']['lDEF']['settings.opmode_detailpage']['vDEF'] ?? null;
-            if (is_numeric($detailPage)) {
-                return (int)$detailPage;
-            }
-            return (int)$result['uid'];
-        }
-        return 0;
     }
 
     protected function ifContentIsNotEmpty(string $content, array $events): bool
@@ -447,5 +333,19 @@ class EventcontainerController extends ActionController
             . $this->date->format('YmdH') . '-'
             . ($this->date->format('i') - 30 > 0 ? '1' : '0')
             . '-' . $uid;
+    }
+
+    /**
+     * @param string $content
+     * @param mixed $events
+     * @param FrontendInterface $cache
+     * @param string $cacheKey
+     * @return void
+     */
+    protected function setCache(string $content, mixed $events, FrontendInterface $cache, string $cacheKey): void
+    {
+        if ($this->ifContentIsNotEmpty($content, $events ?? [])) {
+            $cache->set($cacheKey, $content);
+        }
     }
 }

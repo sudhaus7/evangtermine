@@ -81,6 +81,7 @@
                     <settings.etkey_regions>
                         <TCEforms>
                             <label>LLL:EXT:evangtermine/Resources/Private/Language/locallang.xlf:feflexform.regions</label>
+                            <description>LLL:EXT:evangtermine/Resources/Private/Language/locallang.xlf:feflexform.onlyForImportEvents</description>
                             <config>
                                 <type>select</type>
                                 <renderType>selectSingleBox</renderType>
@@ -93,6 +94,7 @@
                     <settings.etkey_subregions>
                         <TCEforms>
                             <label>LLL:EXT:evangtermine/Resources/Private/Language/locallang.xlf:feflexform.subregions</label>
+                            <description>LLL:EXT:evangtermine/Resources/Private/Language/locallang.xlf:feflexform.onlyForImportEvents</description>
                             <config>
                                 <type>select</type>
                                 <renderType>selectSingleBox</renderType>
@@ -105,6 +107,7 @@
                     <settings.etkey_region2>
                         <TCEforms>
                             <label>LLL:EXT:evangtermine/Resources/Private/Language/locallang.xlf:feflexform.regions2</label>
+                            <description>LLL:EXT:evangtermine/Resources/Private/Language/locallang.xlf:feflexform.onlyForImportEvents</description>
                             <config>
                                 <type>select</type>
                                 <renderType>selectSingleBox</renderType>
@@ -117,6 +120,7 @@
                     <settings.etkey_region3>
                         <TCEforms>
                             <label>LLL:EXT:evangtermine/Resources/Private/Language/locallang.xlf:feflexform.regions3</label>
+                            <description>LLL:EXT:evangtermine/Resources/Private/Language/locallang.xlf:feflexform.onlyForImportEvents</description>
                             <config>
                                 <type>select</type>
                                 <renderType>selectSingleBox</renderType>
@@ -129,6 +133,7 @@
                     <settings.etkey_places>
                         <TCEforms>
                             <label>LLL:EXT:evangtermine/Resources/Private/Language/locallang.xlf:feflexform.places</label>
+                            <description>LLL:EXT:evangtermine/Resources/Private/Language/locallang.xlf:feflexform.onlyForImportEvents</description>
                             <config>
                                 <type>select</type>
                                 <renderType>selectSingleBox</renderType>

@@ -54,7 +54,7 @@ class TagViewHelper extends AbstractViewHelper
     {
         $this->registerArgument('name', 'string', 'name of tag to generate', false, 'span');
         $this->registerArgument('class', 'string', 'class name for tag', false);
-        $this->registerArgument('node', 'object', 'SimpleXMLElement object to generate tag for', true);
+        $this->registerArgument('node', 'mixed', 'SimpleXMLElement object to generate tag for', true);
     }
 
     /**
@@ -62,9 +62,16 @@ class TagViewHelper extends AbstractViewHelper
      */
     public function render(): string
     {
-        // If wrong object or object empty, return empty string
-        if ((get_class($this->arguments['node']) != 'SimpleXMLElement') || ($this->arguments['node'] == '') || !$this->arguments['node']) {
-            return '';
+        if (is_string($this->arguments['node'])) {
+            // If empty string, return it
+            if (empty($this->arguments['node'])) {
+                return '';
+            }
+        } else {
+            // If wrong object or object empty, return empty string
+            if ((get_class($this->arguments['node']) != 'SimpleXMLElement') || ($this->arguments['node'] == '') || !$this->arguments['node']) {
+                return '';
+            }
         }
 
         // Prepare class attribute

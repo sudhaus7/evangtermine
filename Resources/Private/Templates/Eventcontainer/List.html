@@ -24,7 +24,16 @@
                 <f:then>
                     <f:for each="{events}" as="event" iteration="iterator">
                         <f:if condition="{event.month} != {monthOfLastEvent}">
-                            <div class="monthbar">{event.month} {event.year}</div>
+                            <f:then>
+                                <div class="monthbar">{event.month} {event.year}</div>
+                            </f:then>
+                            <f:else>
+                                <f:if condition="!{importEvents}">
+                                    <f:if condition="{event.monthbar} != '0'">
+                                        {et:tag(name: "div", class: "monthbar", node: event.monthbar)}
+                                    </f:if>
+                                </f:if>
+                            </f:else>
                         </f:if>
                         <f:variable name="monthOfLastEvent">{event.month}</f:variable>
 
@@ -46,47 +55,51 @@
 </f:section>
 
 <f:section name="event">
-    <div class="et_content_date"><span class="et_tag">{event.datum2}<br>{event.liturgBez}</span></div>
+    <div class="et_content_date"><span class="et_tag">{event.DATUM2}<br>{event.LITURG_BEZ}</span></div>
     <div class="et_content_title">
+        <f:if condition="{importEvents}">
+            <f:then>
+                <f:variable name="linkArguments" value="{uid:event.uid}"/>
+            </f:then>
+            <f:else>
+                <f:variable name="linkArguments" value="{ID:'{et:str(on:event.ID)}'}"/>
+            </f:else>
+        </f:if>
         <f:if condition="{settings.opmode_detailpage}">
             <f:then>
                 <f:link.action action="show"
                                pageUid="{settings.opmode_detailpage}"
                                controller="Eventcontainer"
-                               pluginName="List"
-                               arguments="{uid:event.uid}"
+                               pluginName="Detail"
+                               arguments="{linkArguments}"
                                class="et_link_title"
                                data="{pluginuid:'{f:if(condition: \'{settings.opmode_detailpage}\',then:\'{settings.opmode_detailpage}\',else:\'{data.uid}\')}'}"
-                >
-                    {event.title}
-                </f:link.action>
+                >{event._event_TITLE}</f:link.action>
             </f:then>
             <f:else>
                 <f:link.action action="show"
                                pageUid="{pageId}"
                                controller="Eventcontainer"
                                pluginName="List"
-                               arguments="{uid:event.uid}"
+                               arguments="{linkArguments}"
                                class="et_link_title"
                                data="{pluginuid:'{f:if(condition: \'{settings.opmode_detailpage}\',then:\'{settings.opmode_detailpage}\',else:\'{data.uid}\')}'}"
-                >
-                    {event.title}
-                </f:link.action>
+                >{event._event_TITLE}</f:link.action>
             </f:else>
         </f:if>
-        <f:if condition="{event.shortDescription}">
-            <br><span class="et_description">{event.shortDescription}</span>
+        <f:if condition="{et:str(on:event._event_SHORT_DESCRIPTION)}">
+            <br><span class="et_description">{et:str(on:event._event_SHORT_DESCRIPTION)}</span>
         </f:if>
         <br>
-        <f:if condition="{event.placeName} && {event.placeName} != 'Ohne Ort'">
-            <span class="et_city">{event.placeCity}: </span>
-            <span class="et_placename">{event.placeName}</span>
+        <f:if condition="{et:str(on:event._place_NAME)} != 'Ohne Ort'">
+            <span class="et_city">{event._place_CITY}: </span>
+            <span class="et_placename">{event._place_NAME}</span>
         </f:if>
-        <f:if condition="{event.personName}">
-            <span class="et_personname">{event.personName}</span>
+        <f:if condition="{et:str(on:event._person_NAME)}">
+            <span class="et_personname">{event._person_NAME}</span>
         </f:if>
-        <f:if condition="{event.userRealname}">
-            <span class="et_content_user">{event.userRealname}</span>
+        <f:if condition="{et:str(on:event._user_REALNAME)}">
+            <span class="et_content_user">{event._user_REALNAME}</span>
         </f:if>
     </div>
 </f:section>

@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace ArbkomEKvW\Evangtermine\Domain\Repository;
 
 use ArbkomEKvW\Evangtermine\Domain\Model\Categorylist;
@@ -39,6 +41,7 @@ class EventRepository extends Repository
      * @return array|null
      * @throws Exception
      * @throws UnexpectedTypeException
+     * @throws \Doctrine\DBAL\Exception
      */
     public function prepareFindByEtKeysQuery(EtKeys $etKeys, string $additionParams = ''): ?array
     {
@@ -165,6 +168,7 @@ class EventRepository extends Repository
      * @return array
      * @throws Exception
      * @throws UnexpectedTypeException
+     * @throws \Doctrine\DBAL\Exception
      */
     public function setConstraints(QueryInterface $query, EtKeys $etKeys, ?array $eventUids): array
     {
@@ -362,7 +366,7 @@ class EventRepository extends Repository
         $queryBuilder->select('region', 'event_subregion_id', 'event_region2_id', 'event_region3_id', 'place_region', 'attributes')
             ->from('tx_evangtermine_domain_model_event')
             ->where(
-                $queryBuilder->expr()->like('attributes', $queryBuilder->createNamedParameter('%' . $queryBuilder->escapeLikeWildcards($id) . '%', Connection::PARAM_STR))
+                $queryBuilder->expr()->like('attributes', $queryBuilder->createNamedParameter('%' . $queryBuilder->escapeLikeWildcards((string)$id) . '%', Connection::PARAM_STR))
             );
         $result = $queryBuilder->executeQuery()->fetchAllAssociative();
         if (empty($result)) {
@@ -712,6 +716,7 @@ class EventRepository extends Repository
      */
     public function findAllCategoriesWithEtKeys(?array $settings = null, int $pluginUid = 0): array
     {
+        /** @var CacheManager $cacheManager */
         $cacheManager = GeneralUtility::makeInstance(CacheManager::class);
         $dateString = (new \DateTime('today midnight'))->format('Ymd');
         $cache = $cacheManager->getCache('evangtermine');
@@ -763,6 +768,7 @@ class EventRepository extends Repository
      */
     public function findAllGroupsWithEtKeys(?array $settings = null, int $pluginUid = 0): array
     {
+        /** @var CacheManager $cacheManager */
         $cacheManager = GeneralUtility::makeInstance(CacheManager::class);
         $dateString = (new \DateTime('today midnight'))->format('Ymd');
         $cache = $cacheManager->getCache('evangtermine');
@@ -821,6 +827,7 @@ class EventRepository extends Repository
      * @return array
      * @throws Exception
      * @throws UnexpectedTypeException
+     * @throws \Doctrine\DBAL\Exception
      */
     protected function prepareQuery(?array $settings): array
     {

@@ -51,7 +51,7 @@ class StrViewHelper extends AbstractViewHelper
 {
     public function initializeArguments(): void
     {
-        $this->registerArgument('on', 'object', 'Object for toString', true);
+        $this->registerArgument('on', 'mixed', 'Object for toString', true);
     }
 
     /**
@@ -59,8 +59,12 @@ class StrViewHelper extends AbstractViewHelper
      */
     public function render(): string
     {
-        if ($this->arguments['on']) {
-            return $this->arguments['on']->__toString();
+        $on = $this->arguments['on'];
+        if ($on) {
+            if (is_string($on)) {
+                return $on;
+            }
+            return $on->__toString();
         }
         return '';
     }

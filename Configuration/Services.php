@@ -3,8 +3,10 @@
 declare(strict_types=1);
 
 use ArbkomEKvW\Evangtermine\Command\ImportEventsCommand;
+use ArbkomEKvW\Evangtermine\Services\Events\EventsServiceInterface;
 use ArbkomEKvW\Evangtermine\Solr\IndexService;
 use Symfony\Component\DependencyInjection\Loader\Configurator\ContainerConfigurator;
+use TYPO3\CMS\Core\Configuration\ExtensionConfiguration;
 use TYPO3\CMS\Core\Package\PackageManager;
 use TYPO3\CMS\Core\Service\DependencyOrderingService;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
@@ -32,5 +34,18 @@ return static function (ContainerConfigurator $containerConfigurator): void {
     if ($packageManager->isPackageActive('solr')) {
         $services->set(IndexService::class)
             ->public();
+    }
+
+    $extConfig  = GeneralUtility::makeInstance(ExtensionConfiguration::class)->get('evangtermine');
+    if (!empty($extConfig['importEvents'])) {
+        $services->alias(
+            EventsServiceInterface::class,
+            \ArbkomEKvW\Evangtermine\Services\Events\Imported\EventsService::class
+        );
+    } else {
+        $services->alias(
+            EventsServiceInterface::class,
+            \ArbkomEKvW\Evangtermine\Services\Events\Api\EventsService::class
+        );
     }
 };

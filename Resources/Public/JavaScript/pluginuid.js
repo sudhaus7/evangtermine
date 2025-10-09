@@ -20,3 +20,22 @@ const evangTerminePluginUid = function () {
   }
 }
 evangTerminePluginUid();
+
+const when404 = function () {
+  document.addEventListener('DOMContentLoaded', function () {
+    const httpsStatusCode = window.performance.getEntries()[0].responseStatus;
+    if (httpsStatusCode === 404) {
+      const evangTerminePlugin = document.querySelector('.plugin-evangelische-termine');
+      if (evangTerminePlugin) {
+        let elementOffset = evangTerminePlugin.offsetTop;
+        window.scroll({
+          top: elementOffset,
+          left: 0,
+          behavior: 'smooth'
+        });
+      }
+    }
+  });
+};
+
+when404();

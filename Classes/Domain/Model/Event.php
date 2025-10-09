@@ -132,6 +132,11 @@ class Event extends AbstractEntity
         return $this->title;
     }
 
+    public function get_event_TITLE(): string
+    {
+        return $this->getTitle();
+    }
+
     public function setTitle(string $title): void
     {
         $this->title = $title;
@@ -231,6 +236,11 @@ class Event extends AbstractEntity
         return $this->liturgBez;
     }
 
+    public function getLITURG_BEZ(): string
+    {
+        return $this->getLiturgBez();
+    }
+
     public function setLiturgBez(string $liturgBez): void
     {
         $this->liturgBez = $liturgBez;
@@ -239,6 +249,11 @@ class Event extends AbstractEntity
     public function getShortDescription(): string
     {
         return $this->shortDescription;
+    }
+
+    public function get_event_SHORT_DESCRIPTION(): string
+    {
+        return $this->getShortDescription();
     }
 
     public function setShortDescription(string $shortDescription): void
@@ -251,6 +266,11 @@ class Event extends AbstractEntity
         return $this->longDescription;
     }
 
+    public function get_event_LONG_DESCRIPTION(): string
+    {
+        return $this->getLongDescription();
+    }
+
     public function setLongDescription(string $longDescription): void
     {
         $this->longDescription = $longDescription;
@@ -259,6 +279,11 @@ class Event extends AbstractEntity
     public function getPlaceId(): string
     {
         return $this->placeId;
+    }
+
+    public function get_place_ID(): string
+    {
+        return $this->getPlaceId();
     }
 
     public function setPlaceId(string $placeId): void
@@ -271,6 +296,11 @@ class Event extends AbstractEntity
         return $this->placeName;
     }
 
+    public function get_place_NAME(): string
+    {
+        return $this->getPlaceName();
+    }
+
     public function setPlaceName(string $placeName): void
     {
         $this->placeName = $placeName;
@@ -279,6 +309,11 @@ class Event extends AbstractEntity
     public function getPlaceStreetNr(): string
     {
         return $this->placeStreetNr;
+    }
+
+    public function get_place_STREET_NR(): string
+    {
+        return $this->getPlaceStreetNr();
     }
 
     public function setPlaceStreetNr(string $placeStreetNr): void
@@ -291,6 +326,11 @@ class Event extends AbstractEntity
         return $this->placeZip;
     }
 
+    public function get_place_ZIP(): string
+    {
+        return $this->getPlaceZip();
+    }
+
     public function setPlaceZip(string $placeZip): void
     {
         $this->placeZip = $placeZip;
@@ -299,6 +339,11 @@ class Event extends AbstractEntity
     public function getPlaceCity(): string
     {
         return $this->placeCity;
+    }
+
+    public function get_place_CITY(): string
+    {
+        return $this->getPlaceCity();
     }
 
     public function setPlaceCity(string $placeCity): void
@@ -331,6 +376,11 @@ class Event extends AbstractEntity
         return $this->image;
     }
 
+    public function get_event_IMAGE(): string
+    {
+        return $this->getImage();
+    }
+
     public function setImage(string $image): void
     {
         $this->image = $image;
@@ -361,6 +411,11 @@ class Event extends AbstractEntity
         return $this->people;
     }
 
+    public function get_event_PEOPLE(): string
+    {
+        return $this->getPeople();
+    }
+
     public function setPeople(string $people): void
     {
         $this->people = $people;
@@ -369,6 +424,11 @@ class Event extends AbstractEntity
     public function getCategories(): string
     {
         return $this->categories;
+    }
+
+    public function get_event_EVENTTYPE(): string
+    {
+        return $this->getCategories();
     }
 
     public function setCategories(string $categories): void
@@ -381,6 +441,11 @@ class Event extends AbstractEntity
         return $this->pollId;
     }
 
+    public function get_poll_ID(): string
+    {
+        return $this->getPollId();
+    }
+
     public function setPollId(string $pollId): void
     {
         $this->pollId = $pollId;
@@ -389,6 +454,11 @@ class Event extends AbstractEntity
     public function getWebformLinkname(): string
     {
         return $this->webformLinkname;
+    }
+
+    public function get_webform_LINKNAME(): string
+    {
+        return $this->getWebformLinkname();
     }
 
     public function setWebformLinkname(string $webformLinkname): void
@@ -401,6 +471,11 @@ class Event extends AbstractEntity
         return $this->caption;
     }
 
+    public function get_event_CAPTION(): string
+    {
+        return $this->getCaption();
+    }
+
     public function setCaption(string $caption): void
     {
         $this->caption = $caption;
@@ -409,6 +484,11 @@ class Event extends AbstractEntity
     public function getTextbox1(): string
     {
         return $this->textbox1;
+    }
+
+    public function get_event_TEXTBOX_1(): string
+    {
+        return $this->getTextbox1();
     }
 
     public function setTextbox1(string $textbox1): void
@@ -421,6 +501,11 @@ class Event extends AbstractEntity
         return $this->textbox2;
     }
 
+    public function get_event_TEXTBOX_2(): string
+    {
+        return $this->getTextbox2();
+    }
+
     public function setTextbox2(string $textbox2): void
     {
         $this->textbox2 = $textbox2;
@@ -429,6 +514,11 @@ class Event extends AbstractEntity
     public function getTextbox3(): string
     {
         return $this->textbox3;
+    }
+
+    public function get_event_TEXTBOX_3(): string
+    {
+        return $this->getTextbox3();
     }
 
     public function setTextbox3(string $textbox3): void
@@ -441,6 +531,11 @@ class Event extends AbstractEntity
         return $this->textline1;
     }
 
+    public function get_event_TEXTLINE_1(): string
+    {
+        return $this->getTextline1();
+    }
+
     public function setTextline1(string $textline1): void
     {
         $this->textline1 = $textline1;
@@ -449,6 +544,11 @@ class Event extends AbstractEntity
     public function getTextline2(): string
     {
         return $this->textline2;
+    }
+
+    public function get_event_TEXTLINE_2(): string
+    {
+        return $this->getTextline2();
     }
 
     public function setTextline2(string $textline2): void
@@ -461,6 +561,11 @@ class Event extends AbstractEntity
         return $this->textline3;
     }
 
+    public function get_event_TEXTLINE_3(): string
+    {
+        return $this->getTextline3();
+    }
+
     public function setTextline3(string $textline3): void
     {
         $this->textline3 = $textline3;
@@ -469,6 +574,11 @@ class Event extends AbstractEntity
     public function getTextline4(): string
     {
         return $this->textline4;
+    }
+
+    public function get_event_TEXTLINE_4(): string
+    {
+        return $this->getTextline4();
     }
 
     public function setTextline4(string $textline4): void
@@ -481,6 +591,11 @@ class Event extends AbstractEntity
         return $this->textline5;
     }
 
+    public function get_event_TEXTLINE_5(): string
+    {
+        return $this->getTextline5();
+    }
+
     public function setTextline5(string $textline5): void
     {
         $this->textline5 = $textline5;
@@ -489,6 +604,11 @@ class Event extends AbstractEntity
     public function getEmail(): string
     {
         return $this->email;
+    }
+
+    public function get_event_EMAIL(): string
+    {
+        return $this->getEmail();
     }
 
     public function setEmail(string $email): void
@@ -501,6 +621,11 @@ class Event extends AbstractEntity
         return $this->link;
     }
 
+    public function get_event_LINK(): string
+    {
+        return $this->getLink();
+    }
+
     public function setLink(string $link): void
     {
         $this->link = $link;
@@ -509,6 +634,11 @@ class Event extends AbstractEntity
     public function getFeedbackId(): string
     {
         return $this->feedbackId;
+    }
+
+    public function get_event_FEEDBACK_ID(): string
+    {
+        return $this->getFeedbackId();
     }
 
     public function setFeedbackId(string $feedbackId): void
@@ -521,6 +651,11 @@ class Event extends AbstractEntity
         return $this->placeInfo;
     }
 
+    public function get_place_INFO(): string
+    {
+        return $this->getPlaceInfo();
+    }
+
     public function setPlaceInfo(string $placeInfo): void
     {
         $this->placeInfo = $placeInfo;
@@ -529,6 +664,11 @@ class Event extends AbstractEntity
     public function getPlaceImage(): string
     {
         return $this->placeImage;
+    }
+
+    public function get_place_IMAGE(): string
+    {
+        return $this->getPlaceImage();
     }
 
     public function setPlaceImage(string $placeImage): void
@@ -551,12 +691,22 @@ class Event extends AbstractEntity
         return $this->personName;
     }
 
+    public function get_person_NAME(): string
+    {
+        return $this->getPersonName();
+    }
+
     public function setPersonName(string $personName): void
     {
         $this->personName = $personName;
     }
 
     public function getPersonEmail(): string
+    {
+        return $this->personEmail;
+    }
+
+    public function get_Person_EMAIL(): string
     {
         return $this->personEmail;
     }
@@ -569,6 +719,11 @@ class Event extends AbstractEntity
     public function getPersonContact(): string
     {
         return $this->personContact;
+    }
+
+    public function get_person_CONTACT(): string
+    {
+        return $this->getPersonContact();
     }
 
     public function setPersonContact(string $personContact): void
@@ -591,6 +746,11 @@ class Event extends AbstractEntity
         return $this->userRealname;
     }
 
+    public function get_user_REALNAME(): string
+    {
+        return $this->getUserRealname();
+    }
+
     public function setUserRealname(string $userRealname): void
     {
         $this->userRealname = $userRealname;
@@ -599,6 +759,11 @@ class Event extends AbstractEntity
     public function getUserStreetNr(): string
     {
         return $this->userStreetNr;
+    }
+
+    public function get_user_STREET_NR(): string
+    {
+        return $this->getUserStreetNr();
     }
 
     public function setUserStreetNr(string $userStreetNr): void
@@ -611,6 +776,11 @@ class Event extends AbstractEntity
         return $this->userZip;
     }
 
+    public function get_user_ZIP(): string
+    {
+        return $this->getUserZip();
+    }
+
     public function setUserZip(string $userZip): void
     {
         $this->userZip = $userZip;
@@ -619,6 +789,11 @@ class Event extends AbstractEntity
     public function getUserCity(): string
     {
         return $this->userCity;
+    }
+
+    public function get_user_CITY(): string
+    {
+        return $this->getUserCity();
     }
 
     public function setUserCity(string $userCity): void
@@ -631,6 +806,11 @@ class Event extends AbstractEntity
         return $this->userEmail;
     }
 
+    public function get_user_EMAIL(): string
+    {
+        return $this->getUserEmail();
+    }
+
     public function setUserEmail(string $userEmail): void
     {
         $this->userEmail = $userEmail;
@@ -639,6 +819,11 @@ class Event extends AbstractEntity
     public function getUserUrl(): string
     {
         return $this->userUrl;
+    }
+
+    public function get_user_URL(): string
+    {
+        return $this->getUserUrl();
     }
 
     public function setUserUrl(string $userUrl): void
@@ -651,6 +836,11 @@ class Event extends AbstractEntity
         return $this->userContact;
     }
 
+    public function get_user_CONTACT(): string
+    {
+        return $this->getUserContact();
+    }
+
     public function setUserContact(string $userContact): void
     {
         $this->userContact = $userContact;
@@ -661,6 +851,11 @@ class Event extends AbstractEntity
         return $this->userDescription;
     }
 
+    public function get_user_DESCRIPTION(): string
+    {
+        return $this->getUserDescription();
+    }
+
     public function setUserDescription(string $userDescription): void
     {
         $this->userDescription = $userDescription;
@@ -669,6 +864,11 @@ class Event extends AbstractEntity
     public function getUserImage(): string
     {
         return $this->userImage;
+    }
+
+    public function get_user_IMAGE(): string
+    {
+        return $this->getUserImage();
     }
 
     public function setUserImage(string $userImage): void
@@ -1206,8 +1406,27 @@ class Event extends AbstractEntity
         }
         $attributesArray = json_decode($this->attributes, true);
         foreach ($attributesArray as $key => $value) {
-            if (!empty($value['db'])) {
-                $attributesArray[$key]['db'] = explode(',', $value['db']);
+            $value = explode(',', $value['db'] ?? '');
+            $attributesArray[$key]['db'] = $value;
+
+            $keyArray = explode('_', $key);
+            if (count($keyArray) > 1) {
+                $keyArray[1] = strtoupper($keyArray[1]);
+            }
+            $newKey = '_' . implode('_', $keyArray);
+            $attributesArray[$newKey]['label'] = ($attributesArray[$key]['label'] ?? '');
+            $attributesArray[$newKey]['db'] = $value;
+
+            $newKey = '_event' . strtoupper($newKey);
+            $attributesArray[$newKey]['label'] = ($attributesArray[$key]['label'] ?? '');
+            $attributesArray[$newKey]['db'] = $value;
+
+            $lastCharOfKey = substr($newKey, -1);
+            if (is_numeric($lastCharOfKey)) {
+                $stringWithoutLastChar = substr($newKey, 0, -1);
+                $newKey = $stringWithoutLastChar . '_' . $lastCharOfKey;
+                $attributesArray[$newKey]['label'] = ($attributesArray[$key]['label'] ?? '');
+                $attributesArray[$newKey]['db'] = $value;
             }
         }
         return $attributesArray;

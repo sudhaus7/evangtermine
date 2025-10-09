@@ -173,11 +173,14 @@
 				<source>Nothing selected</source>
 			</trans-unit>
 
+			<trans-unit id="feflexform.onlyForImportEvents">
+				<source>This option is only available if the events are retrieved from the database.</source>
+			</trans-unit>
+
 			<trans-unit id="noEventsFound">
 				<source>No events are currently planned.</source>
 			</trans-unit>
 
 		</body>
-
 	</file>
 </xliff>

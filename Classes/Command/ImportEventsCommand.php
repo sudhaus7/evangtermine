@@ -22,6 +22,7 @@ use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 
+use TYPO3\CMS\Core\Information\Typo3Version;
 use TYPO3\CMS\Core\Site\SiteFinder;
 use function sys_get_temp_dir;
 
@@ -60,8 +61,6 @@ class ImportEventsCommand extends Command implements LoggerAwareInterface
     protected array $months = [];
     protected array $allIds = [];
     protected array $pagesWithPlugin = [];
-    protected bool $setRedirects = false;
-    protected string $redirectDescription = 'Vom Evangelische Termine-Import angelegt';
     protected string $detailPageSlugPart = '/termindetails';
 
     public function __construct(
@@ -84,7 +83,7 @@ class ImportEventsCommand extends Command implements LoggerAwareInterface
         $this->groupList = GeneralUtility::makeInstance(Grouplist::class)->getItemslist();
         $this->dataHandler = GeneralUtility::makeInstance(DataHandler::class);
         $this->extConfig  = GeneralUtility::makeInstance(ExtensionConfiguration::class)->get('evangtermine');
-        if (version_compare(GeneralUtility::makeInstance(\TYPO3\CMS\Core\Information\Typo3Version::class)->getVersion(), '11.0.0', '<')) {
+        if (version_compare(GeneralUtility::makeInstance(Typo3Version::class)->getVersion(), '11.0.0', '<')) {
             $this->storageRepository = GeneralUtility::makeInstance(\ArbkomEKvW\Evangtermine\Resource\StorageRepository::class);
         } else {
             $this->storageRepository = GeneralUtility::makeInstance(StorageRepository::class);
@@ -152,8 +151,8 @@ class ImportEventsCommand extends Command implements LoggerAwareInterface
     }
 
     /**
+     * @param InputInterface $input
      * @param OutputInterface $output
-     * @throws Exception
      * @throws SiteNotFoundException
      * @throws \Doctrine\DBAL\Exception
      */
@@ -285,9 +284,7 @@ class ImportEventsCommand extends Command implements LoggerAwareInterface
             ->fromArray($event, $event['pid'], $uid);
         $slug = $this->slugHelper->generate($event, $event['pid']);
         $slug = $this->slugHelper->buildSlugForUniqueInTable($slug, $state);
-        $slug = $this->checkSlugForDuplicates($slug, $uid);
-        //$this->deleteRedirectEntries($slug);
-        return $slug;
+        return $this->checkSlugForDuplicates($slug, $uid);
     }
 
     /**
@@ -511,7 +508,6 @@ class ImportEventsCommand extends Command implements LoggerAwareInterface
         $events = $statement->fetchAllAssociative();
 
         foreach ($events as $event) {
-            //$this->createRedirectEntries($event['slug'] ?? '');
             $this->connectionPool->getConnectionForTable('tx_evangtermine_domain_model_event')
                 ->delete(
                     'tx_evangtermine_domain_model_event', // from
@@ -541,7 +537,6 @@ class ImportEventsCommand extends Command implements LoggerAwareInterface
         $progressBar = new ProgressBar($output, count($events));
 
         foreach ($events as $event) {
-            //$this->createRedirectEntries($event['slug'] ?? '');
             $this->logger->debug(sprintf('Deleting %s %s', $event['uid'] ?? '', $event['title'] ?? ''));
             // delete the event if it is not found in the API
             $this->connectionPool->getConnectionForTable('tx_evangtermine_domain_model_event')
@@ -552,53 +547,6 @@ class ImportEventsCommand extends Command implements LoggerAwareInterface
             $progressBar->advance();
         }
         $progressBar->finish();
-    }
-
-    protected function createRedirectEntries(string $slug): void
-    {
-        if (!$this->setRedirects) {
-            return;
-        }
-        if (empty($slug)) {
-            return;
-        }
-        foreach ($this->pagesWithPlugin as $page) {
-            $sysRedirectData = [
-                'pid' => $page['uid'],
-                'updatedon' => time(),
-                'createdon' => time(),
-                'createdby' => 0,
-                'target_statuscode' => 301,
-                'source_host' => $page['domain'],
-                'source_path' => $page['slug'] . $page['detailPageSlugPart'] . $slug,
-                'target' => sprintf('t3://page?uid=%d&_language=0', $page['uid']),
-                'description' => $this->redirectDescription,
-            ];
-            $this->connectionPool->getConnectionForTable('sys_redirect')
-                ->insert(
-                    'sys_redirect',
-                    $sysRedirectData,
-                );
-        }
-    }
-
-    protected function deleteRedirectEntries(string $slug): void
-    {
-        if (!$this->setRedirects) {
-            return;
-        }
-        if (empty($slug)) {
-            return;
-        }
-        if (!empty($this->redirectDescription)) {
-            $queryBuilder = $this->connectionPool->getQueryBuilderForTable('sys_redirect');
-            $queryBuilder->delete('sys_redirect')
-                ->where(
-                    $queryBuilder->expr()->like('source_path', $queryBuilder->createNamedParameter('%' . $queryBuilder->escapeLikeWildcards($this->detailPageSlugPart . $slug))),
-                    $queryBuilder->expr()->eq('description', $queryBuilder->createNamedParameter($this->redirectDescription))
-                );
-            $queryBuilder->executeStatement();
-        }
     }
 
     /**

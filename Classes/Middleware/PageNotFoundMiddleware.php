@@ -27,9 +27,20 @@ class PageNotFoundMiddleware implements MiddlewareInterface
         if ($this->is404Request($request)) {
             foreach ($this->uriParts as $uriPart) {
                 if (str_contains($this->requestUri, $uriPart)) {
+
+                    /**
+                     * First replace the uri
+                     * "https://example.com/listpage/termindetails/slug-of-event"
+                     * or
+                     * "https://example.com/listpage/terminteaser/slug-of-event"
+                     * with
+                     * "https://example.com/listpage"
+                     * which is the uri of the page with the list plugin.
+                     **/
                     $uriArray = explode($uriPart, $this->requestUri);
                     if (count($uriArray) > 1) {
                         $uri = $this->createUriString($uriArray[0], $request);
+                        /** @var Uri $newUri */
                         $newUri = GeneralUtility::makeInstance(Uri::class, $uri);
 
                         /** @var ServerRequest $newRequest */

@@ -215,12 +215,16 @@
 				<target>Nichts ausgewählt</target>
 			</trans-unit>
 
+			<trans-unit id="feflexform.onlyForImportEvents">
+				<source>This option is only available if the events are retrieved from the database.</source>
+				<target>Diese Option ist nur verfügbar, wenn die Veranstaltungen aus der Datenbank geholt werden.</target>
+			</trans-unit>
+
 			<trans-unit id="noEventsFound">
 				<source>No events are currently planned.</source>
 				<target>Aktuell sind keine Termine geplant.</target>
 			</trans-unit>
 
 		</body>
-
 	</file>
 </xliff>

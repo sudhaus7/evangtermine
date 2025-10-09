@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * This file is part of the TYPO3 project.
  *
@@ -66,8 +68,9 @@ class EventcontainerRepository extends Repository implements SingletonInterface
      */
     protected string $xmlSourceUrl = '';
 
-    public function __construct(\ArbkomEKvW\Evangtermine\Util\ExtConf $extConf)
+    public function __construct(ExtConf $extConf)
     {
+        parent::__construct();
         $this->extConf = $extConf;
     }
 
