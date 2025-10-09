@@ -13,7 +13,7 @@ class ToggleAllFilters extends AbstractNode
         $pageRenderer = GeneralUtility::makeInstance(PageRenderer::class);
 
         if (!empty($pageRenderer)) {
-            $pageRenderer->loadRequireJsModule('TYPO3/CMS/Evangtermine/Backend/ToggleAllFilters');
+            $pageRenderer->addJsFile('EXT:evangtermine/Resources/Public/JavaScript/Backend/ToggleAllFilters.js');
         }
 
         return [

@@ -45,7 +45,7 @@ class ImportEventsCommand extends Command implements LoggerAwareInterface
 {
     use LoggerAwareTrait;
 
-    public const ITEMS_PER_PAGE = 100;
+    public const int ITEMS_PER_PAGE = 100;
 
     protected ConnectionPool $connectionPool;
     protected RequestFactory $requestFactory;

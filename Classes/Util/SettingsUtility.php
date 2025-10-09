@@ -53,6 +53,9 @@ class SettingsUtility
     public function fetchParamsFromSettings(array $settingsArray, EtKeys $etks): void
     {
         foreach ($settingsArray as $key => $value) {
+            if (is_array($value)) {
+                $value = implode(',', $value);
+            }
             if (substr($key, 0, 6) == 'etkey_' && $value != '') {
                 $targetMethod = 'set' . ucfirst(substr($key, 6));
                 if (method_exists($etks, $targetMethod)) {

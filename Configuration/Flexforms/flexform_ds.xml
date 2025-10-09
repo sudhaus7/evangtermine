@@ -6,332 +6,268 @@
     <sheets>
         <sDEF>
             <ROOT>
-                <TCEforms>
-                    <sheetTitle>LLL:EXT:evangtermine/Resources/Private/Language/locallang.xlf:pluginsheet.general</sheetTitle>
-                </TCEforms>
+                <sheetTitle>LLL:EXT:evangtermine/Resources/Private/Language/locallang.xlf:pluginsheet.general</sheetTitle>
                 <type>array</type>
                 <el>
                     <settings.etkey_vid>
-                        <TCEforms>
-                            <label>LLL:EXT:evangtermine/Resources/Private/Language/locallang.xlf:feflexform.vid</label>
-                            <!-- entspricht userId -->
-                            <config>
-                                <type>input</type>
-                                <size>20</size>
-                                <eval>trim</eval>
-                            </config>
-                        </TCEforms>
+                        <label>LLL:EXT:evangtermine/Resources/Private/Language/locallang.xlf:feflexform.vid</label>
+                        <!-- entspricht userId -->
+                        <config>
+                            <type>input</type>
+                            <size>20</size>
+                            <eval>trim</eval>
+                        </config>
                     </settings.etkey_vid>
                     <settings.etkey_q>
-                        <TCEforms>
-                            <label>LLL:EXT:evangtermine/Resources/Private/Language/locallang.xlf:feflexform.et_q</label>
-                            <config>
-                                <type>input</type>
-                                <size>20</size>
-                                <eval>trim</eval>
-                            </config>
-                        </TCEforms>
+                        <label>LLL:EXT:evangtermine/Resources/Private/Language/locallang.xlf:feflexform.et_q</label>
+                        <config>
+                            <type>input</type>
+                            <size>20</size>
+                            <eval>trim</eval>
+                        </config>
                     </settings.etkey_q>
                     <settings.etkey_highlight>
-                        <TCEforms>
-                            <label>LLL:EXT:evangtermine/Resources/Private/Language/locallang.xlf:feflexform.highlight</label>
-                            <config>
-                                <type>select</type>
-                                <renderType>selectSingle</renderType>
-                                <items type="array">
-                                    <numIndex index="0" type="array">
-                                        <numIndex index="0">LLL:EXT:evangtermine/Resources/Private/Language/locallang.xlf:feflexform.highlight.high</numIndex>
-                                        <numIndex index="1">high</numIndex>
-                                    </numIndex>
-                                    <numIndex index="1" type="array">
-                                        <numIndex index="0">LLL:EXT:evangtermine/Resources/Private/Language/locallang.xlf:feflexform.highlight.all</numIndex>
-                                        <numIndex index="1">all</numIndex>
-                                    </numIndex>
-                                </items>
-                                <default>all</default>
-                            </config>
-                        </TCEforms>
+                        <label>LLL:EXT:evangtermine/Resources/Private/Language/locallang.xlf:feflexform.highlight</label>
+                        <config>
+                            <type>select</type>
+                            <renderType>selectSingle</renderType>
+                            <items type="array">
+                                <numIndex index="0" type="array">
+                                    <numIndex index="0">LLL:EXT:evangtermine/Resources/Private/Language/locallang.xlf:feflexform.highlight.high</numIndex>
+                                    <numIndex index="1">high</numIndex>
+                                </numIndex>
+                                <numIndex index="1" type="array">
+                                    <numIndex index="0">LLL:EXT:evangtermine/Resources/Private/Language/locallang.xlf:feflexform.highlight.all</numIndex>
+                                    <numIndex index="1">all</numIndex>
+                                </numIndex>
+                            </items>
+                            <default>all</default>
+                        </config>
                     </settings.etkey_highlight>
                     <settings.etkey_eventtype>
-                        <TCEforms>
-                            <label>LLL:EXT:evangtermine/Resources/Private/Language/locallang.xlf:feflexform.eventtype</label>
-                            <config>
-                                <type>select</type>
-                                <renderType>selectSingleBox</renderType>
-                                <size>6</size>
-                                <maxitems>25</maxitems>
-                                <itemsProcFunc>ArbkomEKvW\Evangtermine\Util\CategoryUtil->getCategories</itemsProcFunc>
-                                <default>all</default>
-                            </config>
-                        </TCEforms>
+                        <label>LLL:EXT:evangtermine/Resources/Private/Language/locallang.xlf:feflexform.eventtype</label>
+                        <config>
+                            <type>select</type>
+                            <renderType>selectSingleBox</renderType>
+                            <size>6</size>
+                            <maxitems>25</maxitems>
+                            <itemsProcFunc>ArbkomEKvW\Evangtermine\Util\CategoryUtil->getCategories</itemsProcFunc>
+                            <default>all</default>
+                        </config>
                     </settings.etkey_eventtype>
                     <settings.etkey_people>
-                        <TCEforms>
-                            <label>LLL:EXT:evangtermine/Resources/Private/Language/locallang.xlf:feflexform.people</label>
-                            <config>
-                                <type>select</type>
-                                <renderType>selectSingleBox</renderType>
-                                <size>6</size>
-                                <maxitems>25</maxitems>
-                                <itemsProcFunc>ArbkomEKvW\Evangtermine\Util\CategoryUtil->getGroups</itemsProcFunc>
-                                <default>all</default>
-                            </config>
-                        </TCEforms>
+                        <label>LLL:EXT:evangtermine/Resources/Private/Language/locallang.xlf:feflexform.people</label>
+                        <config>
+                            <type>select</type>
+                            <renderType>selectSingleBox</renderType>
+                            <size>6</size>
+                            <maxitems>25</maxitems>
+                            <itemsProcFunc>ArbkomEKvW\Evangtermine\Util\CategoryUtil->getGroups</itemsProcFunc>
+                            <default>all</default>
+                        </config>
                     </settings.etkey_people>
                     <settings.etkey_regions>
-                        <TCEforms>
-                            <label>LLL:EXT:evangtermine/Resources/Private/Language/locallang.xlf:feflexform.regions</label>
-                            <description>LLL:EXT:evangtermine/Resources/Private/Language/locallang.xlf:feflexform.onlyForImportEvents</description>
-                            <config>
-                                <type>select</type>
-                                <renderType>selectSingleBox</renderType>
-                                <size>6</size>
-                                <itemsProcFunc>ArbkomEKvW\Evangtermine\Util\CategoryUtil->getRegions</itemsProcFunc>
-                                <default>all</default>
-                            </config>
-                        </TCEforms>
+                        <label>LLL:EXT:evangtermine/Resources/Private/Language/locallang.xlf:feflexform.regions</label>
+                        <description>LLL:EXT:evangtermine/Resources/Private/Language/locallang.xlf:feflexform.onlyForImportEvents</description>
+                        <config>
+                            <type>select</type>
+                            <renderType>selectSingleBox</renderType>
+                            <size>6</size>
+                            <itemsProcFunc>ArbkomEKvW\Evangtermine\Util\CategoryUtil->getRegions</itemsProcFunc>
+                            <default>all</default>
+                        </config>
                     </settings.etkey_regions>
                     <settings.etkey_subregions>
-                        <TCEforms>
-                            <label>LLL:EXT:evangtermine/Resources/Private/Language/locallang.xlf:feflexform.subregions</label>
-                            <description>LLL:EXT:evangtermine/Resources/Private/Language/locallang.xlf:feflexform.onlyForImportEvents</description>
-                            <config>
-                                <type>select</type>
-                                <renderType>selectSingleBox</renderType>
-                                <size>6</size>
-                                <itemsProcFunc>ArbkomEKvW\Evangtermine\Util\CategoryUtil->getSubregions</itemsProcFunc>
-                                <default>all</default>
-                            </config>
-                        </TCEforms>
+                        <label>LLL:EXT:evangtermine/Resources/Private/Language/locallang.xlf:feflexform.subregions</label>
+                        <description>LLL:EXT:evangtermine/Resources/Private/Language/locallang.xlf:feflexform.onlyForImportEvents</description>
+                        <config>
+                            <type>select</type>
+                            <renderType>selectSingleBox</renderType>
+                            <size>6</size>
+                            <itemsProcFunc>ArbkomEKvW\Evangtermine\Util\CategoryUtil->getSubregions</itemsProcFunc>
+                            <default>all</default>
+                        </config>
                     </settings.etkey_subregions>
                     <settings.etkey_region2>
-                        <TCEforms>
-                            <label>LLL:EXT:evangtermine/Resources/Private/Language/locallang.xlf:feflexform.regions2</label>
-                            <description>LLL:EXT:evangtermine/Resources/Private/Language/locallang.xlf:feflexform.onlyForImportEvents</description>
-                            <config>
-                                <type>select</type>
-                                <renderType>selectSingleBox</renderType>
-                                <size>6</size>
-                                <itemsProcFunc>ArbkomEKvW\Evangtermine\Util\CategoryUtil->getRegions2</itemsProcFunc>
-                                <default>all</default>
-                            </config>
-                        </TCEforms>
+                        <label>LLL:EXT:evangtermine/Resources/Private/Language/locallang.xlf:feflexform.regions2</label>
+                        <description>LLL:EXT:evangtermine/Resources/Private/Language/locallang.xlf:feflexform.onlyForImportEvents</description>
+                        <config>
+                            <type>select</type>
+                            <renderType>selectSingleBox</renderType>
+                            <size>6</size>
+                            <itemsProcFunc>ArbkomEKvW\Evangtermine\Util\CategoryUtil->getRegions2</itemsProcFunc>
+                            <default>all</default>
+                        </config>
                     </settings.etkey_region2>
                     <settings.etkey_region3>
-                        <TCEforms>
-                            <label>LLL:EXT:evangtermine/Resources/Private/Language/locallang.xlf:feflexform.regions3</label>
-                            <description>LLL:EXT:evangtermine/Resources/Private/Language/locallang.xlf:feflexform.onlyForImportEvents</description>
-                            <config>
-                                <type>select</type>
-                                <renderType>selectSingleBox</renderType>
-                                <size>6</size>
-                                <itemsProcFunc>ArbkomEKvW\Evangtermine\Util\CategoryUtil->getRegions3</itemsProcFunc>
-                                <default>all</default>
-                            </config>
-                        </TCEforms>
+                        <label>LLL:EXT:evangtermine/Resources/Private/Language/locallang.xlf:feflexform.regions3</label>
+                        <description>LLL:EXT:evangtermine/Resources/Private/Language/locallang.xlf:feflexform.onlyForImportEvents</description>
+                        <config>
+                            <type>select</type>
+                            <renderType>selectSingleBox</renderType>
+                            <size>6</size>
+                            <itemsProcFunc>ArbkomEKvW\Evangtermine\Util\CategoryUtil->getRegions3</itemsProcFunc>
+                            <default>all</default>
+                        </config>
                     </settings.etkey_region3>
                     <settings.etkey_places>
-                        <TCEforms>
-                            <label>LLL:EXT:evangtermine/Resources/Private/Language/locallang.xlf:feflexform.places</label>
-                            <description>LLL:EXT:evangtermine/Resources/Private/Language/locallang.xlf:feflexform.onlyForImportEvents</description>
-                            <config>
-                                <type>select</type>
-                                <renderType>selectSingleBox</renderType>
-                                <size>6</size>
-                                <itemsProcFunc>ArbkomEKvW\Evangtermine\Util\CategoryUtil->getPlaces</itemsProcFunc>
-                                <default>all</default>
-                            </config>
-                        </TCEforms>
+                        <label>LLL:EXT:evangtermine/Resources/Private/Language/locallang.xlf:feflexform.places</label>
+                        <description>LLL:EXT:evangtermine/Resources/Private/Language/locallang.xlf:feflexform.onlyForImportEvents</description>
+                        <config>
+                            <type>select</type>
+                            <renderType>selectSingleBox</renderType>
+                            <size>6</size>
+                            <itemsProcFunc>ArbkomEKvW\Evangtermine\Util\CategoryUtil->getPlaces</itemsProcFunc>
+                            <default>all</default>
+                        </config>
                     </settings.etkey_places>
                     <settings.etkey_itemsPerPage>
-                        <TCEforms>
-                            <label>LLL:EXT:evangtermine/Resources/Private/Language/locallang.xlf:feflexform.itemsPerPage</label>
-                            <config>
-                                <type>input</type>
-                                <size>20</size>
-                                <default>20</default>
-                                <eval>trim,int</eval>
-                            </config>
-                        </TCEforms>
+                        <label>LLL:EXT:evangtermine/Resources/Private/Language/locallang.xlf:feflexform.itemsPerPage</label>
+                        <config>
+                            <type>input</type>
+                            <size>20</size>
+                            <default>20</default>
+                            <eval>trim,int</eval>
+                        </config>
                     </settings.etkey_itemsPerPage>
                     <settings.evt_addprms>
-                    	<TCEforms>
-                    		<label>LLL:EXT:evangtermine/Resources/Private/Language/locallang.xlf:feflexform.addprms</label>
-                    		<config>
-                    			<type>input</type>
-                    			<size>20</size>
-                                <eval>trim</eval>
-                    		</config>
-                    	</TCEforms>
+                        <label>LLL:EXT:evangtermine/Resources/Private/Language/locallang.xlf:feflexform.addprms</label>
+                        <config>
+                            <type>input</type>
+                            <size>20</size>
+                            <eval>trim</eval>
+                        </config>
                     </settings.evt_addprms>
                 </el>
             </ROOT>
         </sDEF>
         <cdistrict>
             <ROOT>
-                <TCEforms>
-                    <sheetTitle>LLL:EXT:evangtermine/Resources/Private/Language/locallang.xlf:pluginsheet.cdistrict</sheetTitle>
-                </TCEforms>
+                <sheetTitle>LLL:EXT:evangtermine/Resources/Private/Language/locallang.xlf:pluginsheet.cdistrict</sheetTitle>
                 <type>array</type>
                 <el>
                     <settings.etkey_region>
-                        <TCEforms>
-                            <label>LLL:EXT:evangtermine/Resources/Private/Language/locallang.xlf:feflexform.region</label>
-                            <config>
-                                <type>input</type>
-                                <size>20</size>
-                                <eval>trim</eval>
-                            </config>
-                        </TCEforms>
+                        <label>LLL:EXT:evangtermine/Resources/Private/Language/locallang.xlf:feflexform.region</label>
+                        <config>
+                            <type>input</type>
+                            <size>20</size>
+                            <eval>trim</eval>
+                        </config>
                     </settings.etkey_region>
                     <settings.etkey_aid>
-                        <TCEforms>
-                            <label>LLL:EXT:evangtermine/Resources/Private/Language/locallang.xlf:feflexform.aid</label>
-                            <config>
-                                <type>input</type>
-                                <size>20</size>
-                                <eval>trim</eval>
-                            </config>
-                        </TCEforms>
+                        <label>LLL:EXT:evangtermine/Resources/Private/Language/locallang.xlf:feflexform.aid</label>
+                        <config>
+                            <type>input</type>
+                            <size>20</size>
+                            <eval>trim</eval>
+                        </config>
                     </settings.etkey_aid>
                 </el>
             </ROOT>
         </cdistrict>
         <opmode>
         	<ROOT>
-        		<TCEforms>
-                    <sheetTitle>LLL:EXT:evangtermine/Resources/Private/Language/locallang.xlf:pluginsheet.opmode</sheetTitle>
-                </TCEforms>
+                <sheetTitle>LLL:EXT:evangtermine/Resources/Private/Language/locallang.xlf:pluginsheet.opmode</sheetTitle>
                 <type>array</type>
                 <el>
                 	<settings.opmode_detailpage>
-                		<TCEforms>
-                			<label>LLL:EXT:evangtermine/Resources/Private/Language/locallang.xlf:feflexform.detailpage</label>
-                			<config>
-                				<type>group</type>
-                				<internal_type>db</internal_type>
-                				<allowed>pages</allowed>
-                			</config>
-                		</TCEforms>
+                        <label>LLL:EXT:evangtermine/Resources/Private/Language/locallang.xlf:feflexform.detailpage</label>
+                        <config>
+                            <type>group</type>
+                            <internal_type>db</internal_type>
+                            <allowed>pages</allowed>
+                        </config>
                 	</settings.opmode_detailpage>
                     <settings.hide_place_names>
-                        <TCEforms>
-                            <label>LLL:EXT:evangtermine/Resources/Private/Language/locallang.xlf:feflexform.hidePlaceNames</label>
-                            <config>
-                                <type>check</type>
-                            </config>
-                        </TCEforms>
+                        <label>LLL:EXT:evangtermine/Resources/Private/Language/locallang.xlf:feflexform.hidePlaceNames</label>
+                        <config>
+                            <type>check</type>
+                        </config>
                     </settings.hide_place_names>
                     <settings.etkey_hideOngoingEvents>
-                        <TCEforms>
-                            <label>LLL:EXT:evangtermine/Resources/Private/Language/locallang.xlf:feflexform.hideOngoingEvents</label>
-                            <config>
-                                <type>check</type>
-                            </config>
-                        </TCEforms>
+                        <label>LLL:EXT:evangtermine/Resources/Private/Language/locallang.xlf:feflexform.hideOngoingEvents</label>
+                        <config>
+                            <type>check</type>
+                        </config>
                     </settings.etkey_hideOngoingEvents>
                 </el>
         	</ROOT>
         </opmode>
         <form>
             <ROOT>
-                <TCEforms>
-                    <sheetTitle>LLL:EXT:evangtermine/Resources/Private/Language/locallang.xlf:pluginsheet.searchform</sheetTitle>
-                </TCEforms>
+                <sheetTitle>LLL:EXT:evangtermine/Resources/Private/Language/locallang.xlf:pluginsheet.searchform</sheetTitle>
                 <type>array</type>
                 <el>
                     <settings.toggleAllFilters>
-                        <TCEforms>
-                            <label>LLL:EXT:evangtermine/Resources/Private/Language/locallang.xlf:feflexform.toggleAllFilters</label>
-                            <config>
-                                <type>check</type>
-                                <fieldInformation>
-                                    <toggleAllFilters>
-                                        <renderType>toggleAllFilters</renderType>
-                                    </toggleAllFilters>
-                                </fieldInformation>
-                            </config>
-                        </TCEforms>
+                        <label>LLL:EXT:evangtermine/Resources/Private/Language/locallang.xlf:feflexform.toggleAllFilters</label>
+                        <config>
+                            <type>check</type>
+                            <fieldInformation>
+                                <toggleAllFilters>
+                                    <renderType>toggleAllFilters</renderType>
+                                </toggleAllFilters>
+                            </fieldInformation>
+                        </config>
                     </settings.toggleAllFilters>
                     <settings.hide_highlights>
-                        <TCEforms>
-                            <label>LLL:EXT:evangtermine/Resources/Private/Language/locallang.xlf:feflexform.hideHighlights</label>
-                            <config>
-                                <type>check</type>
-                            </config>
-                        </TCEforms>
+                        <label>LLL:EXT:evangtermine/Resources/Private/Language/locallang.xlf:feflexform.hideHighlights</label>
+                        <config>
+                            <type>check</type>
+                        </config>
                     </settings.hide_highlights>
                     <settings.hide_categories>
-                        <TCEforms>
-                            <label>LLL:EXT:evangtermine/Resources/Private/Language/locallang.xlf:feflexform.hideCategories</label>
-                            <config>
-                                <type>check</type>
-                            </config>
-                        </TCEforms>
+                        <label>LLL:EXT:evangtermine/Resources/Private/Language/locallang.xlf:feflexform.hideCategories</label>
+                        <config>
+                            <type>check</type>
+                        </config>
                     </settings.hide_categories>
                     <settings.hide_target_audience>
-                        <TCEforms>
-                            <label>LLL:EXT:evangtermine/Resources/Private/Language/locallang.xlf:feflexform.hideTargetAudience</label>
-                            <config>
-                                <type>check</type>
-                            </config>
-                        </TCEforms>
+                        <label>LLL:EXT:evangtermine/Resources/Private/Language/locallang.xlf:feflexform.hideTargetAudience</label>
+                        <config>
+                            <type>check</type>
+                        </config>
                     </settings.hide_target_audience>
                     <settings.hide_regions>
-                        <TCEforms>
-                            <label>LLL:EXT:evangtermine/Resources/Private/Language/locallang.xlf:feflexform.hideRegions</label>
-                            <config>
-                                <type>check</type>
-                            </config>
-                        </TCEforms>
+                        <label>LLL:EXT:evangtermine/Resources/Private/Language/locallang.xlf:feflexform.hideRegions</label>
+                        <config>
+                            <type>check</type>
+                        </config>
                     </settings.hide_regions>
                     <settings.hide_places>
-                        <TCEforms>
-                            <label>LLL:EXT:evangtermine/Resources/Private/Language/locallang.xlf:feflexform.hidePlaces</label>
-                            <config>
-                                <type>check</type>
-                            </config>
-                        </TCEforms>
+                        <label>LLL:EXT:evangtermine/Resources/Private/Language/locallang.xlf:feflexform.hidePlaces</label>
+                        <config>
+                            <type>check</type>
+                        </config>
                     </settings.hide_places>
                     <settings.hide_zip_search>
-                        <TCEforms>
-                            <label>LLL:EXT:evangtermine/Resources/Private/Language/locallang.xlf:feflexform.hideZipSearch</label>
-                            <config>
-                                <type>check</type>
-                            </config>
-                        </TCEforms>
+                        <label>LLL:EXT:evangtermine/Resources/Private/Language/locallang.xlf:feflexform.hideZipSearch</label>
+                        <config>
+                            <type>check</type>
+                        </config>
                     </settings.hide_zip_search>
                     <settings.hide_searchword>
-                        <TCEforms>
-                            <label>LLL:EXT:evangtermine/Resources/Private/Language/locallang.xlf:feflexform.hideSearchword</label>
-                            <config>
-                                <type>check</type>
-                            </config>
-                        </TCEforms>
+                        <label>LLL:EXT:evangtermine/Resources/Private/Language/locallang.xlf:feflexform.hideSearchword</label>
+                        <config>
+                            <type>check</type>
+                        </config>
                     </settings.hide_searchword>
                     <settings.hide_date>
-                        <TCEforms>
-                            <label>LLL:EXT:evangtermine/Resources/Private/Language/locallang.xlf:feflexform.hideDate</label>
-                            <config>
-                                <type>check</type>
-                            </config>
-                        </TCEforms>
+                        <label>LLL:EXT:evangtermine/Resources/Private/Language/locallang.xlf:feflexform.hideDate</label>
+                        <config>
+                            <type>check</type>
+                        </config>
                     </settings.hide_date>
                     <settings.hide_hideOngoingEvents>
-                        <TCEforms>
-                            <label>LLL:EXT:evangtermine/Resources/Private/Language/locallang.xlf:feflexform.hide_hideOngoingEvents</label>
-                            <config>
-                                <type>check</type>
-                            </config>
-                        </TCEforms>
+                        <label>LLL:EXT:evangtermine/Resources/Private/Language/locallang.xlf:feflexform.hide_hideOngoingEvents</label>
+                        <config>
+                            <type>check</type>
+                        </config>
                     </settings.hide_hideOngoingEvents>
                     <settings.hide_itemsPerPage>
-                        <TCEforms>
-                            <label>LLL:EXT:evangtermine/Resources/Private/Language/locallang.xlf:feflexform.hideItemsPerPage</label>
-                            <config>
-                                <type>check</type>
-                            </config>
-                        </TCEforms>
+                        <label>LLL:EXT:evangtermine/Resources/Private/Language/locallang.xlf:feflexform.hideItemsPerPage</label>
+                        <config>
+                            <type>check</type>
+                        </config>
                     </settings.hide_itemsPerPage>
                 </el>
             </ROOT>
