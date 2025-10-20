@@ -13,6 +13,12 @@
     "license": ["GPL-2.0-or-later"],
     "authors": [
 		{
+			"name": "Daniel Simon",
+			"email": "dsimon@sudhaus7.de",
+			"role": "Developer",
+			"homepage": "https://sudhaus7.de/"
+		},
+		{
 			"name": "Frank Berger",
 			"email": "fberger@sudhaus7.de",
 			"role": "Developer",

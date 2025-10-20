@@ -16,10 +16,10 @@ Evangelische Termine
 
 	:Extension name:
 		Evangelische Termine für TYPO3
-	
+
 	:Extension Key:
 		evangtermine
-		
+
 	:Version:
 		|release|
 
@@ -33,10 +33,10 @@ Evangelische Termine
 		04/2023
 
 	:Author:
-		Christoph Roth - Evangelische Kirche von Westfalen
+		Christoph Roth - Evangelische Kirche von Westfalen, Daniel Simon - Sudhaus7
 
 	:Email:
-		christoph.roth@ekvw.de
+		christoph.roth@ekvw.de, dsimon@sudhaus7.de
 
 	:License:
 		This document is published under the Open Content License
@@ -49,13 +49,13 @@ Evangelische Termine
 	a GNU/GPL CMS/Framework available from `www.typo3.org <http://www.typo3.org/>`_.
 
 	**Why this is not an english manual**
-	
+
 	This extension integrates the output of the proprietary "Evangelische Termine" web application into TYPO3 web sites.
-	"Evangelische Termine" is an application for publication and management	of local event notes 
+	"Evangelische Termine" is an application for publication and management	of local event notes
 	owned by `Vernetzte Kirche`_ and used by several protestant churches in Germany.
 	As it would make little sense to write an english manual for an all-german target audience,
-	this document will be in german. 
-	
+	this document will be in german.
+
 	**Inhaltsverzeichnis**
 
 .. toctree::
@@ -66,4 +66,4 @@ Evangelische Termine
 	Introduction/Index
 	UsersManual/Index
 
-.. _Vernetzte Kirche: http://www.vernetzte-kirche.de	
+.. _Vernetzte Kirche: http://www.vernetzte-kirche.de
