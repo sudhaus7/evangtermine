@@ -10,6 +10,11 @@
 
 		<header/>
 		<body>
+			<trans-unit id="extconftemplate.labelImportEvents">
+				<source>Retrieve events from the database instead of from the API.:If this option is selected, the data must be imported via CLI script.</source>
+				<target>Termine aus der Datenbank holen, anstatt aus der API: Wenn diese Option ausgewählt ist, müssen die Daten per CLI-Skript importiert werden.</target>
+			</trans-unit>
+
 			<trans-unit id="extconftemplate.labelHost">
 				<source></source>
 				<target>Host festlegen:Bestimmen Sie hier, in welcher Landeskirche Sie Evangelische Termine einbinden möchten.</target>
@@ -17,7 +22,7 @@
 
 			<trans-unit id="extconftemplate.labelMode">
 				<source></source>
-				<target>Daten-Cache benutzen:Bei Cache-Benutzung werden die Daten schneller und Ressourcen schonender abgerufen, es sind aber u.U. nicht alle Inhaltsfelder vorhanden.</target>
+				<target>Daten-Cache benutzen:Bei Cache-Benutzung werden die Daten schneller und Ressourcen schonender abgerufen, es sind aber u.U. nicht alle Inhaltsfelder vorhanden. Nur relevant, wenn die Veranstaltungen nicht importiert werden.</target>
 			</trans-unit>
 
 			<trans-unit id="pluginsheet.general">

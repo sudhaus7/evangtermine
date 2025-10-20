@@ -1,3 +1,19 @@
+Version 4.0.0
+-------------
+
+Datum 20.10.2025
+
+- Kompatibel mit TYPO3 13.4.x
+
+Version 3.0.0
+-------------
+
+Datum 20.10.2025
+
+- Zusätzliche Option: Speicherung der Veranstaltungen in der TYPO3-Datenbank via CLI-Skript
+- Kompatibel mit TYPO3 12.4.x
+
+
 Version 2.2.3
 -------------
 
@@ -152,7 +168,7 @@ Datum: 20.07.2015
 
 - Fehler mit templateRootPaths usw. in Dokumentation korrigiert.
 
- 
+
 Version 2.0.0
 -------------
 
@@ -160,4 +176,3 @@ Datum: 20.07.2015
 
 - Erste veröffentlichte Version
 
- 

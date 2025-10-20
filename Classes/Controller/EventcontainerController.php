@@ -62,7 +62,7 @@ class EventcontainerController extends ActionController
         $this->settingsUtility = $settingsUtility;
         $this->renderingContextFactory = $renderingContextFactory;
         $this->extconf = GeneralUtility::makeInstance(ExtConf::class);
-        $this->importEvents = (bool)$this->extconf->getExtConfArray()['importEvents'];
+        $this->importEvents = (bool)$this->extconf->getExtConfArray()['importEvents'] ?? false;
     }
 
     protected function initializeAction(): void

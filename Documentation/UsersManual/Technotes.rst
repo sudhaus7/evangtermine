@@ -4,19 +4,19 @@ Feldwerte auslesen
 evangtermine ruft die XML-Ausgabe von evangelische-termine.de ab, also z.B.::
 
 	https://www.evangelische-termine.de/xml?highlight=high&itemsPerPage=20
-	
+
 Was zu einer XML-Datei mit einer Liste von <Veranstaltung>-Elementen führt (Ausschnitt):
 
 .. figure:: xml_raw_list.png
 	:width: 600px
 	:alt: Ausschnitt XML-Ergebnis
-	
+
 	Ausschnitt XML-Ergebnis
-	
+
 Die Liste der <Veranstaltung>-Elemente wird in ein Array von SimpleXMLElement-Objekten übertragen und an das Fluid-Template
 übergeben, es steht dort unter dem Namen **events.items** zur Verfügung. Im Template wird daraus eine Schleife gebildet::
 
-	<f:for each="{events.items}" as="event">
+	<f:for each="{events}" as="event" iteration="iterator">
 	...
 	...
 	</f:for each>
@@ -28,27 +28,46 @@ werden kann, z.B.::
 
 So lassen sich alle Feldwerte auslesen.
 
+Wenn die Veranstaltungen in der Datenbank gespeichert werden, werden die Feldwerte stattdessen mit Hilfe des Models **ArbkomEKvW\Evangtermine\Domain\Model\Event**
+geholt. Dieses Model beinhaltet die gewöhnlichen Setter, beispielsweise
+
+..  code-block:: php
+    public function getUserRealname(): string
+        {
+            return $this->userRealname;
+        }
+
+und darüberhinaus angepasste Setter, beispielsweise
+
+.. code-block:: php
+    public function get_user_REALNAME(): string
+    {
+        return $this->getUserRealname();
+    }
+
+um dieselbe Fluid-Syntax **event._user_REALNAME** verwenden zu können, unabhängig davon, ob die Veranstaltungen aus der Datenbank oder der API geholt werden.
+
 Labels
 ^^^^^^
 
 Wenn auf die Labels einzelner Felder zugegriffen werden soll, steht dafür ein eigener ViewHelper zur Verfügung, z.B.::
 
 	<et:attr on="{event._event_TITLE}" name="Label" />
-	
+
 Liest aus dem Objekt unter event._event_TITLE das Attribut "Label", also in diesem Fall der Wert "Titel".
-	
+
 
 Verwendbare ViewHelper
 ----------------------
 
 **et:attr**
-	
+
 Liest Attributwerte aus einem SimpleXMLElement-Objekt aus::
-	
+
 	<et:attr on="{event._event_TITLE}" name="Label" />
-	
-ergibt "Titel".	
-	
+
+ergibt "Titel".
+
 ============ =============================== =======
 Eigenschaft  Bedeutung                       Pflicht
 ============ =============================== =======
@@ -69,20 +88,20 @@ Eigenschaft  Bedeutung                      Pflicht
 ============ ============================== =======
 on           SimpleXMLElement-Objekt        ja
 ============ ============================== =======
-	
-	
+
+
 **et:tag**
 
 Hüllt den Wert von *node* in einen Tag *name* mit einem class-Attribut *class*::
 
 	<et:tag node="{event._event_TITLE}" name="p" class="important" />
-	
+
 	erzeugt
-	
+
 	<p class="important">Gottesdienst zum Erntedank</p>
-	
+
 Werden *name* und *class* nicht angegeben, entspricht *name* = "span" und *class* dem Namen des
-XML-Knotens mit vorangestelltem "et", also z.B. *et_event_TITLE* 
+XML-Knotens mit vorangestelltem "et", also z.B. *et_event_TITLE*
 
 =========== ============================== =======
 Eigenschaft Bedeutung                      Pflicht
@@ -102,11 +121,11 @@ Template: **List.html** (EventcontainerController, Action: **list**)
 **events**
 	Objekt vom Typ Eventcontainer, enthält unter {events.items} die Liste der <Veranstaltung>-Elemente
 	(SimpleXMLElements) und unter {events.metaData} das Element <meta>.
-	
+
 **etkeys**
 	Objekt vom Typ EtKeys. Attribute des Objekts sind alle aktiven Request-Parameter aus dem Abruf
-	der XML-Daten. {etkeys.highlight} liefert z.B. den Parameter *highlight* mit dem Wert *high* oder *all*, 
-	{etkeys.vid} die aktive Veranstalter-Id usw.   
+	der XML-Daten. {etkeys.highlight} liefert z.B. den Parameter *highlight* mit dem Wert *high* oder *all*,
+	{etkeys.vid} die aktive Veranstalter-Id usw.
 
 **categoryList**
 	Liste der gültigen Veranstaltungskategorien (variiert je nach Landeskirche)
@@ -131,7 +150,7 @@ Template: **Show.html** (EventcontainerController, Action: **show**)
 **detailitems**
 	Die Felder des Elements <detail>, das ist eine Liste von <item>-Elementen mit fertig zusammengesetzter
 	Veranstaltungsadresse und anderen Informationen.
-	
+
 
 **eventhost**
 	Der Hostname, der im Extension Manager eingestellt wurde, z.B. www.evangelische-termine.de oder www.veranstaltungen-ekvw.de

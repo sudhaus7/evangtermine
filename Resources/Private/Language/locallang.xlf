@@ -9,12 +9,16 @@
 
 		<header />
 		<body>
+			<trans-unit id="extconftemplate.labelImportEvents">
+				<source>Retrieve events from the database instead of from the API.:If this option is selected, the data must be imported via CLI script.</source>
+			</trans-unit>
+
 			<trans-unit id="extconftemplate.labelHost">
             	<source>Choose host:Select the church you will use Evangelische Termine in.</source>
             </trans-unit>
 
             <trans-unit id="extconftemplate.labelMode">
-                <source>Use cached data:Using cached data will be faster, but in some cases there might be not all content fields available.</source>
+                <source>Use cached data:Using cached data will be faster, but in some cases there might be not all content fields available. Only relevant when not importing the events.</source>
             </trans-unit>
 
 			<trans-unit id="pluginsheet.general">
