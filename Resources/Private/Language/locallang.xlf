@@ -14,10 +14,6 @@
             </trans-unit>
 
 			<trans-unit id="extconftemplate.labelHost">
-            	<source>Retrieve events from the database instead of from the API.</source>
-            </trans-unit>
-
-			<trans-unit id="extconftemplate.labelHost">
             	<source>Choose host:Select the church you will use Evangelische Termine in.</source>
             </trans-unit>
 
