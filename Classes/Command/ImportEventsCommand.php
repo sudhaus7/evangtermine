@@ -5,12 +5,11 @@ namespace ArbkomEKvW\Evangtermine\Command;
 use ArbkomEKvW\Evangtermine\Domain\Model\Categorylist;
 use ArbkomEKvW\Evangtermine\Domain\Model\Eventcontainer;
 use ArbkomEKvW\Evangtermine\Domain\Model\Grouplist;
-use ArbkomEKvW\Evangtermine\Solr\IndexService;
+use ArbkomEKvW\Evangtermine\Solr\IndexServiceInterface;
 use ArbkomEKvW\Evangtermine\Util\FieldMapping;
 use ArbkomEKvW\Evangtermine\Util\UrlUtility;
 use DateTime;
 use DateTimeZone;
-use Doctrine\DBAL\Driver\Exception;
 use Psr\Log\LoggerAwareInterface;
 use Psr\Log\LoggerAwareTrait;
 use SimpleXMLElement;
@@ -22,12 +21,10 @@ use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 
-use TYPO3\CMS\Core\Information\Typo3Version;
-use TYPO3\CMS\Core\Site\SiteFinder;
 use function sys_get_temp_dir;
-
 use TYPO3\CMS\Core\Configuration\Exception\ExtensionConfigurationExtensionNotConfiguredException;
 use TYPO3\CMS\Core\Configuration\Exception\ExtensionConfigurationPathDoesNotExistException;
+
 use TYPO3\CMS\Core\Configuration\ExtensionConfiguration;
 use TYPO3\CMS\Core\Database\ConnectionPool;
 use TYPO3\CMS\Core\DataHandling\DataHandler;
@@ -35,9 +32,11 @@ use TYPO3\CMS\Core\DataHandling\Model\RecordStateFactory;
 use TYPO3\CMS\Core\DataHandling\SlugHelper;
 use TYPO3\CMS\Core\Exception\SiteNotFoundException;
 use TYPO3\CMS\Core\Http\RequestFactory;
+use TYPO3\CMS\Core\Information\Typo3Version;
 use TYPO3\CMS\Core\Log\LogManager;
 use TYPO3\CMS\Core\Resource\ResourceStorage;
 use TYPO3\CMS\Core\Resource\StorageRepository;
+use TYPO3\CMS\Core\Site\SiteFinder;
 use TYPO3\CMS\Core\Utility\ExtensionManagementUtility;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 
@@ -64,16 +63,18 @@ class ImportEventsCommand extends Command implements LoggerAwareInterface
     protected string $detailPageSlugPart = '/termindetails';
 
     public function __construct(
-        private readonly SiteFinder $siteFinder
+        private readonly SiteFinder $siteFinder,
+        private readonly IndexServiceInterface $solrIndexer
     ) {
         parent::__construct();
     }
 
     /**
-     * @throws ExtensionConfigurationPathDoesNotExistException
+     * @param InputInterface $input
+     * @param OutputInterface $output
      * @throws ExtensionConfigurationExtensionNotConfiguredException
+     * @throws ExtensionConfigurationPathDoesNotExistException
      * @throws \Doctrine\DBAL\Exception
-     * @throws SiteNotFoundException
      */
     public function initialize(InputInterface $input, OutputInterface $output): void
     {
@@ -121,7 +122,6 @@ class ImportEventsCommand extends Command implements LoggerAwareInterface
      * @param InputInterface $input
      * @param OutputInterface $output
      * @return int
-     * @throws Exception
      * @throws SiteNotFoundException
      * @throws \Doctrine\DBAL\Exception
      */
@@ -138,12 +138,10 @@ class ImportEventsCommand extends Command implements LoggerAwareInterface
         }
 
         $this->importAllEvents($input, $output);
-
         if (ExtensionManagementUtility::isLoaded('solr')) {
             $this->logger->info('starting Solr Index');
-            $solrIndexer = GeneralUtility::makeInstance(IndexService::class);
-            $solrIndexer->setLogger($this->logger);
-            $solrIndexer->indexForAllSites();
+            $this->solrIndexer->setLogger($this->logger);
+            $this->solrIndexer->indexForAllSites();
             $this->logger->info('finish Solr Index');
         }
 
@@ -221,7 +219,9 @@ class ImportEventsCommand extends Command implements LoggerAwareInterface
             $queryBuilder = $this->connectionPool->getQueryBuilderForTable('tx_evangtermine_domain_model_event');
             $queryBuilder->select('uid')
                 ->from(
-                    'tx_evangtermine_domain_model_event')->where($queryBuilder->expr()->eq('id', $queryBuilder->createNamedParameter($event['id']))
+                    'tx_evangtermine_domain_model_event'
+                )->where(
+                    $queryBuilder->expr()->eq('id', $queryBuilder->createNamedParameter($event['id']))
                 );
             $uid = $queryBuilder->executeQuery()->fetchOne();
 
@@ -275,6 +275,9 @@ class ImportEventsCommand extends Command implements LoggerAwareInterface
     }
 
     /**
+     * @param array $event
+     * @param $uid
+     * @return string
      * @throws SiteNotFoundException
      * @throws \Doctrine\DBAL\Exception
      */
@@ -288,6 +291,9 @@ class ImportEventsCommand extends Command implements LoggerAwareInterface
     }
 
     /**
+     * @param string $slug
+     * @param $uid
+     * @return string
      * @throws \Doctrine\DBAL\Exception
      */
     private function checkSlugForDuplicates(string $slug, $uid): string
@@ -310,7 +316,6 @@ class ImportEventsCommand extends Command implements LoggerAwareInterface
     /**
      * @param InputInterface $input
      * @param OutputInterface $output
-     *
      * @return SplObjectStorage<SimpleXMLElement>
      * @throws \Doctrine\DBAL\Exception
      */
@@ -354,7 +359,11 @@ class ImportEventsCommand extends Command implements LoggerAwareInterface
         return $newItems;
     }
 
-    /**
+    /**+
+     * @param SplObjectStorage $newItems
+     * @param array $items
+     * @param string $key
+     * @return void
      * @throws \Doctrine\DBAL\Exception
      */
     protected function getNewItems(SplObjectStorage $newItems, array $items, string $key): void
@@ -410,6 +419,9 @@ class ImportEventsCommand extends Command implements LoggerAwareInterface
     }
 
     /**
+     * @param array $event
+     * @param string $itemField
+     * @param string $eventField
      * @throws \Doctrine\DBAL\Exception
      */
     protected function insertImage(array $event, string $itemField, string $eventField): void
@@ -493,6 +505,7 @@ class ImportEventsCommand extends Command implements LoggerAwareInterface
     }
 
     /**
+     * @param OutputInterface $output
      * @throws \Doctrine\DBAL\Exception
      */
     protected function deleteEvents(OutputInterface $output): void
@@ -628,8 +641,8 @@ class ImportEventsCommand extends Command implements LoggerAwareInterface
     }
 
     /**
+     * @return array
      * @throws \Doctrine\DBAL\Exception
-     * @throws SiteNotFoundException
      */
     protected function getPagesWithPlugin(): array
     {
@@ -654,7 +667,6 @@ class ImportEventsCommand extends Command implements LoggerAwareInterface
                     ];
                 }
             } catch (\Exception $e) {
-
             }
         }
         foreach ($pages as $pageUid => $page) {

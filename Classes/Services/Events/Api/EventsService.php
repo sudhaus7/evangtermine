@@ -48,7 +48,7 @@ class EventsService extends EventsServiceBase implements EventsServiceInterface
         return [
             $eventContainer->getItems()[0],
             $eventContainer->getMetaData(),
-            $eventContainer->getDetail()
+            $eventContainer->getDetail(),
         ];
     }
 

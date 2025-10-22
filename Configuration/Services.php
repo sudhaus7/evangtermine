@@ -4,11 +4,12 @@ declare(strict_types=1);
 
 use ArbkomEKvW\Evangtermine\Command\ImportEventsCommand;
 use ArbkomEKvW\Evangtermine\Services\Events\EventsServiceInterface;
+use ArbkomEKvW\Evangtermine\Solr\DummyIndexService;
 use ArbkomEKvW\Evangtermine\Solr\IndexService;
+use ArbkomEKvW\Evangtermine\Solr\IndexServiceInterface;
 use Symfony\Component\DependencyInjection\Loader\Configurator\ContainerConfigurator;
 use TYPO3\CMS\Core\Configuration\ExtensionConfiguration;
-use TYPO3\CMS\Core\Package\PackageManager;
-use TYPO3\CMS\Core\Service\DependencyOrderingService;
+use TYPO3\CMS\Core\Utility\ExtensionManagementUtility;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 
 return static function (ContainerConfigurator $containerConfigurator): void {
@@ -29,11 +30,18 @@ return static function (ContainerConfigurator $containerConfigurator): void {
         'description' => '',
     ]);
 
-    $dependencyOrderingService = GeneralUtility::makeInstance(DependencyOrderingService::class);
-    $packageManager = GeneralUtility::makeInstance(PackageManager::class, $dependencyOrderingService);
-    if ($packageManager->isPackageActive('solr')) {
+    if (ExtensionManagementUtility::isLoaded('solr')) {
         $services->set(IndexService::class)
             ->public();
+        $services->alias(
+            IndexServiceInterface::class,
+            IndexService::class
+        );
+    } else {
+        $services->alias(
+            IndexServiceInterface::class,
+            DummyIndexService::class
+        );
     }
 
     $extConfig  = GeneralUtility::makeInstance(ExtensionConfiguration::class)->get('evangtermine');

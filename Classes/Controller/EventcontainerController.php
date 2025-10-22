@@ -220,7 +220,6 @@ class EventcontainerController extends ActionController
                         new ModifyEvangTermineShowActionViewEvent($this->view, $event)
                     );
                 }
-
             } else {
                 $this->addFlashMessage('Keine Event-ID übergeben', '', ContextualFeedbackSeverity::ERROR);
                 $this->redirect('genericinfo');
@@ -340,7 +339,6 @@ class EventcontainerController extends ActionController
      * @param mixed $events
      * @param FrontendInterface $cache
      * @param string $cacheKey
-     * @return void
      */
     protected function setCache(string $content, mixed $events, FrontendInterface $cache, string $cacheKey): void
     {
