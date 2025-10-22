@@ -9,6 +9,8 @@ use ArbkomEKvW\Evangtermine\Solr\IndexService;
 use ArbkomEKvW\Evangtermine\Solr\IndexServiceInterface;
 use Symfony\Component\DependencyInjection\Loader\Configurator\ContainerConfigurator;
 use TYPO3\CMS\Core\Configuration\ExtensionConfiguration;
+use TYPO3\CMS\Core\Package\PackageManager;
+use TYPO3\CMS\Core\Service\DependencyOrderingService;
 use TYPO3\CMS\Core\Utility\ExtensionManagementUtility;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 
@@ -30,7 +32,9 @@ return static function (ContainerConfigurator $containerConfigurator): void {
         'description' => '',
     ]);
 
-    if (ExtensionManagementUtility::isLoaded('solr')) {
+    $dependencyOrderingService = GeneralUtility::makeInstance(DependencyOrderingService::class);
+    $packageManager = GeneralUtility::makeInstance(PackageManager::class, $dependencyOrderingService);
+    if ($packageManager->isPackageActive('solr')) {
         $services->set(IndexService::class)
             ->public();
         $services->alias(

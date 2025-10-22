@@ -359,7 +359,7 @@ class ImportEventsCommand extends Command implements LoggerAwareInterface
         return $newItems;
     }
 
-    /**+
+    /**
      * @param SplObjectStorage $newItems
      * @param array $items
      * @param string $key
