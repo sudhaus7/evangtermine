@@ -27,7 +27,6 @@ class PageNotFoundMiddleware implements MiddlewareInterface
         if ($this->is404Request($request)) {
             foreach ($this->uriParts as $uriPart) {
                 if (str_contains($this->requestUri, $uriPart)) {
-
                     /**
                      * First replace the uri
                      * "https://example.com/listpage/termindetails/slug-of-event"
@@ -44,7 +43,8 @@ class PageNotFoundMiddleware implements MiddlewareInterface
                         $newUri = GeneralUtility::makeInstance(Uri::class, $uri);
 
                         /** @var ServerRequest $newRequest */
-                        $newRequest = GeneralUtility::makeInstance(ServerRequest::class,
+                        $newRequest = GeneralUtility::makeInstance(
+                            ServerRequest::class,
                             $newUri,
                             $request->getMethod(),
                             $request->getBody(),

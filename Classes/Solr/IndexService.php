@@ -22,7 +22,7 @@ use TYPO3\CMS\Core\Utility\GeneralUtility;
 use TYPO3\CMS\Extbase\Persistence\Generic\Exception\UnexpectedTypeException;
 use TYPO3\CMS\Extbase\Persistence\QueryInterface;
 
-class IndexService implements LoggerAwareInterface
+class IndexService implements IndexServiceInterface, LoggerAwareInterface
 {
     use LoggerAwareTrait;
 
@@ -104,7 +104,7 @@ class IndexService implements LoggerAwareInterface
                     GeneralUtility::makeInstance(ConnectionPool::class)
                         ->getConnectionForTable('tx_solr_indexqueue_item')
                         ->update(
-                        'tx_solr_indexqueue_item',
+                            'tx_solr_indexqueue_item',
                             [
                                 'changed' => time(),
                             ],
@@ -118,7 +118,7 @@ class IndexService implements LoggerAwareInterface
                     GeneralUtility::makeInstance(ConnectionPool::class)
                         ->getConnectionForTable('tx_solr_indexqueue_item')
                         ->insert(
-                        'tx_solr_indexqueue_item',
+                            'tx_solr_indexqueue_item',
                             [
                                 'item_uid'               => $itemUid,
                                 'item_type'              => 'tx_evangtermine_domain_model_event',

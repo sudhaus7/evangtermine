@@ -4,11 +4,11 @@ declare(strict_types=1);
 
 use ArbkomEKvW\Evangtermine\Command\ImportEventsCommand;
 use ArbkomEKvW\Evangtermine\Services\Events\EventsServiceInterface;
+use ArbkomEKvW\Evangtermine\Solr\DummyIndexService;
 use ArbkomEKvW\Evangtermine\Solr\IndexService;
+use ArbkomEKvW\Evangtermine\Solr\IndexServiceInterface;
 use Symfony\Component\DependencyInjection\Loader\Configurator\ContainerConfigurator;
 use TYPO3\CMS\Core\Configuration\ExtensionConfiguration;
-use TYPO3\CMS\Core\Package\PackageManager;
-use TYPO3\CMS\Core\Service\DependencyOrderingService;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 
 return static function (ContainerConfigurator $containerConfigurator): void {
@@ -18,23 +18,34 @@ return static function (ContainerConfigurator $containerConfigurator): void {
         ->autowire()
         ->autoconfigure();
 
-    $services->load('ArbkomEKvW\Evangtermine\\', __DIR__ . '/../Classes/*')
-        ->exclude([
-        __DIR__ . '/../Classes/Domain/Model/*',
-    ]);
+    if (class_exists('\\ApacheSolrForTypo3\\Solr\\IndexQueue\\Queue')) {
+        $services->load('ArbkomEKvW\Evangtermine\\', __DIR__ . '/../Classes/*')
+            ->exclude([
+                __DIR__ . '/../Classes/Domain/Model/*',
+            ]);
+        $services->alias(
+            IndexServiceInterface::class,
+            IndexService::class
+        );
+    } else {
+        $services->load('ArbkomEKvW\Evangtermine\\', __DIR__ . '/../Classes/*')
+            ->exclude([
+                __DIR__ . '/../Classes/Domain/Model/*',
+                __DIR__ . '/../Classes/Solr/EventStrategy.php',
+                __DIR__ . '/../Classes/Solr/IndexService.php',
+                __DIR__ . '/../Classes/Solr/TermineInitializer.php',
+            ]);
+        $services->alias(
+            IndexServiceInterface::class,
+            DummyIndexService::class
+        );
+    }
 
     $services->set(ImportEventsCommand::class)
         ->tag('console.command', [
-        'command' => 'evangtermine:importevents',
-        'description' => '',
-    ]);
-
-    $dependencyOrderingService = GeneralUtility::makeInstance(DependencyOrderingService::class);
-    $packageManager = GeneralUtility::makeInstance(PackageManager::class, $dependencyOrderingService);
-    if ($packageManager->isPackageActive('solr')) {
-        $services->set(IndexService::class)
-            ->public();
-    }
+            'command' => 'evangtermine:importevents',
+            'description' => '',
+        ]);
 
     $extConfig  = GeneralUtility::makeInstance(ExtensionConfiguration::class)->get('evangtermine');
     if (!empty($extConfig['importEvents'])) {
