@@ -185,8 +185,6 @@ plugin.tx_solr.index.queue {
                 returnLast = url
                 linkAccessRestrictedPages = 1
             }
-
         }
     }
-
 }
