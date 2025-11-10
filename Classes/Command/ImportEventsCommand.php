@@ -127,7 +127,6 @@ class ImportEventsCommand extends Command implements LoggerAwareInterface
      */
     public function execute(InputInterface $input, OutputInterface $output): int
     {
-        var_dump(get_class($this->solrIndexer));exit;
         if ($input->getOption('removelock')) {
             $this->removeFileForRunCheck();
         }
