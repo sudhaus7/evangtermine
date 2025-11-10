@@ -1,7 +1,6 @@
 
 plugin.tx_evangtermine {
 	view {
-
 		templateRootPaths {
 			10 = {$plugin.tx_evangtermine.view.templateRootPaths}
 		}
