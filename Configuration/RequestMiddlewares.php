@@ -14,7 +14,7 @@
  */
 
 return [
-    'frontend' => [
+    /*'frontend' => [
         'sudhaus7/evangtermine' => [
             'target' => \ArbkomEKvW\Evangtermine\Middleware\PageNotFoundMiddleware::class,
             'after' => [
@@ -24,5 +24,5 @@ return [
                 'typo3/cms-frontend/site',
             ],
         ],
-    ],
+    ],*/
 ];
