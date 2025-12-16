@@ -363,7 +363,6 @@ class ImportEventsCommand extends Command implements LoggerAwareInterface
      * @param SplObjectStorage $newItems
      * @param array $items
      * @param string $key
-     * @return void
      * @throws \Doctrine\DBAL\Exception
      */
     protected function getNewItems(SplObjectStorage $newItems, array $items, string $key): void

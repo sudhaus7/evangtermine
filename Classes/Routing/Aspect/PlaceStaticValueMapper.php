@@ -16,6 +16,7 @@ class PlaceStaticValueMapper extends AbstractStaticValueMapper
     {
         parent::__construct($settings);
 
+        /** @var EventRepository $eventRepository */
         $eventRepository = GeneralUtility::makeInstance(EventRepository::class);
         $places = $eventRepository->findAllPlaces();
         foreach ($places as $key => $place) {

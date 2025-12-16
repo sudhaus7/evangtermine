@@ -84,6 +84,8 @@ if (!isset($GLOBALS['TYPO3_CONF_VARS']['SYS']['caching']['cacheConfigurations'][
         = \TYPO3\CMS\Core\Cache\Frontend\VariableFrontend::class;
 }
 
+$GLOBALS['TYPO3_CONF_VARS']['SYS']['routing']['aspects']['Prevent404ValueMapper']
+    = ArbkomEKvW\Evangtermine\Routing\Aspect\Prevent404ValueMapper::class;
 /*$GLOBALS['TYPO3_CONF_VARS']['SYS']['routing']['aspects']['RegionStaticValueMapper']
     = ArbkomEKvW\Evangtermine\Routing\Aspect\RegionStaticValueMapper::class;
 $GLOBALS['TYPO3_CONF_VARS']['SYS']['routing']['aspects']['PlaceStaticValueMapper']

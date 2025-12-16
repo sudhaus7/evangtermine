@@ -202,6 +202,11 @@ class EventcontainerController extends ActionController
         // We need this for multiple evang. Termine plugins on one site.
         if ($this->pluginIsDetailPlugin($data)) {
             $uid = $this->request->getArguments()['uid'] ?? $this->request->getArguments()['ID'] ?? null;
+
+            if ($uid == -1) {
+                return $this->redirectToListPage($data['pid']);
+            }
+
             if (!empty($uid)) {
                 [$event, $meta, $detailItems] = $this->eventsService->findByUid($uid);
 
@@ -225,12 +230,7 @@ class EventcontainerController extends ActionController
                 $this->redirect('genericinfo');
             }
         } else {
-            // render content of teaser or list
-            if ($data['list_type'] == 'evangtermine_teaser') {
-                return $this->teaserAction();
-            }
-            $this->view = $this->setView('list');
-            return $this->listAction();
+            return $this->renderContentOfTeaserOrList($data['list_type']);
         }
         return $this->htmlResponse();
     }
@@ -345,5 +345,35 @@ class EventcontainerController extends ActionController
         if ($this->ifContentIsNotEmpty($content, $events ?? [])) {
             $cache->set($cacheKey, $content);
         }
+    }
+
+    /**
+     * @param $list_type
+     * @return ResponseInterface
+     * @throws Exception
+     * @throws NoSuchCacheException
+     */
+    protected function renderContentOfTeaserOrList($list_type): ResponseInterface
+    {
+        if ($list_type == 'evangtermine_teaser') {
+            return $this->teaserAction();
+        }
+        $this->view = $this->setView('list');
+        return $this->listAction();
+    }
+
+    /**
+     * @param $pid
+     * @return ResponseInterface
+     */
+    protected function redirectToListPage($pid): ResponseInterface
+    {
+        $url = $this->uriBuilder->reset()
+            ->setTargetPageUid($pid ?? 0)
+            ->build();
+
+        return $this->responseFactory->createResponse()
+            ->withStatus(404, '404 Not Found')
+            ->withHeader('Refresh', '0,url=' . $url);
     }
 }
