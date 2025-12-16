@@ -18,7 +18,7 @@ routeEnhancers:
     defaultController: 'Eventcontainer::list'
     aspects:
       eventtitle:
-        type: Prevent404ValueMapper
+        type: PersistedAliasMapper
         tableName: 'tx_evangtermine_domain_model_event'
         routeFieldName: 'slug'
         routeValuePrefix: '/'
@@ -61,7 +61,7 @@ routeEnhancers:
           eventtitle: uid
     aspects:
       eventtitle:
-        type: Prevent404ValueMapper
+        type: PersistedAliasMapper
         tableName: 'tx_evangtermine_domain_model_event'
         routeFieldName: 'slug'
         routeValuePrefix: '/'
