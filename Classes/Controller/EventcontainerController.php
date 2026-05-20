@@ -44,8 +44,7 @@ class EventcontainerController extends ActionController
     protected RenderingContextFactory $renderingContextFactory;
 
     /**
-     * Uid value of current tt_content record
-     * serves as unique id of this plugin instance, used for session identification
+     * Uid value of the current tt_content record serves as a unique i d of this plugin instance, used for session identification
      */
     private int $currentPluginUid;
 
@@ -55,14 +54,25 @@ class EventcontainerController extends ActionController
     private ExtConf $extconf;
     private bool $importEvents;
 
-    public function __construct(private readonly EventsServiceInterface $eventsService, private readonly DetailPageService $detailPageService, CacheManager $cacheManager, SettingsUtility $settingsUtility, RenderingContextFactory $renderingContextFactory)
+    public function __construct(
+        private readonly EventsServiceInterface $eventsService,
+        private readonly DetailPageService $detailPageService,
+        CacheManager $cacheManager,
+        SettingsUtility $settingsUtility,
+        RenderingContextFactory $renderingContextFactory
+    )
     {
         $this->cacheManager = $cacheManager;
         $this->date = new \DateTime();
         $this->settingsUtility = $settingsUtility;
         $this->renderingContextFactory = $renderingContextFactory;
         $this->extconf = GeneralUtility::makeInstance(ExtConf::class);
-        $this->importEvents = (bool)$this->extconf->getExtConfArray()['importEvents'] ?? false;
+        $config = $this->extconf->getExtConfArray();
+        if (empty($config['importEvents'] ?? '')) {
+            $this->importEvents = false;
+        } else {
+            $this->importEvents = (bool)$this->extconf->getExtConfArray()['importEvents'] ?? false;
+        }
     }
 
     protected function initializeAction(): void
@@ -81,7 +91,7 @@ class EventcontainerController extends ActionController
     }
 
     /**
-     * create new Etkeys object and load Settings
+     * create a new Etkeys object and load Settings
      * @return EtKeys $etkeys
      */
     private function getNewFromSettings(): EtKeys
@@ -96,7 +106,7 @@ class EventcontainerController extends ActionController
 
     /**
      * action list
-     * - must collect all parameters (etkeys) from config-settings, session and request
+     * - must collect all parameters (etkeys) from config-settings, session, and request
      * - update session
      * - retrieve Event data (from XML or DB)
      * - hand it to view
@@ -246,7 +256,7 @@ class EventcontainerController extends ActionController
     protected function setView(string $actionName)
     {
         $backendConfigurationManager = GeneralUtility::makeInstance(BackendConfigurationManager::class);
-        $typoscript = $backendConfigurationManager->getTypoScriptSetup();
+        $typoscript = $backendConfigurationManager->getTypoScriptSetup($this->request);
         $pluginConfiguration = $typoscript['plugin.']['tx_evangtermine.']['view.'] ?? [];
         if (empty($pluginConfiguration)) {
             return $this->view;

@@ -91,5 +91,5 @@ plugin.tx_evangtermine._CSS_DEFAULT_STYLE (
 )
 
 page.includeJSFooter {
-  pluginEvangtermineUrl = EXT:evangtermine/Resources/Public/JavaScript/url.min.js
+	pluginEvangtermineUrl = EXT:evangtermine/Resources/Public/JavaScript/url.min.js
 }

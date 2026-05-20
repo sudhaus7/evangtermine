@@ -33,12 +33,12 @@
                             <renderType>selectSingle</renderType>
                             <items type="array">
                                 <numIndex index="0" type="array">
-                                    <numIndex index="0">LLL:EXT:evangtermine/Resources/Private/Language/locallang.xlf:feflexform.highlight.high</numIndex>
-                                    <numIndex index="1">high</numIndex>
+                                    <label>LLL:EXT:evangtermine/Resources/Private/Language/locallang.xlf:feflexform.highlight.high</label>
+                                    <value>high</value>
                                 </numIndex>
                                 <numIndex index="1" type="array">
-                                    <numIndex index="0">LLL:EXT:evangtermine/Resources/Private/Language/locallang.xlf:feflexform.highlight.all</numIndex>
-                                    <numIndex index="1">all</numIndex>
+                                    <label>LLL:EXT:evangtermine/Resources/Private/Language/locallang.xlf:feflexform.highlight.all</label>
+                                    <value>all</value>
                                 </numIndex>
                             </items>
                             <default>all</default>
@@ -124,10 +124,10 @@
                     <settings.etkey_itemsPerPage>
                         <label>LLL:EXT:evangtermine/Resources/Private/Language/locallang.xlf:feflexform.itemsPerPage</label>
                         <config>
-                            <type>input</type>
+                            <type>number</type>
                             <size>20</size>
                             <default>20</default>
-                            <eval>trim,int</eval>
+                            <eval>trim</eval>
                         </config>
                     </settings.etkey_itemsPerPage>
                     <settings.evt_addprms>
@@ -166,18 +166,17 @@
             </ROOT>
         </cdistrict>
         <opmode>
-        	<ROOT>
+            <ROOT>
                 <sheetTitle>LLL:EXT:evangtermine/Resources/Private/Language/locallang.xlf:pluginsheet.opmode</sheetTitle>
                 <type>array</type>
                 <el>
-                	<settings.opmode_detailpage>
+                    <settings.opmode_detailpage>
                         <label>LLL:EXT:evangtermine/Resources/Private/Language/locallang.xlf:feflexform.detailpage</label>
                         <config>
                             <type>group</type>
-                            <internal_type>db</internal_type>
                             <allowed>pages</allowed>
                         </config>
-                	</settings.opmode_detailpage>
+                    </settings.opmode_detailpage>
                     <settings.hide_place_names>
                         <label>LLL:EXT:evangtermine/Resources/Private/Language/locallang.xlf:feflexform.hidePlaceNames</label>
                         <config>
@@ -191,7 +190,7 @@
                         </config>
                     </settings.etkey_hideOngoingEvents>
                 </el>
-        	</ROOT>
+            </ROOT>
         </opmode>
         <form>
             <ROOT>

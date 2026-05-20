@@ -181,7 +181,6 @@ plugin.tx_solr.index.queue {
                 parameter.data = site:evangtermineTargetPage
                 additionalParams = &tx_evangtermine_list[action]=show&tx_evangtermine_list[uid]={field:uid}
                 additionalParams.insertData = 1
-                useCacheHash = 1
                 returnLast = url
                 linkAccessRestrictedPages = 1
             }
