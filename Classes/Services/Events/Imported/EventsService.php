@@ -38,7 +38,7 @@ class EventsService extends EventsServiceBase implements EventsServiceInterface
             try {
                 $events = $this->eventRepository->findByEtKeys($query, $etKeys);
                 $nrOfEvents = $this->eventRepository->getNumberOfEventsByEtKeys($query);
-            } catch (\Exception $exception) {
+            } catch (\Exception) {
             }
         }
         return [$events ?? [], $nrOfEvents ?? 0];

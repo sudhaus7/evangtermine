@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * This file is part of the TYPO3 project.
  *
@@ -10,7 +12,6 @@
  *
  * The TYPO3 project - inspiring people to share!
  */
-
 namespace ArbkomEKvW\Evangtermine\Domain\Model;
 
 /***************************************************************

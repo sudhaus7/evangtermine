@@ -51,12 +51,9 @@ class LabelViewHelper extends AbstractViewHelper
     }
 
     /**
-     * @param array $arguments
-     * @param \Closure $renderChildrenClosure
-     * @param RenderingContextInterface $renderingContext
      * @return string
      */
-    public static function renderStatic(array $arguments, \Closure $renderChildrenClosure, RenderingContextInterface $renderingContext): string
+    public function render(): string
     {
         $eventTCA = $GLOBALS['TCA']['tx_evangtermine_domain_model_event']['columns'] ?? null;
         if (empty($eventTCA)) {

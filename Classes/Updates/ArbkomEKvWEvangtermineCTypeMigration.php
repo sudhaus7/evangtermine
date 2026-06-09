@@ -7,17 +7,17 @@ namespace ArbkomEKvW\Evangtermine\Updates;
 use TYPO3\CMS\Install\Attribute\UpgradeWizard;
 use TYPO3\CMS\Install\Updates\AbstractListTypeToCTypeUpdate;
 
-#[UpgradeWizard('arbkomEKvW_evangtermineCTypeMigration')]
-final class EvangtermineCTypeMigration extends AbstractListTypeToCTypeUpdate
+#[UpgradeWizard('arbkomekvwEvangtermineCTypeMigration')]
+final class ArbkomEKvWEvangtermineCTypeMigration extends AbstractListTypeToCTypeUpdate
 {
     public function getTitle(): string
     {
-        return 'Migrate "Evangtermine" plugins to content elements.';
+        return 'Migrate "ArbkomEKvW Evangtermine" plugins to content elements.';
     }
 
     public function getDescription(): string
     {
-        return 'The "Evangtermine" plugins are now registered as content element. Update migrates existing records and backend user permissions.';
+        return 'The "ArbkomEKvW Evangtermine" plugins are now registered as content element. Update migrates existing records and backend user permissions.';
     }
 
     /**

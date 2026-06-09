@@ -2,7 +2,6 @@
 
 namespace ArbkomEKvW\Evangtermine\ViewHelpers;
 
-use TYPO3Fluid\Fluid\Core\Rendering\RenderingContextInterface;
 use TYPO3Fluid\Fluid\Core\ViewHelper\AbstractViewHelper;
 
 class StringExplodeViewHelper extends AbstractViewHelper
@@ -13,8 +12,8 @@ class StringExplodeViewHelper extends AbstractViewHelper
         $this->registerArgument('separator', 'string', '', false);
     }
 
-    public static function renderStatic(array $arguments, \Closure $renderChildrenClosure, RenderingContextInterface $renderingContext): array
+    public function render(): array
     {
-        return explode($arguments['separator'] ?: ',', $arguments['string']);
+        return explode($this->arguments['separator'] ?: ',', (string) $this->arguments['string']);
     }
 }

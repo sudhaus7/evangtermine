@@ -56,8 +56,8 @@ class SettingsUtility
             if (is_array($value)) {
                 $value = implode(',', $value);
             }
-            if (substr($key, 0, 6) == 'etkey_' && $value != '') {
-                $targetMethod = 'set' . ucfirst(substr($key, 6));
+            if (str_starts_with((string) $key, 'etkey_') && $value != '') {
+                $targetMethod = 'set' . ucfirst(substr((string) $key, 6));
                 if (method_exists($etks, $targetMethod)) {
                     $etks->{$targetMethod}($value);
                 }
@@ -66,7 +66,7 @@ class SettingsUtility
 
         // evaluate additional params field in flexform
         if (isset($settingsArray['evt_addprms']) && $settingsArray['evt_addprms'] != '') {
-            $addprms = explode('&', $settingsArray['evt_addprms']);
+            $addprms = explode('&', (string) $settingsArray['evt_addprms']);
             foreach ($addprms as $keyval) {
                 if (str_contains($keyval, '=')) {
                     [$key, $value] = explode('=', trim($keyval));
@@ -90,7 +90,7 @@ class SettingsUtility
             if (empty($value) || $value == '0' || $value == 'all') {
                 continue;
             }
-            $targetMethod = 'set' . ucfirst($key);
+            $targetMethod = 'set' . ucfirst((string) $key);
             if (method_exists($etks, $targetMethod)) {
                 $etks->{$targetMethod}($value);
             }
@@ -104,7 +104,7 @@ class SettingsUtility
         if (empty($addParams)) {
             $settingsArray['evt_addprms'] = $stringForOnlyInternEvents;
         } else {
-            $addParamsArray = explode('&', $settingsArray['evt_addprms']);
+            $addParamsArray = explode('&', (string) $settingsArray['evt_addprms']);
             $destFound = false;
             foreach ($addParamsArray as $addParam) {
                 if (str_starts_with($addParam, 'dest=')) {

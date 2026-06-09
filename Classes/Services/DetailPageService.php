@@ -2,12 +2,17 @@
 
 namespace ArbkomEKvW\Evangtermine\Services;
 
+use TYPO3\CMS\Core\Database\Connection;
 use Doctrine\DBAL\Exception;
 use TYPO3\CMS\Core\Database\ConnectionPool;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 
 class DetailPageService
 {
+    public $settings;
+    public function __construct(private readonly ConnectionPool $connectionPool)
+    {
+    }
     /**
      * @throws Exception
      */
@@ -18,12 +23,12 @@ class DetailPageService
             return 0;
         }
 
-        $connectionPool = GeneralUtility::makeInstance(ConnectionPool::class);
+        $connectionPool = $this->connectionPool;
         $queryBuilder = $connectionPool->getQueryBuilderForTable('tt_content');
         $queryBuilder->select('*')
             ->from('tt_content')
             ->where(
-                $queryBuilder->expr()->eq('pid', $queryBuilder->createNamedParameter((int)$detailPage, \PDO::PARAM_INT)),
+                $queryBuilder->expr()->eq('pid', $queryBuilder->createNamedParameter((int)$detailPage, Connection::PARAM_INT)),
                 $queryBuilder->expr()->eq('list_type', $queryBuilder->createNamedParameter('evangtermine_detail'))
             );
         $result = $queryBuilder->executeQuery()->fetchAssociative();
@@ -33,7 +38,7 @@ class DetailPageService
             $queryBuilder->select('*')
                 ->from('tt_content')
                 ->where(
-                    $queryBuilder->expr()->eq('pid', $queryBuilder->createNamedParameter((int)$detailPage, \PDO::PARAM_INT)),
+                    $queryBuilder->expr()->eq('pid', $queryBuilder->createNamedParameter((int)$detailPage, Connection::PARAM_INT)),
                     $queryBuilder->expr()->eq('list_type', $queryBuilder->createNamedParameter('evangtermine_list'))
                 );
             $result = $queryBuilder->executeQuery()->fetchAssociative();
@@ -58,19 +63,16 @@ class DetailPageService
     {
         $detailPage = $this->settings['opmode_detailpage'] ?? 0;
         if (empty($detailPage)) {
-            if (isset($data['uid'])) {
-                return $data['uid'];
-            }
-            return 0;
+            return $data['uid'] ?? 0;
         }
 
         /** @var ConnectionPool $connectionPool */
-        $connectionPool = GeneralUtility::makeInstance(ConnectionPool::class);
+        $connectionPool = $this->connectionPool;
         $queryBuilder = $connectionPool->getQueryBuilderForTable('tt_content');
         $queryBuilder->select('*')
             ->from('tt_content')
             ->where(
-                $queryBuilder->expr()->eq('pid', $queryBuilder->createNamedParameter((int)$detailPage, \PDO::PARAM_INT)),
+                $queryBuilder->expr()->eq('pid', $queryBuilder->createNamedParameter((int)$detailPage, Connection::PARAM_INT)),
                 $queryBuilder->expr()->eq('list_type', $queryBuilder->createNamedParameter('evangtermine_detail'))
             );
         $result = $queryBuilder->executeQuery()->fetchAssociative();
@@ -83,7 +85,7 @@ class DetailPageService
         $queryBuilder->select('*')
             ->from('tt_content')
             ->where(
-                $queryBuilder->expr()->eq('pid', $queryBuilder->createNamedParameter((int)$detailPage, \PDO::PARAM_INT)),
+                $queryBuilder->expr()->eq('pid', $queryBuilder->createNamedParameter((int)$detailPage, Connection::PARAM_INT)),
                 $queryBuilder->expr()->eq('list_type', $queryBuilder->createNamedParameter('evangtermine_list'))
             );
         $result = $queryBuilder->executeQuery()->fetchAssociative();

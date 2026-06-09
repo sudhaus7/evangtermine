@@ -31,7 +31,7 @@ class EventsService extends EventsServiceBase implements EventsServiceInterface
         $eventContainer = $this->eventRepository->findByEtKeys($etKeys);
 
         // fine tune and save parameters to session
-        if ($etKeys->getQ() == 'none') {
+        if ($etKeys->getQ() === 'none') {
             $etKeys->setQ('');
         }
         return [$eventContainer->getItems(), $eventContainer->getMetaData()->totalItems];

@@ -21,12 +21,12 @@ class OsmService
         curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, true);
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
         $responseData = curl_exec($ch);
-        if (curl_errno($ch)) {
+        if (curl_errno($ch) !== 0) {
             return [];
         }
         curl_close($ch);
 
-        if (empty($responseData)) {
+        if ($responseData === false || ($responseData === '' || $responseData === '0')) {
             return ['0', '0'];
         }
         $responseDataArray = json_decode($responseData);

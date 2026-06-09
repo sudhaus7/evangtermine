@@ -52,7 +52,7 @@ class ExtConf implements SingletonInterface
      * Unserialized extConf Data
      * @var array
      */
-    private mixed $extConfArray;
+    private readonly mixed $extConfArray;
 
     /**
      * constructor

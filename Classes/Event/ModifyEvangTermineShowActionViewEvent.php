@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * This file is part of the TYPO3 project.
  *
@@ -10,7 +12,6 @@
  *
  * The TYPO3 project - inspiring people to share!
  */
-
 namespace ArbkomEKvW\Evangtermine\Event;
 
 use ArbkomEKvW\Evangtermine\Domain\Model\Event;
@@ -18,13 +19,8 @@ use TYPO3Fluid\Fluid\View\ViewInterface;
 
 final class ModifyEvangTermineShowActionViewEvent
 {
-    protected ViewInterface $view;
-    protected Event $event;
-
-    public function __construct(ViewInterface $view, Event $event)
+    public function __construct(protected ViewInterface $view, protected Event $event)
     {
-        $this->view = $view;
-        $this->event = $event;
     }
 
     public function getView(): ViewInterface

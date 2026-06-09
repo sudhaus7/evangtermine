@@ -2,6 +2,8 @@
 
 declare(strict_types=1);
 
+use ApacheSolrForTypo3\Solr\IndexQueue\Queue;
+use ArbkomEKvW\Evangtermine\Services\Events\Imported\EventsService;
 use ArbkomEKvW\Evangtermine\Command\ImportEventsCommand;
 use ArbkomEKvW\Evangtermine\Services\Events\EventsServiceInterface;
 use ArbkomEKvW\Evangtermine\Solr\DummyIndexService;
@@ -18,7 +20,7 @@ return static function (ContainerConfigurator $containerConfigurator): void {
         ->autowire()
         ->autoconfigure();
 
-    if (class_exists('\\ApacheSolrForTypo3\\Solr\\IndexQueue\\Queue')) {
+    if (class_exists(Queue::class)) {
         $services->load('ArbkomEKvW\Evangtermine\\', __DIR__ . '/../Classes/*')
             ->exclude([
                 __DIR__ . '/../Classes/Domain/Model/*',
@@ -51,7 +53,7 @@ return static function (ContainerConfigurator $containerConfigurator): void {
     if (!empty($extConfig['importEvents'])) {
         $services->alias(
             EventsServiceInterface::class,
-            \ArbkomEKvW\Evangtermine\Services\Events\Imported\EventsService::class
+            EventsService::class
         );
     } else {
         $services->alias(

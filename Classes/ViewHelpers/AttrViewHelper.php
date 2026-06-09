@@ -53,7 +53,7 @@ class AttrViewHelper extends AbstractViewHelper
      */
     public function render(): string
     {
-        if (get_class($this->arguments['on']) == 'SimpleXMLElement') {
+        if ($this->arguments['on']::class == 'SimpleXMLElement') {
             return $this->arguments['on'][$this->arguments['name']];
         }
         return '';

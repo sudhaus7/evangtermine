@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace ArbkomEKvW\Evangtermine\Solr;
 
 use ApacheSolrForTypo3\Solr\Domain\Index\Queue\GarbageRemover\AbstractStrategy;

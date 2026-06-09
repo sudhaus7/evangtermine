@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace ArbkomEKvW\Evangtermine\Tests;
 
 class TestXmlData

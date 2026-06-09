@@ -58,17 +58,19 @@ class CategoryUtil
     protected CacheManager $cacheManager;
     protected string $dateString;
     protected VariableFrontend $cache;
+    protected ConnectionPool $connectionPool;
 
     /**
-     * Constructor fetches name of foreign host for category retrieval
+     * Constructor fetches the name of a foreign host for category retrieval
      * @throws NoSuchCacheException
      */
     public function __construct()
     {
+        $this->connectionPool = GeneralUtility::makeInstance(ConnectionPool::class);
         $extconf = GeneralUtility::makeInstance(ExtConf::class);
         $this->host = $extconf->getExtConfArray()['host'];
         $this->cacheManager = GeneralUtility::makeInstance(CacheManager::class);
-        $this->dateString = (new DateTime('today midnight'))->format('Ymd');
+        $this->dateString = new DateTime('today midnight')->format('Ymd');
         $this->cache = $this->cacheManager->getCache('evangtermine');
     }
 
@@ -183,7 +185,7 @@ class CategoryUtil
      */
     private function getDistinctEntries(string $table, string $field): array
     {
-        $queryBuilder = GeneralUtility::makeInstance(ConnectionPool::class)->getQueryBuilderForTable($table);
+        $queryBuilder = $this->connectionPool->getQueryBuilderForTable($table);
         $queryBuilder->select($field)
             ->from($table)
             ->groupBy($field);
@@ -241,16 +243,13 @@ class CategoryUtil
         $contentString = UrlUtility::loadUrl($url);
         $fname = basename($url);
         $contentArray = json_decode($contentString);
-        if ($contentArray === null) {
-            // try reading the cached files
-
-            if (is_file(\sys_get_temp_dir() . '/' . $fname)) {
-                $contentString = \file_get_contents(\sys_get_temp_dir() . '/' . $fname);
-                $contentArray = json_decode($contentString);
-            }
+        // try reading the cached files
+        if ($contentArray === null && is_file(\sys_get_temp_dir() . '/' . $fname)) {
+            $contentString = \file_get_contents(\sys_get_temp_dir() . '/' . $fname);
+            $contentArray = json_decode($contentString);
         }
         if ($contentArray === null) {
-            throw new RuntimeException('No valid JSON in ' . $url);
+            throw new RuntimeException('No valid JSON in ' . $url, 7751079417);
         }
 
         file_put_contents(\sys_get_temp_dir() . '/' . $fname, $contentString);

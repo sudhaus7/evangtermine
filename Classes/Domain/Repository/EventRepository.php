@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace ArbkomEKvW\Evangtermine\Domain\Repository;
 
+use TYPO3\CMS\Core\Http\ApplicationType;
 use ArbkomEKvW\Evangtermine\Domain\Model\Categorylist;
 use ArbkomEKvW\Evangtermine\Domain\Model\EtKeys;
 use ArbkomEKvW\Evangtermine\Domain\Model\Grouplist;
@@ -34,6 +35,13 @@ class EventRepository extends Repository
         'event_region3_id',
         'place_region'*/
     ];
+    /**
+     * Constructs a new Repository
+     */
+    public function __construct(private readonly ConnectionPool $connectionPool, private readonly CacheManager $cacheManager)
+    {
+        parent::__construct();
+    }
 
     /**
      * @param EtKeys $etKeys
@@ -61,13 +69,13 @@ class EventRepository extends Repository
 
         // if search word or vid
         $searchWordConstraint = [];
-        if ((!empty($etKeys->getQ()) && $etKeys->getQ() != 'none') || (!empty($etKeys->getVid()) && $etKeys->getVid() != 'all') || !empty($additionParams)) {
+        if ((!in_array($etKeys->getQ(), ['', '0'], true) && $etKeys->getQ() !== 'none') || (!in_array($etKeys->getVid(), ['', '0'], true) && $etKeys->getVid() !== 'all') || $additionParams !== '' && $additionParams !== '0') {
             $eventsWithSearchWord = $this->filterWithSearchWordAndVidAndAdditionalParams($etKeys, $additionParams);
             $searchWordConstraint = $this->setSearchWordAndVidConstraint($query, $eventsWithSearchWord);
         }
         $queryConstraints = array_merge($queryConstraints, $searchWordConstraint);
 
-        if (!empty($queryConstraints)) {
+        if ($queryConstraints !== []) {
             $query->matching($query->logicalAnd(...$queryConstraints));
         }
         return [$query, $queryConstraints];
@@ -126,7 +134,7 @@ class EventRepository extends Repository
 
     public function preSelect(EtKeys $etKeys): array
     {
-        list($eventUids, $filtered) = $this->findWithinDistance($etKeys);
+        [$eventUids, $filtered] = $this->findWithinDistance($etKeys);
         return $this->hideOngoingEvents($etKeys, $eventUids, $filtered);
     }
 
@@ -136,12 +144,12 @@ class EventRepository extends Repository
         $radius = $etKeys->getRadius();
 
         $query = $this->createQuery();
-        if (empty($zip) || empty($radius)) {
+        if ($zip === '' || $zip === '0' || $radius === 0) {
             return [null, false];
         }
 
         $osmService = GeneralUtility::makeInstance(OsmService::class);
-        list($lat, $lon) = $osmService->determineCoordinates($zip);
+        [$lat, $lon] = $osmService->determineCoordinates($zip);
 
         $statement = 'SELECT uid FROM tx_evangtermine_domain_model_event
             WHERE (
@@ -173,7 +181,7 @@ class EventRepository extends Repository
     public function setConstraints(QueryInterface $query, EtKeys $etKeys, ?array $eventUids): array
     {
         $queryConstraints = [];
-        if (!empty($eventUids)) {
+        if ($eventUids !== null && $eventUids !== []) {
             $queryConstraints = array_merge($queryConstraints, $this->setUidConstraint($query, $eventUids));
         }
         $queryConstraints = array_merge($queryConstraints, $this->setHighlightConstraint($query, $etKeys));
@@ -193,7 +201,7 @@ class EventRepository extends Repository
     public function setSearchWordAndVidConstraint(Query $query, array $ids): array
     {
         $queryConstraints = [];
-        if (empty($ids)) {
+        if ($ids === []) {
             // set to -9999 to prevent an error but still find no events
             $queryConstraints[] = $query->in('id', [-9999]);
         } else {
@@ -223,11 +231,11 @@ class EventRepository extends Repository
     {
         $vidValue = $etKeys->getVid();
         $queryConstraints = [];
-        if ($vidValue == 'all') {
+        if ($vidValue === 'all') {
             return $queryConstraints;
         }
         $vids = explode(',', $vidValue);
-        if (empty($vids)) {
+        if ($vids === []) {
             return $queryConstraints;
         }
         $queryConstraints[] = $query->in('event_user_id', $vids);
@@ -238,7 +246,7 @@ class EventRepository extends Repository
     {
         $queryConstraints = [];
         $highlight = $etKeys->getHighlight();
-        if (empty($highlight) || $highlight == 'all') {
+        if (in_array($highlight, ['', '0', 'all'], true)) {
             return $queryConstraints;
         }
         $queryConstraints[] = $query->greaterThan('highlight', 1);
@@ -253,7 +261,7 @@ class EventRepository extends Repository
         $categoryArray = explode(',', $category);
         $categoryConstraints = [];
         foreach ($categoryArray as $category) {
-            if (empty($category) || $category == 'all') {
+            if (in_array($category, ['', '0', 'all'], true)) {
                 continue;
             }
             $categoryConstraints[] = $query->equals('categories', $category);
@@ -261,7 +269,7 @@ class EventRepository extends Repository
             $categoryConstraints[] = $query->like('categories', $category . ',%');
             $categoryConstraints[] = $query->like('categories', '%,' . $category);
         }
-        if (!empty($categoryConstraints)) {
+        if ($categoryConstraints !== []) {
             $queryConstraints[] = $query->logicalOr(...$categoryConstraints);
         }
         return $queryConstraints;
@@ -279,7 +287,7 @@ class EventRepository extends Repository
 
         $personConstraints = [];
         foreach ($personArray as $person) {
-            if (empty($person) || $person == 'all') {
+            if (in_array($person, ['', '0', 'all'], true)) {
                 continue;
             }
             $personConstraints[] = $query->equals('people', $person);
@@ -287,7 +295,7 @@ class EventRepository extends Repository
             $personConstraints[] = $query->like('people', $person . ',%');
             $personConstraints[] = $query->like('people', '%,' . $person);
         }
-        if (!empty($personConstraints)) {
+        if ($personConstraints !== []) {
             $queryConstraints[] = $query->logicalOr(...$personConstraints);
         }
         return $queryConstraints;
@@ -305,11 +313,11 @@ class EventRepository extends Repository
         $queryConstraints = [];
 
         $regions = $etKeys->getRegions();
-        if ($regions == 'alleBezirke' || $regions == 'alleKreise') {
+        if ($regions === 'alleBezirke' || $regions === 'alleKreise') {
             $etKeys->setRegions('all');
             $regions = $etKeys->getRegions();
         }
-        if (!empty($regions) && $regions !== 'all') {
+        if (!in_array($regions, ['', '0', 'all'], true)) {
             $possibleRegions = [];
             foreach (explode(',', $regions) as $possibleRegion) {
                 $possibleRegions[] = $query->equals('region', $possibleRegion);
@@ -319,14 +327,14 @@ class EventRepository extends Repository
 
         $region = $etKeys->getRegion();
 
-        if (empty($region) || $region == 'all') {
+        if (in_array($region, ['', '0', 'all'], true)) {
             return $queryConstraints;
         }
         $possibleRegions = [];
         foreach (explode(',', $region) as $possibleRegion) {
             if (is_numeric($possibleRegion)) {
                 $regionName = $this->getRegionById((int)$possibleRegion);
-                if (!empty($regionName)) {
+                if (!in_array($regionName, [null, '', '0'], true)) {
                     foreach (self::REGION_FIELDS as $field) {
                         $possibleRegions[] = $query->equals($field, $regionName);
                     }
@@ -335,7 +343,7 @@ class EventRepository extends Repository
                 $possibleRegions[] = $query->equals('region', $possibleRegion);
             }
         }
-        if (!empty($possibleRegions)) {
+        if ($possibleRegions !== []) {
             $queryConstraints[] = $query->logicalOr(...$possibleRegions);
         }
         return $queryConstraints;
@@ -361,7 +369,7 @@ class EventRepository extends Repository
      */
     protected function getRegionById(int $id): ?string
     {
-        $connectionPool = GeneralUtility::makeInstance(ConnectionPool::class);
+        $connectionPool = $this->connectionPool;
         $queryBuilder = $connectionPool->getQueryBuilderForTable('tx_evangtermine_domain_model_event');
         $queryBuilder->select('region', 'event_subregion_id', 'event_region2_id', 'event_region3_id', 'place_region', 'attributes')
             ->from('tx_evangtermine_domain_model_event')
@@ -373,7 +381,7 @@ class EventRepository extends Repository
             return null;
         }
         foreach ($result as $event) {
-            $attributes = json_decode($event['attributes'], true);
+            $attributes = json_decode((string) $event['attributes'], true);
             foreach (self::REGION_FIELDS as $field) {
                 if ((isset($attributes[$field]['db']) && (int)$attributes[$field]['db'] ?? 0) == $id) {
                     return $event[$field] ?? null;
@@ -388,7 +396,7 @@ class EventRepository extends Repository
         $queryConstraints = [];
 
         $places = $etKeys->getPlaces();
-        if (!empty($places) && $places !== 'all') {
+        if (!in_array($places, ['', '0', 'all'], true)) {
             $possiblePlaces = [];
             foreach (explode(',', $places) as $possiblePlace) {
                 $possiblePlaces[] = $query->equals('place_id', $possiblePlace);
@@ -397,7 +405,7 @@ class EventRepository extends Repository
         }
 
         $place = $etKeys->getPlace();
-        if (empty($place) || $place == 'all') {
+        if (in_array($place, ['', '0', 'all'], true)) {
             return $queryConstraints;
         }
         $possiblePlaces = [];
@@ -412,7 +420,7 @@ class EventRepository extends Repository
     {
         $queryConstraints = [];
         $date = $etKeys->getDate();
-        if (!empty($date)) {
+        if ($date !== '' && $date !== '0') {
             $dateTime = (new \DateTime())->createFromFormat('Y-m-d', $date);
             if (empty($dateTime)) {
                 $dateTime = (new \DateTime())->createFromFormat('d.m.Y', $date);
@@ -444,13 +452,13 @@ class EventRepository extends Repository
     {
         if ($filtered) {
             if (
-                empty($eventUids) ||
-                empty($etKeys->getHideOngoingEvents())
+                $eventUids === null || $eventUids === [] ||
+                in_array($etKeys->getHideOngoingEvents(), ['', '0'], true)
             ) {
                 return [$eventUids, true];
             }
         } else {
-            if (empty($etKeys->getHideOngoingEvents())) {
+            if (in_array($etKeys->getHideOngoingEvents(), ['', '0'], true)) {
                 return [null, false];
             }
             $query = $this->createQuery();
@@ -483,7 +491,7 @@ class EventRepository extends Repository
         $places = [];
         $places['all'] = 'Alle Orte';
 
-        $connectionPool = GeneralUtility::makeInstance(ConnectionPool::class);
+        $connectionPool = $this->connectionPool;
         $queryBuilder = $connectionPool->getQueryBuilderForTable('tx_evangtermine_domain_model_event');
 
         $etkeyPlaces = $settings['etkey_places'] ?? '';
@@ -521,7 +529,7 @@ class EventRepository extends Repository
                 $queryBuilder->expr()->neq('place_city', $queryBuilder->createNamedParameter('.')),
                 $queryBuilder->expr()->neq('place_zip', $queryBuilder->createNamedParameter('00000')),
             );
-        if (!empty($uids)) {
+        if ($uids !== null && $uids !== []) {
             $queryBuilder->andWhere(
                 $queryBuilder->expr()->in('uid', $uids)
             );
@@ -543,7 +551,7 @@ class EventRepository extends Repository
      */
     public function findAllPlacesWithEtKeys(?array $settings = null, int $pluginUid = 0): array
     {
-        $cacheManager = GeneralUtility::makeInstance(CacheManager::class);
+        $cacheManager = $this->cacheManager;
         $dateString = (new \DateTime('today midnight'))->format('Ymd');
         $cache = $cacheManager->getCache('evangtermine');
         $cacheKey = 'places-with-events-' . $dateString . '-' . $pluginUid;
@@ -599,29 +607,24 @@ class EventRepository extends Repository
             foreach ($regionsFromSettings as $region) {
                 $regions[$region] = $region;
             }
-
-            if (!empty($regions['all'])) {
+            if (isset($regions['all']) && ($regions['all'] !== '' && $regions['all'] !== '0')) {
                 unset($regions['all']);
                 unset($regions['alleBezirke']);
                 unset($regions['alleKreise']);
                 $regions = array_merge(['all' => 'Alle Regionen'], $regions);
-            } else {
-                if (!empty($regions['alleBezirke'])) {
-                    unset($regions['alleBezirke']);
-                    if (empty($regions['alleKreise'])) {
-                        $regions = array_merge(['all' => 'Alle Kirchenbezirke'], $regions);
-                    } else {
-                        unset($regions['alleKreise']);
-                        $regions = array_merge(['all' => 'Alle Regionen'], $regions);
-                    }
+            } elseif (isset($regions['alleBezirke']) && ($regions['alleBezirke'] !== '' && $regions['alleBezirke'] !== '0')) {
+                unset($regions['alleBezirke']);
+                if (empty($regions['alleKreise'])) {
+                    $regions = array_merge(['all' => 'Alle Kirchenbezirke'], $regions);
                 } else {
-                    if (empty($regions['alleKreise'])) {
-                        $regions = array_merge(['all' => 'Alle Regionen'], $regions);
-                    } else {
-                        unset($regions['alleKreise']);
-                        $regions = array_merge(['all' => 'Alle Kirchenkreise'], $regions);
-                    }
+                    unset($regions['alleKreise']);
+                    $regions = array_merge(['all' => 'Alle Regionen'], $regions);
                 }
+            } elseif (empty($regions['alleKreise'])) {
+                $regions = array_merge(['all' => 'Alle Regionen'], $regions);
+            } else {
+                unset($regions['alleKreise']);
+                $regions = array_merge(['all' => 'Alle Kirchenkreise'], $regions);
             }
             if (
                 $etkeyRegions !== 'alleBezirke' &&
@@ -629,11 +632,9 @@ class EventRepository extends Repository
             ) {
                 return $regions;
             }
-        } else {
-            if (!\TYPO3\CMS\Core\Http\ApplicationType::fromRequest($GLOBALS['TYPO3_REQUEST'])->isBackend()) {
-                unset($regions['alleBezirke']);
-                unset($regions['alleKreise']);
-            }
+        } elseif (!ApplicationType::fromRequest($GLOBALS['TYPO3_REQUEST'])->isBackend()) {
+            unset($regions['alleBezirke']);
+            unset($regions['alleKreise']);
         }
 
         $regionsFromDB = $this->getRegionsFromDB();
@@ -652,7 +653,7 @@ class EventRepository extends Repository
      */
     public function findAllRegionsWithEtKeys(?array $settings = null, int $pluginUid = 0): array
     {
-        $cacheManager = GeneralUtility::makeInstance(CacheManager::class);
+        $cacheManager = $this->cacheManager;
         $dateString = (new \DateTime('today midnight'))->format('Ymd');
         $cache = $cacheManager->getCache('evangtermine');
         $cacheKey = 'regions-with-events-' . $dateString . '-' . $pluginUid;
@@ -694,7 +695,7 @@ class EventRepository extends Repository
      */
     public function getRegionsFromDB(): array
     {
-        $connectionPool = GeneralUtility::makeInstance(ConnectionPool::class);
+        $connectionPool = $this->connectionPool;
         $queryBuilder = $connectionPool->getQueryBuilderForTable('tx_evangtermine_domain_model_event');
         $queryBuilder->select('region')
             ->from('tx_evangtermine_domain_model_event')
@@ -717,7 +718,7 @@ class EventRepository extends Repository
     public function findAllCategoriesWithEtKeys(?array $settings = null, int $pluginUid = 0): array
     {
         /** @var CacheManager $cacheManager */
-        $cacheManager = GeneralUtility::makeInstance(CacheManager::class);
+        $cacheManager = $this->cacheManager;
         $dateString = (new \DateTime('today midnight'))->format('Ymd');
         $cache = $cacheManager->getCache('evangtermine');
         $cacheKey = 'categories-with-events-' . $dateString . '-' . $pluginUid;
@@ -769,7 +770,7 @@ class EventRepository extends Repository
     public function findAllGroupsWithEtKeys(?array $settings = null, int $pluginUid = 0): array
     {
         /** @var CacheManager $cacheManager */
-        $cacheManager = GeneralUtility::makeInstance(CacheManager::class);
+        $cacheManager = $this->cacheManager;
         $dateString = (new \DateTime('today midnight'))->format('Ymd');
         $cache = $cacheManager->getCache('evangtermine');
         $cacheKey = 'groups-with-events-' . $dateString . '-' . $pluginUid;
@@ -781,7 +782,7 @@ class EventRepository extends Repository
             if (!empty($settings['etkey_people']) && $settings['etkey_people'] !== 'all') {
                 $allowedGroups = [];
                 $allowedGroups[0] = $groups[0];
-                foreach (explode(',', $settings['etkey_people']) as $person) {
+                foreach (explode(',', (string) $settings['etkey_people']) as $person) {
                     if (!empty($groups[$person])) {
                         $allowedGroups[$person] = $groups[$person];
                     }
@@ -838,7 +839,7 @@ class EventRepository extends Repository
         $settingsUtility->fetchParamsFromSettings($settings, $etKeys);
 
         $etKeys->setItemsPerPage(1);
-        list($query, $queryConstraints) = $this->prepareFindByEtKeysQuery($etKeys);
+        [$query, $queryConstraints] = $this->prepareFindByEtKeysQuery($etKeys);
 
         if (empty($query)) {
             return [null, [], null, []];
@@ -859,12 +860,12 @@ class EventRepository extends Repository
         $queryConstraints = [];
         $allowedSubregions = [];
         foreach (explode(',', $subregions) as $subregion) {
-            if (empty($subregion) || $subregion == 'all' || $subregion == 'Alle') {
+            if (in_array($subregion, ['', '0', 'all', 'Alle'], true)) {
                 continue;
             }
             $allowedSubregions[] = $query->equals($field, $subregion);
         }
-        if (!empty($allowedSubregions)) {
+        if ($allowedSubregions !== []) {
             $queryConstraints[] = $query->logicalOr(...$allowedSubregions);
         }
         return $queryConstraints;

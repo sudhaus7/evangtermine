@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace ArbkomEKvW\Evangtermine\Solr;
 
 use Psr\Log\LoggerAwareInterface;

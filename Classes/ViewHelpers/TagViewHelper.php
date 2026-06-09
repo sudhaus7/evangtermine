@@ -67,11 +67,9 @@ class TagViewHelper extends AbstractViewHelper
             if (empty($this->arguments['node'])) {
                 return '';
             }
-        } else {
+        } elseif (($this->arguments['node']::class != 'SimpleXMLElement') || ($this->arguments['node'] == '') || !$this->arguments['node']) {
             // If wrong object or object empty, return empty string
-            if ((get_class($this->arguments['node']) != 'SimpleXMLElement') || ($this->arguments['node'] == '') || !$this->arguments['node']) {
-                return '';
-            }
+            return '';
         }
 
         // Prepare class attribute

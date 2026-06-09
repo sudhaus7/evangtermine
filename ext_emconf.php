@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * This file is part of the TYPO3 project.
  *
@@ -10,7 +12,6 @@
  *
  * The TYPO3 project - inspiring people to share!
  */
-
 $EM_CONF[$_EXTKEY] = [
     'title' => 'Evangelische Termine',
     'description' => 'Anzeige des Terminkalenders der Vernetzten Kirche in der Ev.-Luth. Kirche in Bayern und weiteren teilnehmenden evangelischen Landeskirchen.',
@@ -21,7 +22,7 @@ $EM_CONF[$_EXTKEY] = [
     'version' => '4.0.2',
     'constraints' => [
         'depends' => [
-            'typo3' => '13.4.0-13.4.99',
+            'typo3' => '14.0.0-14.3.99',
         ],
         'conflicts' => [
         ],

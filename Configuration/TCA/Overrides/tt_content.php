@@ -1,5 +1,10 @@
 <?php
 
+declare(strict_types=1);
+
+use TYPO3\CMS\Core\Utility\ExtensionManagementUtility;
+use TYPO3\CMS\Extbase\Utility\ExtensionUtility;
+
 /*
  * This file is part of the TYPO3 project.
  *
@@ -11,8 +16,14 @@
  * The TYPO3 project - inspiring people to share!
  */
 
-\TYPO3\CMS\Extbase\Utility\ExtensionUtility::registerPlugin('evangtermine', 'List', 'Evangelische Termine - Liste');
+ExtensionUtility::registerPlugin('evangtermine', 'List', 'Evangelische Termine - Liste');
 
-\TYPO3\CMS\Extbase\Utility\ExtensionUtility::registerPlugin('evangtermine', 'Detail', 'Evangelische Termine - Detail');
+ExtensionUtility::registerPlugin('evangtermine', 'Detail', 'Evangelische Termine - Detail');
 
-\TYPO3\CMS\Extbase\Utility\ExtensionUtility::registerPlugin('evangtermine', 'Teaser', 'Evangelische Termine - Teaser');
+ExtensionUtility::registerPlugin('evangtermine', 'Teaser', 'Evangelische Termine - Teaser');
+
+$pluginSignature = 'evangtermine_list';
+ExtensionManagementUtility::addToAllTCAtypes('tt_content', '--div--;Configuration,pi_flexform,', $pluginSignature, 'after:subheader');
+
+$pluginSignature = 'evangtermine_teaser';
+ExtensionManagementUtility::addToAllTCAtypes('tt_content', '--div--;Configuration,pi_flexform,', $pluginSignature, 'after:subheader');

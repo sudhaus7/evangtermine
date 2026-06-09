@@ -67,11 +67,7 @@ class Etpager
     public function up($totalItems, $itemsPerPage, $currentPage): void
     {
         // Number of Events in result
-        if (is_object($totalItems)) {
-            $totalItems = (int)($totalItems->__toString());
-        } else {
-            $totalItems = (int)$totalItems;
-        }
+        $totalItems = is_object($totalItems) ? (int)($totalItems->__toString()) : (int)$totalItems;
 
         $itemsPerPage = (int)$itemsPerPage ?: 20;
 

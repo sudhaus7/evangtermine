@@ -1,51 +1,63 @@
 <?php
 
+declare(strict_types=1);
+
+use TYPO3\CMS\Extbase\Utility\ExtensionUtility;
+use ArbkomEKvW\Evangtermine\Controller\EventcontainerController;
+use ArbkomEKvW\Evangtermine\Backend\FieldControl\ToggleAllFilters;
+use TYPO3\CMS\Core\Cache\Backend\Typo3DatabaseBackend;
+use TYPO3\CMS\Core\Cache\Frontend\VariableFrontend;
+use ArbkomEKvW\Evangtermine\Routing\Aspect\Prevent404ValueMapper;
+use TYPO3\CMS\Core\Log\LogLevel;
+use TYPO3\CMS\Core\Log\Writer\FileWriter;
+use TYPO3\CMS\Core\Core\Environment;
+
 if (!defined('TYPO3')) {
     die('Access denied.');
 }
 
 $extensionkey = 'evangtermine';
 
-\TYPO3\CMS\Extbase\Utility\ExtensionUtility::configurePlugin(
+ExtensionUtility::configurePlugin(
     $extensionkey,
     'List',
     [
-        ArbkomEKvW\Evangtermine\Controller\EventcontainerController::class => 'list, show, genericinfo',
+        EventcontainerController::class => 'list, show, genericinfo',
     ],
     // non-cacheable actions
     [
-        ArbkomEKvW\Evangtermine\Controller\EventcontainerController::class => 'list, show, genericinfo',
+        EventcontainerController::class => 'list, show, genericinfo',
     ]
 );
 
-\TYPO3\CMS\Extbase\Utility\ExtensionUtility::configurePlugin(
+ExtensionUtility::configurePlugin(
     $extensionkey,
     'Detail',
     [
-        ArbkomEKvW\Evangtermine\Controller\EventcontainerController::class => 'show, genericinfo',
+        EventcontainerController::class => 'show, genericinfo',
     ],
     // non-cacheable actions
     [
-        ArbkomEKvW\Evangtermine\Controller\EventcontainerController::class => 'show, genericinfo',
+        EventcontainerController::class => 'show, genericinfo',
     ]
 );
 
-\TYPO3\CMS\Extbase\Utility\ExtensionUtility::configurePlugin(
+ExtensionUtility::configurePlugin(
     $extensionkey,
     'Teaser',
     [
-        ArbkomEKvW\Evangtermine\Controller\EventcontainerController::class => 'teaser, show, genericinfo',
+        EventcontainerController::class => 'teaser, show, genericinfo',
     ],
     // non-cacheable actions
     [
-        ArbkomEKvW\Evangtermine\Controller\EventcontainerController::class => 'teaser, show, genericinfo',
+        EventcontainerController::class => 'teaser, show, genericinfo',
     ]
 );
 
 $GLOBALS['TYPO3_CONF_VARS']['SYS']['formEngine']['nodeRegistry'][1715678295] = [
     'nodeName' => 'toggleAllFilters',
     'priority' => 30,
-    'class' => ArbkomEKvW\Evangtermine\Backend\FieldControl\ToggleAllFilters::class,
+    'class' => ToggleAllFilters::class,
 ];
 
 if (!isset($GLOBALS['TYPO3_CONF_VARS']['SYS']['caching']['cacheConfigurations']['evangtermine'])) {
@@ -53,11 +65,11 @@ if (!isset($GLOBALS['TYPO3_CONF_VARS']['SYS']['caching']['cacheConfigurations'][
 }
 if (!isset($GLOBALS['TYPO3_CONF_VARS']['SYS']['caching']['cacheConfigurations']['evangtermine']['backend'])) {
     $GLOBALS['TYPO3_CONF_VARS']['SYS']['caching']['cacheConfigurations']['evangtermine']['backend']
-        = \TYPO3\CMS\Core\Cache\Backend\Typo3DatabaseBackend::class;
+        = Typo3DatabaseBackend::class;
 }
 if (!isset($GLOBALS['TYPO3_CONF_VARS']['SYS']['caching']['cacheConfigurations']['evangtermine']['frontend'])) {
     $GLOBALS['TYPO3_CONF_VARS']['SYS']['caching']['cacheConfigurations']['evangtermine']['frontend']
-        = \TYPO3\CMS\Core\Cache\Frontend\VariableFrontend::class;
+        = VariableFrontend::class;
 }
 
 if (!isset($GLOBALS['TYPO3_CONF_VARS']['SYS']['caching']['cacheConfigurations']['evangtermine_event_list'])) {
@@ -65,11 +77,11 @@ if (!isset($GLOBALS['TYPO3_CONF_VARS']['SYS']['caching']['cacheConfigurations'][
 }
 if (!isset($GLOBALS['TYPO3_CONF_VARS']['SYS']['caching']['cacheConfigurations']['evangtermine_event_list']['backend'])) {
     $GLOBALS['TYPO3_CONF_VARS']['SYS']['caching']['cacheConfigurations']['evangtermine_event_list']['backend']
-        = \TYPO3\CMS\Core\Cache\Backend\Typo3DatabaseBackend::class;
+        = Typo3DatabaseBackend::class;
 }
 if (!isset($GLOBALS['TYPO3_CONF_VARS']['SYS']['caching']['cacheConfigurations']['evangtermine_event_list']['frontend'])) {
     $GLOBALS['TYPO3_CONF_VARS']['SYS']['caching']['cacheConfigurations']['evangtermine_event_list']['frontend']
-        = \TYPO3\CMS\Core\Cache\Frontend\VariableFrontend::class;
+        = VariableFrontend::class;
 }
 
 if (!isset($GLOBALS['TYPO3_CONF_VARS']['SYS']['caching']['cacheConfigurations']['evangtermine_event_teaser'])) {
@@ -77,15 +89,15 @@ if (!isset($GLOBALS['TYPO3_CONF_VARS']['SYS']['caching']['cacheConfigurations'][
 }
 if (!isset($GLOBALS['TYPO3_CONF_VARS']['SYS']['caching']['cacheConfigurations']['evangtermine_event_teaser']['backend'])) {
     $GLOBALS['TYPO3_CONF_VARS']['SYS']['caching']['cacheConfigurations']['evangtermine_event_teaser']['backend']
-        = \TYPO3\CMS\Core\Cache\Backend\Typo3DatabaseBackend::class;
+        = Typo3DatabaseBackend::class;
 }
 if (!isset($GLOBALS['TYPO3_CONF_VARS']['SYS']['caching']['cacheConfigurations']['evangtermine_event_teaser']['frontend'])) {
     $GLOBALS['TYPO3_CONF_VARS']['SYS']['caching']['cacheConfigurations']['evangtermine_event_teaser']['frontend']
-        = \TYPO3\CMS\Core\Cache\Frontend\VariableFrontend::class;
+        = VariableFrontend::class;
 }
 
 $GLOBALS['TYPO3_CONF_VARS']['SYS']['routing']['aspects']['Prevent404ValueMapper']
-    = ArbkomEKvW\Evangtermine\Routing\Aspect\Prevent404ValueMapper::class;
+    = Prevent404ValueMapper::class;
 /*$GLOBALS['TYPO3_CONF_VARS']['SYS']['routing']['aspects']['RegionStaticValueMapper']
     = ArbkomEKvW\Evangtermine\Routing\Aspect\RegionStaticValueMapper::class;
 $GLOBALS['TYPO3_CONF_VARS']['SYS']['routing']['aspects']['PlaceStaticValueMapper']
@@ -93,11 +105,11 @@ $GLOBALS['TYPO3_CONF_VARS']['SYS']['routing']['aspects']['PlaceStaticValueMapper
 
 $GLOBALS['TYPO3_CONF_VARS']['LOG']['ArbkomEKvW']['Evangtermine']['Command']['writerConfiguration'] = [
     // configuration for ERROR level log entries
-    \TYPO3\CMS\Core\Log\LogLevel::DEBUG => [
+    LogLevel::DEBUG => [
         // add a FileWriter
-        \TYPO3\CMS\Core\Log\Writer\FileWriter::class => [
+        FileWriter::class => [
             // configuration for the writer
-            'logFile' => \TYPO3\CMS\Core\Core\Environment::getVarPath() . '/log/evangtermine_command.log',
+            'logFile' => Environment::getVarPath() . '/log/evangtermine_command.log',
         ],
     ],
 ];

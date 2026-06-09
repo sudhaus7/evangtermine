@@ -64,7 +64,7 @@ class Eventcontainer extends AbstractEntity implements EventcontainerInterface
     /**
      * content of the <meta> tag in XML result
      */
-    private ?SimpleXMLElement $metaData;
+    private ?SimpleXMLElement $metaData = null;
 
     /**
      * detail-tag, only present in single view
@@ -143,12 +143,12 @@ class Eventcontainer extends AbstractEntity implements EventcontainerInterface
     {
         $xmlString = trim($xmlString);
 
-        if (!$xmlString || substr($xmlString, 0, 5) != '<?xml') {
+        if (!$xmlString || !str_starts_with($xmlString, '<?xml')) {
             $this->reset();
         } else {
             try {
                 $xmlSimple = new SimpleXMLElement($xmlString);
-            } catch (Exception $e) {
+            } catch (Exception) {
                 $this->reset();
                 return;
             }

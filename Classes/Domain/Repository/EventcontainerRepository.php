@@ -57,21 +57,15 @@ use TYPO3\CMS\Extbase\Persistence\Repository;
 class EventcontainerRepository extends Repository implements SingletonInterface
 {
     /**
-     * @var ExtConf
-     */
-    private ExtConf $extConf;
-
-    /**
      * Url of xml script on remote server
      *
      * @var string
      */
     protected string $xmlSourceUrl = '';
 
-    public function __construct(ExtConf $extConf)
+    public function __construct(private readonly ExtConf $extConf)
     {
         parent::__construct();
-        $this->extConf = $extConf;
     }
 
     /**
@@ -96,7 +90,7 @@ class EventcontainerRepository extends Repository implements SingletonInterface
     public function findByEtKeys(EtKeys $etKeys): EventcontainerInterface
     {
         // URL zusammenbauen: SourceURL plus $etKeys->getValue
-        $query = ($etKeys->getValue()) ? '?' . $etKeys->getValue() : '';
+        $query = ($etKeys->getValue() !== '' && $etKeys->getValue() !== '0') ? '?' . $etKeys->getValue() : '';
         $url = $this->getXmlSourceUrl() . $query;
 
         // URL abfragen, nur IPv4 Auflösung

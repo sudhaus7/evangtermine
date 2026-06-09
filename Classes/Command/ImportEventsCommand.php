@@ -106,7 +106,7 @@ class ImportEventsCommand extends Command implements LoggerAwareInterface
 
         /** @var LogManager $logManager */
         $logManager = GeneralUtility::makeInstance(LogManager::class);
-        $this->logger = $logManager->getLogger(__CLASS__);
+        $this->logger = $logManager->getLogger(self::class);
     }
 
     public function configure(): void
@@ -177,12 +177,12 @@ class ImportEventsCommand extends Command implements LoggerAwareInterface
             $item = (array)$item;
             $item['attributes'] = json_encode($attributes);
             $item['hash'] = $hash;
-            if (str_contains($item['END'], '0000-00-00')) {
-                $startArray = explode(' ', $item['START']);
-                if (str_contains($item['END'], '0000-00-00 00:00:00')) {
+            if (str_contains((string) $item['END'], '0000-00-00')) {
+                $startArray = explode(' ', (string) $item['START']);
+                if (str_contains((string) $item['END'], '0000-00-00 00:00:00')) {
                     $item['END'] = null;
                 } else {
-                    $endArray = explode(' ', $item['END']);
+                    $endArray = explode(' ', (string) $item['END']);
                     $item['END'] = $startArray[0] . ' ' . $endArray[1];
                 }
             }
@@ -193,7 +193,7 @@ class ImportEventsCommand extends Command implements LoggerAwareInterface
                 'crdate' => time(),
                 'id' => $item['ID'] ?? 0,
                 'start' => DateTime::createFromFormat('Y-m-d H:i:s', $item['START'], new DateTimeZone('Europe/Berlin'))->getTimestamp(),
-                'end' => !empty($item['END']) ? DateTime::createFromFormat('Y-m-d H:i:s', $item['END'], new DateTimeZone('Europe/Berlin'))->getTimestamp() : 0,
+                'end' => empty($item['END']) ? 0 : DateTime::createFromFormat('Y-m-d H:i:s', $item['END'], new DateTimeZone('Europe/Berlin'))->getTimestamp(),
                 'hash' => $item['hash'],
             ];
 
@@ -267,7 +267,7 @@ class ImportEventsCommand extends Command implements LoggerAwareInterface
         $array = [];
         foreach ($item['_inputmask_FIELDS'] ?? [] as $key => $value) {
             $val = array_search($key, $fields);
-            if (!empty($val)) {
+            if (!($val === 0 || ($val === '' || $val === '0') || $val === false)) {
                 $array[] = $val;
             }
         }
@@ -324,7 +324,7 @@ class ImportEventsCommand extends Command implements LoggerAwareInterface
         $urlForMetaData = 'https://' . $this->host . '/Veranstalter/xml.php?itemsPerPage=0&highlight=all&dest=all';
         $urlMainPart = 'https://' . $this->host . '/Veranstalter/xml.php?itemsPerPage=' . self::ITEMS_PER_PAGE . '&highlight=all&dest=all';
 
-        list($urlForMetaData, $urlMainPart) = $this->limitRequestToVids($input, $urlForMetaData, $urlMainPart);
+        [$urlForMetaData, $urlMainPart] = $this->limitRequestToVids($input, $urlForMetaData, $urlMainPart);
 
         // URL abfragen, nur IPv4 Auflösung
         $rawXml = UrlUtility::loadUrl($urlForMetaData);
@@ -375,7 +375,7 @@ class ImportEventsCommand extends Command implements LoggerAwareInterface
             }
 
             $this->allIds[] = $id;
-            $hash = sha1($item->asXML());
+            $hash = sha1((string) $item->asXML());
             $res = GeneralUtility::makeInstance(ConnectionPool::class)->getConnectionForTable('tx_evangtermine_domain_model_event')
                 ->select(
                     [ 'hash' ],
@@ -429,10 +429,8 @@ class ImportEventsCommand extends Command implements LoggerAwareInterface
         $statement = $queryBuilder->select('*')
             ->from('tx_evangtermine_domain_model_event')->where($queryBuilder->expr()->eq('id', $queryBuilder->createNamedParameter($event['id'])))->executeQuery();
         $eventFromDB = $statement->fetchAssociative();
-        if (!empty($itemField)) {
-            if (str_starts_with($itemField, '//')) {
-                $itemField = 'https:' . $itemField;
-            }
+        if (!($itemField === '' || $itemField === '0') && str_starts_with($itemField, '//')) {
+            $itemField = 'https:' . $itemField;
         }
         $this->connectionPool->getConnectionForTable('tx_evangtermine_domain_model_event')
             ->update(
@@ -478,7 +476,7 @@ class ImportEventsCommand extends Command implements LoggerAwareInterface
         foreach ($categoriesArray as $category) {
             $category = trim($category);
             $categoryId = array_search($category, $this->categoryList) ?? 0;
-            if (!empty($categoryId)) {
+            if (!($categoryId === 0 || ($categoryId === '' || $categoryId === '0') || $categoryId === false)) {
                 $categoryIds[] = '|' . $categoryId . '|';
             }
         }
@@ -494,7 +492,7 @@ class ImportEventsCommand extends Command implements LoggerAwareInterface
         foreach ($peopleArray as $person) {
             $person = trim($person);
             $personId = array_search($person, $this->groupList);
-            if (!empty($personId)) {
+            if (!($personId === 0 || ($personId === '' || $personId === '0') || $personId === false)) {
                 $peopleIds[] = '|' . $personId . '|';
             }
         }
@@ -605,7 +603,7 @@ class ImportEventsCommand extends Command implements LoggerAwareInterface
 
         file_put_contents($this->fileNameForRunCheck, print_r($this->host, true));
         register_shutdown_function(function () {
-            ImportEventsCommand::removeFileForRunCheck();
+            $this->removeFileForRunCheck();
         });
         return false;
     }
@@ -631,7 +629,7 @@ class ImportEventsCommand extends Command implements LoggerAwareInterface
                 $vidString .= $vid . ',';
             }
         }
-        if (!empty($vidString)) {
+        if ($vidString !== '' && $vidString !== '0') {
             $vidString = '&vid=' . rtrim($vidString, ',');
             $urlForMetaData .= $vidString;
             $urlMainPart .= $vidString;
@@ -657,7 +655,7 @@ class ImportEventsCommand extends Command implements LoggerAwareInterface
             try {
                 $site = $this->siteFinder->getSiteByPageId($plugin['pid']);
                 $host = $site->getBase()->getHost();
-                if (!empty($host)) {
+                if ($host !== '' && $host !== '0') {
                     $pages[$plugin['pid']] = [
                         'uid' => $plugin['pid'],
                         'rootPageUid' => $site->getRootPageId(),
@@ -665,10 +663,10 @@ class ImportEventsCommand extends Command implements LoggerAwareInterface
                         'detailPageSlugPart' => $this->detailPageSlugPart,
                     ];
                 }
-            } catch (\Exception $e) {
+            } catch (\Exception) {
             }
         }
-        foreach ($pages as $pageUid => $page) {
+        foreach (array_keys($pages) as $pageUid) {
             $queryBuilder = $this->connectionPool->getQueryBuilderForTable('pages');
             $queryBuilder->select('*')
                 ->from('pages')

@@ -1388,7 +1388,7 @@ class Event extends AbstractEntity
 
     public function getResourcesAsArray(): array
     {
-        if (empty($this->resources)) {
+        if ($this->resources === '' || $this->resources === '0') {
             return [];
         }
         return json_decode($this->resources, true);
@@ -1401,7 +1401,7 @@ class Event extends AbstractEntity
 
     public function getAttributesAsArray(): array
     {
-        if (empty($this->attributes)) {
+        if ($this->attributes === '' || $this->attributes === '0') {
             return [];
         }
         $attributesArray = json_decode($this->attributes, true);
@@ -1409,7 +1409,7 @@ class Event extends AbstractEntity
             $value = explode(',', $value['db'] ?? '');
             $attributesArray[$key]['db'] = $value;
 
-            $keyArray = explode('_', $key);
+            $keyArray = explode('_', (string) $key);
             if (count($keyArray) > 1) {
                 $keyArray[1] = strtoupper($keyArray[1]);
             }
@@ -1449,7 +1449,7 @@ class Event extends AbstractEntity
 
     public function getOutputOrderAsArray(): array
     {
-        if (empty($this->outputOrder)) {
+        if ($this->outputOrder === '' || $this->outputOrder === '0') {
             return [];
         }
         return json_decode($this->outputOrder, true);

@@ -582,8 +582,8 @@ class EtKeys extends AbstractValueObject
         $this->date = $date;
         if ($date != '') {
             // keep params 'd' and 'month' in sync with 'date'
-            $dateTokens = explode('-', $date);
-            if (!empty($dateTokens[0]) && !empty($dateTokens[1]) && !empty($dateTokens[2])) {
+            $dateTokens = explode('-', (string) $date);
+            if (isset($dateTokens[0]) && ($dateTokens[0] !== '' && $dateTokens[0] !== '0') && (isset($dateTokens[1]) && ($dateTokens[1] !== '' && $dateTokens[1] !== '0')) && (isset($dateTokens[2]) && ($dateTokens[2] !== '' && $dateTokens[2] !== '0'))) {
                 $this->setD($dateTokens[2]);
                 $this->setMonth($dateTokens[1] . '.' . substr($dateTokens[0], -2));
             }
@@ -761,7 +761,7 @@ class EtKeys extends AbstractValueObject
         foreach (get_object_vars($this) as $key => $value) {
             if (in_array($key, $this->allowedKeys) && $value !== null) {
                 $value = $this->convertDateFormatToGermanFormat($key, $value);
-                $parBlocks[] = $key . '=' . urlencode(utf8_decode($value));
+                $parBlocks[] = $key . '=' . urlencode(mb_convert_encoding($value, 'ISO-8859-1'));
             }
         }
 
@@ -799,7 +799,7 @@ class EtKeys extends AbstractValueObject
         $valueArray = [];
 
         foreach ($this->allowedKeys as $key) {
-            $mthd = 'get' . ucfirst($key);
+            $mthd = 'get' . ucfirst((string) $key);
             $valueArray[$key] = '' . $this->$mthd();
         }
 
@@ -815,7 +815,7 @@ class EtKeys extends AbstractValueObject
         $values = (array)json_decode($jsString);
 
         foreach ($values as $key => $val) {
-            $mthd = 'set' . ucfirst($key);
+            $mthd = 'set' . ucfirst((string) $key);
             $this->$mthd($val);
         }
     }
@@ -828,9 +828,9 @@ class EtKeys extends AbstractValueObject
     protected function convertDateFormatToGermanFormat($key, $value)
     {
         if ($key == 'date') {
-            $valueArray = explode('-', $value);
-            if (count($valueArray) == 3) {
-                if (strlen($valueArray[0]) == 4) {
+            $valueArray = explode('-', (string) $value);
+            if (count($valueArray) === 3) {
+                if (strlen($valueArray[0]) === 4) {
                     $year = $valueArray[0];
                     $month = $valueArray[1];
                     $day = $valueArray[2];

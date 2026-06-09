@@ -4,13 +4,14 @@ declare(strict_types=1);
 
 namespace ArbkomEKvW\Evangtermine\Routing\Aspect;
 
+use Doctrine\DBAL\Exception;
 use ArbkomEKvW\Evangtermine\Domain\Repository\EventRepository;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 
 class PlaceStaticValueMapper extends AbstractStaticValueMapper
 {
     /**
-     * @throws \Doctrine\DBAL\Exception
+     * @throws Exception
      */
     public function __construct(array $settings)
     {

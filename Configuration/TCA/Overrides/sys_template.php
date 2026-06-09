@@ -1,5 +1,9 @@
 <?php
 
+declare(strict_types=1);
+
+use TYPO3\CMS\Core\Utility\ExtensionManagementUtility;
+
 /*
  * This file is part of the TYPO3 project.
  *
@@ -11,6 +15,6 @@
  * The TYPO3 project - inspiring people to share!
  */
 
-\TYPO3\CMS\Core\Utility\ExtensionManagementUtility::addStaticFile('evangtermine', 'Configuration/TypoScript', 'Evangelische Termine');
+ExtensionManagementUtility::addStaticFile('evangtermine', 'Configuration/TypoScript', 'Evangelische Termine');
 
-\TYPO3\CMS\Core\Utility\ExtensionManagementUtility::addStaticFile('evangtermine', 'Configuration/TypoScript/Solr', 'Evangelische Termine SOLR Index');
+ExtensionManagementUtility::addStaticFile('evangtermine', 'Configuration/TypoScript/Solr', 'Evangelische Termine SOLR Index');

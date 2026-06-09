@@ -47,11 +47,10 @@ use TYPO3\CMS\Extbase\DomainObject\AbstractEntity;
  */
 class Categorylist extends AbstractEntity
 {
-    protected array $itemList;
+    protected array $itemList = [];
 
     public function __construct($typeMethod = 'getCategories')
     {
-        $this->itemList = [];
         $categoryUtil = GeneralUtility::makeInstance(CategoryUtil::class);
         $categoryUtil->$typeMethod($this->itemList);
 

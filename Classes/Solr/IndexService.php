@@ -25,30 +25,18 @@ use TYPO3\CMS\Extbase\Persistence\QueryInterface;
 class IndexService implements IndexServiceInterface, LoggerAwareInterface
 {
     use LoggerAwareTrait;
-
-    protected EventRepository $eventRepository;
-    protected SiteFinder $siteFinder;
     protected FlexFormService $flexFormService;
-    protected SettingsUtility $settingsUtility;
-    protected Queue $queue;
-    protected SiteRepository $siteRepository;
-    protected ConnectionManager $connectionManager;
     public function __construct(
-        EventRepository $eventRepository,
-        SiteFinder $siteFinder,
+        protected EventRepository $eventRepository,
+        protected SiteFinder $siteFinder,
         FlexFormService $flexFormService,
-        SettingsUtility $settingsUtility,
-        Queue $queue,
-        SiteRepository $siteRepository,
-        ConnectionManager $connectionManager
+        protected SettingsUtility $settingsUtility,
+        protected Queue $queue,
+        protected SiteRepository $siteRepository,
+        protected ConnectionManager $connectionManager,
+        private readonly ConnectionPool $connectionPool
     ) {
-        $this->eventRepository = $eventRepository;
-        $this->siteFinder = $siteFinder;
         $this->flexFormService = $flexFormService;
-        $this->settingsUtility = $settingsUtility;
-        $this->queue = $queue;
-        $this->siteRepository = $siteRepository;
-        $this->connectionManager = $connectionManager;
     }
 
     public function indexForAllSites(): void
@@ -57,7 +45,7 @@ class IndexService implements IndexServiceInterface, LoggerAwareInterface
         foreach ($sites as $site) {
             try {
                 $this->indexForSite($site);
-            } catch (\InvalidArgumentException $e) {
+            } catch (\InvalidArgumentException) {
                 $this->logger->error('Site ' . $site->getRootPageId() . ' ' . $site->getIdentifier() . ' has no Solr configuration');
             } catch (\Throwable $e) {
                 $this->logger->error('Site ' . $site->getRootPageId() . ' ' . $site->getIdentifier() . ' ' . $e->getMessage());
@@ -101,7 +89,7 @@ class IndexService implements IndexServiceInterface, LoggerAwareInterface
             $this->collectGarbage($idsToIndex, $solrSite);
             foreach ($idsToIndex as $itemUid) {
                 if ($this->queue->containsItem('tx_evangtermine_domain_model_event', $itemUid)) {
-                    GeneralUtility::makeInstance(ConnectionPool::class)
+                    $this->connectionPool
                         ->getConnectionForTable('tx_solr_indexqueue_item')
                         ->update(
                             'tx_solr_indexqueue_item',
@@ -115,7 +103,7 @@ class IndexService implements IndexServiceInterface, LoggerAwareInterface
                             ]
                         );
                 } else {
-                    GeneralUtility::makeInstance(ConnectionPool::class)
+                    $this->connectionPool
                         ->getConnectionForTable('tx_solr_indexqueue_item')
                         ->insert(
                             'tx_solr_indexqueue_item',
@@ -137,8 +125,8 @@ class IndexService implements IndexServiceInterface, LoggerAwareInterface
      */
     protected function collectGarbage(array $idsToIndex, SolrSite $solrSite): void
     {
-        if (!empty($idsToIndex)) {
-            $query = GeneralUtility::makeInstance(ConnectionPool::class)
+        if ($idsToIndex !== []) {
+            $query = $this->connectionPool
                                    ->getQueryBuilderForTable('tx_solr_indexqueue_item');
             $stmt  = $query->select('*')
                            ->from('tx_solr_indexqueue_item')->where($query->expr()->notIn('item_uid', $idsToIndex), $query->expr()->eq(
@@ -147,7 +135,7 @@ class IndexService implements IndexServiceInterface, LoggerAwareInterface
                            ), $query->expr()->eq('root', $solrSite->getRootPageId()))->executeQuery();
 
             while ($itemToDelete = $stmt->fetchAssociative()) {
-                GeneralUtility::makeInstance(ConnectionPool::class)->getConnectionForTable('tx_solr_indexqueue_item')
+                $this->connectionPool->getConnectionForTable('tx_solr_indexqueue_item')
                               ->delete(
                                   'tx_solr_indexqueue_item',
                                   ['uid' => $itemToDelete['uid']]
@@ -171,7 +159,7 @@ class IndexService implements IndexServiceInterface, LoggerAwareInterface
     protected function getAllPluginsInSite(Site $site): array
     {
         $pageIds = $this->getAllPagesInSite($site);
-        $query = GeneralUtility::makeInstance(ConnectionPool::class)->getQueryBuilderForTable('tt_content');
+        $query = $this->connectionPool->getQueryBuilderForTable('tt_content');
         $stmt = $query->select('*')
                       ->from('tt_content')->where($query->expr()->eq('CType', $query->createNamedParameter('list')), $query->expr()->eq('list_type', $query->createNamedParameter('evangtermine_list')), $query->expr()->in('pid', $pageIds))->executeQuery();
         return $stmt->fetchAllAssociative();
@@ -184,7 +172,7 @@ class IndexService implements IndexServiceInterface, LoggerAwareInterface
     {
         $pageIds = [];
 
-        $query = GeneralUtility::makeInstance(ConnectionPool::class)->getConnectionForTable('pages');
+        $query = $this->connectionPool->getConnectionForTable('pages');
         $result = $query->executeQuery(sprintf('
 		select pages.uid  from pages
 left join pages p1 on pages.pid=p1.uid

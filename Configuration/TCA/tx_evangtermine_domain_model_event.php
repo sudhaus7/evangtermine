@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 if (!defined('TYPO3')) {
     die('Access denied.');
 }
@@ -19,7 +21,6 @@ return [
             'disabled' => 'hidden',
         ],
         'iconfile' => 'EXT:evangtermine/Resources/Public/Icons/Extension.png',
-        'searchFields' => 'title',
     ],
     'palettes' => [
         'general' => [
@@ -95,6 +96,7 @@ return [
                 'type' => 'input',
                 'eval' => 'trim',
                 'readOnly' => true,
+                'searchable' => false,
             ],
         ],
         'hash' => [
@@ -104,6 +106,7 @@ return [
                 'type' => 'input',
                 'eval' => 'trim',
                 'readOnly' => true,
+                'searchable' => false,
             ],
         ],
         'start' => [
@@ -112,6 +115,7 @@ return [
             'config' => [
                 'type' => 'datetime',
                 'readOnly' => true,
+                'searchable' => false,
             ],
         ],
         'end' => [
@@ -120,6 +124,7 @@ return [
             'config' => [
                 'type' => 'datetime',
                 'readOnly' => true,
+                'searchable' => false,
             ],
         ],
         'mode' => [
@@ -129,6 +134,7 @@ return [
                 'type' => 'input',
                 'eval' => 'trim',
                 'readOnly' => true,
+                'searchable' => false,
             ],
         ],
         'subtitle' => [
@@ -138,6 +144,7 @@ return [
                 'type' => 'input',
                 'eval' => 'trim',
                 'readOnly' => true,
+                'searchable' => false,
             ],
         ],
         'datum1' => [
@@ -147,6 +154,7 @@ return [
                 'type' => 'input',
                 'eval' => 'trim',
                 'readOnly' => true,
+                'searchable' => false,
             ],
         ],
         'datum2' => [
@@ -156,6 +164,7 @@ return [
                 'type' => 'input',
                 'eval' => 'trim',
                 'readOnly' => true,
+                'searchable' => false,
             ],
         ],
         'monthbar' => [
@@ -165,6 +174,7 @@ return [
                 'type' => 'input',
                 'eval' => 'trim',
                 'readOnly' => true,
+                'searchable' => false,
             ],
         ],
         'allday' => [
@@ -210,6 +220,7 @@ return [
                 'size' => 30,
                 'eval' => 'trim',
                 'readOnly' => 1,
+                'searchable' => false,
             ],
         ],
         'people' => [
@@ -220,6 +231,7 @@ return [
                 'size' => 30,
                 'eval' => 'trim',
                 'readOnly' => 1,
+                'searchable' => false,
             ],
         ],
         'short_description' => [
@@ -230,6 +242,7 @@ return [
                 'cols' => 60,
                 'rows' => 5,
                 'readOnly' => true,
+                'searchable' => false,
             ],
         ],
         'long_description' => [
@@ -240,6 +253,7 @@ return [
                 'cols' => 60,
                 'rows' => 5,
                 'readOnly' => true,
+                'searchable' => false,
             ],
         ],
         'link' => [
@@ -249,6 +263,7 @@ return [
                 'type' => 'input',
                 'eval' => 'trim',
                 'readOnly' => true,
+                'searchable' => false,
             ],
         ],
         'event_kat' => [
@@ -258,6 +273,7 @@ return [
                 'type' => 'input',
                 'eval' => 'trim',
                 'readOnly' => true,
+                'searchable' => false,
             ],
         ],
         'event_kat2' => [
@@ -267,6 +283,7 @@ return [
                 'type' => 'input',
                 'eval' => 'trim',
                 'readOnly' => true,
+                'searchable' => false,
             ],
         ],
         'email' => [
@@ -276,6 +293,7 @@ return [
                 'type' => 'input',
                 'eval' => 'trim',
                 'readOnly' => true,
+                'searchable' => false,
             ],
         ],
         'event_person_id' => [
@@ -303,6 +321,7 @@ return [
                 'type' => 'input',
                 'eval' => 'trim',
                 'readOnly' => true,
+                'searchable' => false,
             ],
         ],
         'event_subregion_id' => [
@@ -312,6 +331,7 @@ return [
                 'type' => 'input',
                 'eval' => 'trim',
                 'readOnly' => true,
+                'searchable' => false,
             ],
         ],
         'event_region2_id' => [
@@ -321,6 +341,7 @@ return [
                 'type' => 'input',
                 'eval' => 'trim',
                 'readOnly' => true,
+                'searchable' => false,
             ],
         ],
         'event_region3_id' => [
@@ -330,6 +351,7 @@ return [
                 'type' => 'input',
                 'eval' => 'trim',
                 'readOnly' => true,
+                'searchable' => false,
             ],
         ],
         'event_profession_id' => [
@@ -339,6 +361,7 @@ return [
                 'type' => 'input',
                 'eval' => 'trim',
                 'readOnly' => true,
+                'searchable' => false,
             ],
         ],
         'event_music_kat_id' => [
@@ -348,6 +371,7 @@ return [
                 'type' => 'input',
                 'eval' => 'trim',
                 'readOnly' => true,
+                'searchable' => false,
             ],
         ],
         'event_flag1' => [
@@ -357,6 +381,7 @@ return [
                 'type' => 'input',
                 'eval' => 'trim',
                 'readOnly' => true,
+                'searchable' => false,
             ],
         ],
         'textline1' => [
@@ -366,6 +391,7 @@ return [
                 'type' => 'input',
                 'eval' => 'trim',
                 'readOnly' => true,
+                'searchable' => false,
             ],
         ],
         'textline2' => [
@@ -375,6 +401,7 @@ return [
                 'type' => 'input',
                 'eval' => 'trim',
                 'readOnly' => true,
+                'searchable' => false,
             ],
         ],
         'textline3' => [
@@ -384,6 +411,7 @@ return [
                 'type' => 'input',
                 'eval' => 'trim',
                 'readOnly' => true,
+                'searchable' => false,
             ],
         ],
         'textline4' => [
@@ -393,6 +421,7 @@ return [
                 'type' => 'input',
                 'eval' => 'trim',
                 'readOnly' => true,
+                'searchable' => false,
             ],
         ],
         'textline5' => [
@@ -402,6 +431,7 @@ return [
                 'type' => 'input',
                 'eval' => 'trim',
                 'readOnly' => true,
+                'searchable' => false,
             ],
         ],
         'textline6' => [
@@ -411,6 +441,7 @@ return [
                 'type' => 'input',
                 'eval' => 'trim',
                 'readOnly' => true,
+                'searchable' => false,
             ],
         ],
         'textline7' => [
@@ -420,6 +451,7 @@ return [
                 'type' => 'input',
                 'eval' => 'trim',
                 'readOnly' => true,
+                'searchable' => false,
             ],
         ],
         'textline8' => [
@@ -429,6 +461,7 @@ return [
                 'type' => 'input',
                 'eval' => 'trim',
                 'readOnly' => true,
+                'searchable' => false,
             ],
         ],
         'textbox1' => [
@@ -438,6 +471,7 @@ return [
                 'type' => 'input',
                 'eval' => 'trim',
                 'readOnly' => true,
+                'searchable' => false,
             ],
         ],
         'textbox2' => [
@@ -447,6 +481,7 @@ return [
                 'type' => 'input',
                 'eval' => 'trim',
                 'readOnly' => true,
+                'searchable' => false,
             ],
         ],
         'textbox3' => [
@@ -456,6 +491,7 @@ return [
                 'type' => 'input',
                 'eval' => 'trim',
                 'readOnly' => true,
+                'searchable' => false,
             ],
         ],
         'event_number1' => [
@@ -465,6 +501,7 @@ return [
                 'type' => 'input',
                 'eval' => 'trim',
                 'readOnly' => true,
+                'searchable' => false,
             ],
         ],
         'event_number2' => [
@@ -474,6 +511,7 @@ return [
                 'type' => 'input',
                 'eval' => 'trim',
                 'readOnly' => true,
+                'searchable' => false,
             ],
         ],
         'event_number3' => [
@@ -483,6 +521,7 @@ return [
                 'type' => 'input',
                 'eval' => 'trim',
                 'readOnly' => true,
+                'searchable' => false,
             ],
         ],
         'event_menue1' => [
@@ -492,6 +531,7 @@ return [
                 'type' => 'input',
                 'eval' => 'trim',
                 'readOnly' => true,
+                'searchable' => false,
             ],
         ],
         'event_menue2' => [
@@ -501,6 +541,7 @@ return [
                 'type' => 'input',
                 'eval' => 'trim',
                 'readOnly' => true,
+                'searchable' => false,
             ],
         ],
         'event_yesno1' => [
@@ -510,6 +551,7 @@ return [
                 'type' => 'input',
                 'eval' => 'trim',
                 'readOnly' => true,
+                'searchable' => false,
             ],
         ],
         'event_yesno2' => [
@@ -519,6 +561,7 @@ return [
                 'type' => 'input',
                 'eval' => 'trim',
                 'readOnly' => true,
+                'searchable' => false,
             ],
         ],
         'event_yesno3' => [
@@ -528,6 +571,7 @@ return [
                 'type' => 'input',
                 'eval' => 'trim',
                 'readOnly' => true,
+                'searchable' => false,
             ],
         ],
         'event_destination' => [
@@ -537,6 +581,7 @@ return [
                 'type' => 'input',
                 'eval' => 'trim',
                 'readOnly' => true,
+                'searchable' => false,
             ],
         ],
         'event_status' => [
@@ -546,6 +591,7 @@ return [
                 'type' => 'input',
                 'eval' => 'trim',
                 'readOnly' => true,
+                'searchable' => false,
             ],
         ],
         'feedback_id' => [
@@ -556,6 +602,7 @@ return [
                 'size' => 30,
                 'eval' => 'trim',
                 'readOnly' => 1,
+                'searchable' => false,
             ],
         ],
         'highlight' => [
@@ -581,6 +628,7 @@ return [
                 'size' => 30,
                 'eval' => 'trim',
                 'readOnly' => 1,
+                'searchable' => false,
             ],
         ],
         'event_care' => [
@@ -591,6 +639,7 @@ return [
                 'size' => 30,
                 'eval' => 'trim',
                 'readOnly' => 1,
+                'searchable' => false,
             ],
         ],
         'event_kollekte' => [
@@ -601,6 +650,7 @@ return [
                 'size' => 30,
                 'eval' => 'trim',
                 'readOnly' => 1,
+                'searchable' => false,
             ],
         ],
         'event_statistik' => [
@@ -611,6 +661,7 @@ return [
                 'size' => 30,
                 'eval' => 'trim',
                 'readOnly' => 1,
+                'searchable' => false,
             ],
         ],
         'event_external_id' => [
@@ -621,6 +672,7 @@ return [
                 'size' => 30,
                 'eval' => 'trim',
                 'readOnly' => 1,
+                'searchable' => false,
             ],
         ],
         'event_access' => [
@@ -631,6 +683,7 @@ return [
                 'size' => 30,
                 'eval' => 'trim',
                 'readOnly' => 1,
+                'searchable' => false,
             ],
         ],
         'event_lang' => [
@@ -641,6 +694,7 @@ return [
                 'size' => 30,
                 'eval' => 'trim',
                 'readOnly' => 1,
+                'searchable' => false,
             ],
         ],
         'event_user_id' => [
@@ -661,6 +715,7 @@ return [
                 'size' => 30,
                 'eval' => 'trim',
                 'readOnly' => 1,
+                'searchable' => false,
             ],
         ],
         'caption' => [
@@ -670,6 +725,7 @@ return [
                 'type' => 'input',
                 'eval' => 'trim',
                 'readOnly' => true,
+                'searchable' => false,
             ],
         ],
         'event_modified' => [
@@ -679,6 +735,7 @@ return [
                 'type' => 'input',
                 'eval' => 'trim',
                 'readOnly' => true,
+                'searchable' => false,
             ],
         ],
         'event_koll_descr' => [
@@ -689,6 +746,7 @@ return [
                 'cols' => 60,
                 'rows' => 5,
                 'readOnly' => true,
+                'searchable' => false,
             ],
         ],
         'poll_id' => [
@@ -698,6 +756,7 @@ return [
                 'type' => 'input',
                 'eval' => 'trim',
                 'readOnly' => true,
+                'searchable' => false,
             ],
         ],
         'webform_linkname' => [
@@ -707,6 +766,7 @@ return [
                 'type' => 'input',
                 'eval' => 'trim',
                 'readOnly' => true,
+                'searchable' => false,
             ],
         ],
         'inputmask_name' => [
@@ -716,6 +776,7 @@ return [
                 'type' => 'input',
                 'eval' => 'trim',
                 'readOnly' => true,
+                'searchable' => false,
             ],
         ],
         'place_id' => [
@@ -734,6 +795,7 @@ return [
                 'type' => 'input',
                 'eval' => 'trim',
                 'readOnly' => true,
+                'searchable' => false,
             ],
         ],
         'place_street_nr' => [
@@ -743,6 +805,7 @@ return [
                 'type' => 'input',
                 'eval' => 'trim',
                 'readOnly' => true,
+                'searchable' => false,
             ],
         ],
         'place_zip' => [
@@ -752,6 +815,7 @@ return [
                 'type' => 'input',
                 'eval' => 'trim',
                 'readOnly' => true,
+                'searchable' => false,
             ],
         ],
         'place_city' => [
@@ -761,6 +825,7 @@ return [
                 'type' => 'input',
                 'eval' => 'trim',
                 'readOnly' => true,
+                'searchable' => false,
             ],
         ],
         'place_info' => [
@@ -771,6 +836,7 @@ return [
                 'cols' => 60,
                 'rows' => 5,
                 'readOnly' => true,
+                'searchable' => false,
             ],
         ],
         'place_hidden' => [
@@ -781,6 +847,7 @@ return [
                 'cols' => 60,
                 'rows' => 5,
                 'readOnly' => true,
+                'searchable' => false,
             ],
         ],
         'place_image' => [
@@ -791,6 +858,7 @@ return [
                 'size' => 30,
                 'eval' => 'trim',
                 'readOnly' => 1,
+                'searchable' => false,
             ],
         ],
         'place_image_caption' => [
@@ -800,6 +868,7 @@ return [
                 'type' => 'input',
                 'eval' => 'trim',
                 'readOnly' => true,
+                'searchable' => false,
             ],
         ],
         'place_position' => [
@@ -818,6 +887,7 @@ return [
                 'type' => 'input',
                 'eval' => 'trim',
                 'readOnly' => true,
+                'searchable' => false,
             ],
         ],
         'place_open' => [
@@ -828,6 +898,7 @@ return [
                 'cols' => 60,
                 'rows' => 5,
                 'readOnly' => true,
+                'searchable' => false,
             ],
         ],
         'place_equip' => [
@@ -837,6 +908,7 @@ return [
                 'type' => 'input',
                 'eval' => 'trim',
                 'readOnly' => true,
+                'searchable' => false,
             ],
         ],
         'place_equiptext' => [
@@ -846,6 +918,7 @@ return [
                 'type' => 'input',
                 'eval' => 'trim',
                 'readOnly' => true,
+                'searchable' => false,
             ],
         ],
         'place_region' => [
@@ -855,6 +928,7 @@ return [
                 'type' => 'input',
                 'eval' => 'trim',
                 'readOnly' => true,
+                'searchable' => false,
             ],
         ],
         'lat' => [
@@ -865,6 +939,7 @@ return [
                 'size' => 30,
                 'eval' => 'trim',
                 'readOnly' => 1,
+                'searchable' => false,
             ],
         ],
         'lon' => [
@@ -875,6 +950,7 @@ return [
                 'size' => 30,
                 'eval' => 'trim',
                 'readOnly' => 1,
+                'searchable' => false,
             ],
         ],
         'person_name' => [
@@ -884,6 +960,7 @@ return [
                 'type' => 'input',
                 'eval' => 'trim',
                 'readOnly' => true,
+                'searchable' => false,
             ],
         ],
         'person_email' => [
@@ -893,6 +970,7 @@ return [
                 'type' => 'input',
                 'eval' => 'trim',
                 'readOnly' => true,
+                'searchable' => false,
             ],
         ],
         'person_contact' => [
@@ -902,6 +980,7 @@ return [
                 'type' => 'input',
                 'eval' => 'trim',
                 'readOnly' => true,
+                'searchable' => false,
             ],
         ],
         'person_position' => [
@@ -920,6 +999,7 @@ return [
                 'type' => 'input',
                 'eval' => 'trim',
                 'readOnly' => true,
+                'searchable' => false,
             ],
         ],
         'user_id' => [
@@ -929,6 +1009,7 @@ return [
                 'type' => 'input',
                 'eval' => 'trim',
                 'readOnly' => true,
+                'searchable' => false,
             ],
         ],
         'user_realname' => [
@@ -938,6 +1019,7 @@ return [
                 'type' => 'input',
                 'eval' => 'trim',
                 'readOnly' => true,
+                'searchable' => false,
             ],
         ],
         'user_description' => [
@@ -947,6 +1029,7 @@ return [
                 'type' => 'input',
                 'eval' => 'trim',
                 'readOnly' => true,
+                'searchable' => false,
             ],
         ],
         'user_street_nr' => [
@@ -956,6 +1039,7 @@ return [
                 'type' => 'input',
                 'eval' => 'trim',
                 'readOnly' => true,
+                'searchable' => false,
             ],
         ],
         'user_zip' => [
@@ -965,6 +1049,7 @@ return [
                 'type' => 'input',
                 'eval' => 'trim',
                 'readOnly' => true,
+                'searchable' => false,
             ],
         ],
         'user_city' => [
@@ -974,6 +1059,7 @@ return [
                 'type' => 'input',
                 'eval' => 'trim',
                 'readOnly' => true,
+                'searchable' => false,
             ],
         ],
         'user_email' => [
@@ -983,6 +1069,7 @@ return [
                 'type' => 'input',
                 'eval' => 'trim',
                 'readOnly' => true,
+                'searchable' => false,
             ],
         ],
         'user_url' => [
@@ -992,6 +1079,7 @@ return [
                 'type' => 'input',
                 'eval' => 'trim',
                 'readOnly' => true,
+                'searchable' => false,
             ],
         ],
         'user_contact' => [
@@ -1001,6 +1089,7 @@ return [
                 'type' => 'input',
                 'eval' => 'trim',
                 'readOnly' => true,
+                'searchable' => false,
             ],
         ],
         'user_intdata' => [
@@ -1010,6 +1099,7 @@ return [
                 'type' => 'input',
                 'eval' => 'trim',
                 'readOnly' => true,
+                'searchable' => false,
             ],
         ],
         'user_image' => [
@@ -1020,6 +1110,7 @@ return [
                 'size' => 30,
                 'eval' => 'trim',
                 'readOnly' => 1,
+                'searchable' => false,
             ],
         ],
         'liturg_bez' => [
@@ -1029,6 +1120,7 @@ return [
                 'type' => 'input',
                 'eval' => 'trim',
                 'readOnly' => true,
+                'searchable' => false,
             ],
         ],
         'channels' => [
@@ -1038,6 +1130,7 @@ return [
                 'type' => 'input',
                 'eval' => 'trim',
                 'readOnly' => true,
+                'searchable' => false,
             ],
         ],
         'resources' => [
@@ -1047,6 +1140,7 @@ return [
                 'type' => 'input',
                 'eval' => 'trim',
                 'readOnly' => true,
+                'searchable' => false,
             ],
         ],
         'attributes' => [
@@ -1056,6 +1150,7 @@ return [
                 'cols' => 60,
                 'rows' => 5,
                 'readOnly' => true,
+                'searchable' => false,
             ],
         ],
         'output_order' => [
@@ -1065,6 +1160,7 @@ return [
                 'cols' => 60,
                 'rows' => 5,
                 'readOnly' => true,
+                'searchable' => false,
             ],
         ],
         'slug' => [
@@ -1083,6 +1179,7 @@ return [
                 'fallbackCharacter' => '-',
                 'eval' => 'unique',
                 'prependSlash' => true,
+                'searchable' => false,
             ],
         ],
     ],

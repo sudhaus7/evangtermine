@@ -39,33 +39,25 @@ use TYPO3\CMS\Fluid\View\TemplateView;
  */
 class EventcontainerController extends ActionController
 {
-    protected CacheManager $cacheManager;
     protected \DateTime $date;
-    protected RenderingContextFactory $renderingContextFactory;
 
     /**
      * Uid value of the current tt_content record serves as a unique i d of this plugin instance, used for session identification
      */
     private int $currentPluginUid;
 
-    private SettingsUtility $settingsUtility;
-
     private EtKeys $etkeys;
-    private ExtConf $extconf;
+    private readonly ExtConf $extconf;
     private bool $importEvents;
 
     public function __construct(
         private readonly EventsServiceInterface $eventsService,
         private readonly DetailPageService $detailPageService,
-        CacheManager $cacheManager,
-        SettingsUtility $settingsUtility,
-        RenderingContextFactory $renderingContextFactory
-    )
-    {
-        $this->cacheManager = $cacheManager;
+        protected CacheManager $cacheManager,
+        private readonly SettingsUtility $settingsUtility,
+        protected RenderingContextFactory $renderingContextFactory
+    ) {
         $this->date = new \DateTime();
-        $this->settingsUtility = $settingsUtility;
-        $this->renderingContextFactory = $renderingContextFactory;
         $this->extconf = GeneralUtility::makeInstance(ExtConf::class);
         $config = $this->extconf->getExtConfArray();
         if (empty($config['importEvents'] ?? '')) {
@@ -150,7 +142,7 @@ class EventcontainerController extends ActionController
                 'events' => $events ?? [],
                 'nrOfEvents' => $nrOfEvents,
                 'etkeys' => $this->etkeys,
-                'pageId' => $GLOBALS['TSFE']->id,
+                'pageId' => $this->request->getAttribute('frontend.page.information')->getId(),
                 'pluginUid' => $this->currentPluginUid,
                 'categoryList' => $this->eventsService->getCategoryList($this->settings, $this->currentPluginUid),
                 'groupList' => $this->eventsService->getGroupList($this->settings, $this->currentPluginUid),
@@ -187,7 +179,7 @@ class EventcontainerController extends ActionController
 
             // hand model data to the view
             $this->view->assign('events', $events ?? []);
-            $this->view->assign('pageId', $GLOBALS['TSFE']->id);
+            $this->view->assign('pageId', $this->request->getAttribute('frontend.page.information')->getId());
             $this->view->assign('data', $data);
             $this->view->assign('detailPage', $this->detailPageService->getUid());
             $this->view->assign('detailPagePluginUid', $this->detailPageService->getPluginUid($data));
@@ -237,7 +229,7 @@ class EventcontainerController extends ActionController
                 }
             } else {
                 $this->addFlashMessage('Keine Event-ID übergeben', '', ContextualFeedbackSeverity::ERROR);
-                $this->redirect('genericinfo');
+                return $this->redirect('genericinfo');
             }
         } else {
             return $this->renderContentOfTeaserOrList($data['list_type']);
@@ -284,13 +276,10 @@ class EventcontainerController extends ActionController
 
     protected function ifContentIsNotEmpty(string $content, array $events): bool
     {
-        if (empty($events)) {
+        if ($events === []) {
             return false;
         }
-        if (!empty($content) && !str_contains($content, 'Diese Veranstaltung existiert nicht.')) {
-            return true;
-        }
-        return false;
+        return $content !== '' && $content !== '0' && !str_contains($content, 'Diese Veranstaltung existiert nicht.');
     }
 
     protected function pluginIsDetailPlugin(array $data): bool
@@ -299,16 +288,16 @@ class EventcontainerController extends ActionController
 
         $cookies = [];
         foreach ($_COOKIE as $key => $cookie) {
-            if (str_starts_with($key, 'etpluginuid')) {
+            if (str_starts_with((string) $key, 'etpluginuid')) {
                 $cookies[] = $cookie;
             }
         }
         $uidDetailPlugin = $_COOKIE['etpluginuid' . $uidCurrentPlugin] ?? null;
 
         // delete cookie
-        setcookie('etpluginuid' . $uidCurrentPlugin, '', -1, '/');
+        setcookie('etpluginuid' . $uidCurrentPlugin, '', ['expires' => -1, 'path' => '/']);
 
-        if (empty($cookies)) {
+        if ($cookies === []) {
             return true;
         }
 
@@ -323,11 +312,7 @@ class EventcontainerController extends ActionController
         if (empty($uidDetailPlugin)) {
             return false;
         }
-
-        if ($uidCurrentPlugin == $uidDetailPlugin || $uidDetailPlugin == -1) {
-            return true;
-        }
-        return false;
+        return $uidCurrentPlugin == $uidDetailPlugin || $uidDetailPlugin == -1;
     }
 
     /**
