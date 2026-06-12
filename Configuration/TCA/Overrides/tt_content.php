@@ -24,24 +24,24 @@ ExtensionUtility::registerPlugin('evangtermine', 'Teaser', 'Evangelische Termine
 
 $pluginSignature = 'evangtermine_list';
 ExtensionManagementUtility::addToAllTCAtypes('tt_content', '--div--;Configuration,pi_flexform,', $pluginSignature, 'after:subheader');
-$GLOBALS['TCA']['tt_content']['types'][$pluginSignature]['columnsOverrides']['pi_flexform']['config'] = [
-    'ds' => [
-        'default' => 'FILE:EXT:evangtermine/Configuration/Flexforms/flexform_ds.xml',
-    ],
-];
+\TYPO3\CMS\Core\Utility\ExtensionManagementUtility::addPiFlexFormValue(
+    $pluginSignature,
+    // Flexform configuration schema file
+    'FILE:EXT:evangtermine/Configuration/Flexforms/flexform_ds.xml'
+);
 
 $pluginSignature = 'evangtermine_teaser';
 ExtensionManagementUtility::addToAllTCAtypes('tt_content', '--div--;Configuration,pi_flexform,', $pluginSignature, 'after:subheader');
-$GLOBALS['TCA']['tt_content']['types'][$pluginSignature]['columnsOverrides']['pi_flexform']['config'] = [
-    'ds' => [
-        'default' => 'FILE:EXT:evangtermine/Configuration/Flexforms/flexform_ds.xml',
-    ],
-];
+\TYPO3\CMS\Core\Utility\ExtensionManagementUtility::addPiFlexFormValue(
+    $pluginSignature,
+    // Flexform configuration schema file
+    'FILE:EXT:evangtermine/Configuration/Flexforms/flexform_ds.xml'
+);
 
 $pluginSignature = 'evangtermine_detail';
 ExtensionManagementUtility::addToAllTCAtypes('tt_content', '--div--;Configuration,pi_flexform,', $pluginSignature, 'after:subheader');
-$GLOBALS['TCA']['tt_content']['types'][$pluginSignature]['columnsOverrides']['pi_flexform']['config'] = [
-    'ds' => [
-        'default' => 'FILE:EXT:evangtermine/Configuration/Flexforms/flexform_ds.xml',
-    ],
-];
+\TYPO3\CMS\Core\Utility\ExtensionManagementUtility::addPiFlexFormValue(
+    $pluginSignature,
+    // Flexform configuration schema file
+    'FILE:EXT:evangtermine/Configuration/Flexforms/flexform_ds.xml'
+);

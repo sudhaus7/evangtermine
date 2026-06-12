@@ -15,7 +15,7 @@ declare(strict_types=1);
 namespace ArbkomEKvW\Evangtermine\Event;
 
 use ArbkomEKvW\Evangtermine\Domain\Model\Event;
-use TYPO3Fluid\Fluid\View\ViewInterface;
+use TYPO3\CMS\Core\View\ViewInterface;
 
 final class ModifyEvangTermineShowActionViewEvent
 {

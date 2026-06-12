@@ -26,13 +26,15 @@ use Psr\Http\Message\ResponseInterface;
 use TYPO3\CMS\Core\Cache\CacheManager;
 use TYPO3\CMS\Core\Cache\Exception\NoSuchCacheException;
 use TYPO3\CMS\Core\Cache\Frontend\FrontendInterface;
+use TYPO3\CMS\Core\Domain\Record;
 use TYPO3\CMS\Core\Type\ContextualFeedbackSeverity;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 use TYPO3\CMS\Extbase\Configuration\BackendConfigurationManager;
 use TYPO3\CMS\Extbase\Mvc\Controller\ActionController;
 use TYPO3\CMS\Fluid\Core\Rendering\RenderingContextFactory;
 use TYPO3\CMS\Fluid\View\TemplatePaths;
-use TYPO3\CMS\Fluid\View\TemplateView;
+use TYPO3\CMS\Frontend\DataProcessing\RecordTransformationProcessor;
+use TYPO3Fluid\Fluid\View\TemplateView;
 
 /**
  * EventcontainerController
@@ -55,7 +57,8 @@ class EventcontainerController extends ActionController
         private readonly DetailPageService $detailPageService,
         protected CacheManager $cacheManager,
         private readonly SettingsUtility $settingsUtility,
-        protected RenderingContextFactory $renderingContextFactory
+        protected RenderingContextFactory $renderingContextFactory,
+        private readonly RecordTransformationProcessor $recordTransformationProcessor
     ) {
         $this->date = new \DateTime();
         $this->extconf = GeneralUtility::makeInstance(ExtConf::class);
@@ -150,6 +153,7 @@ class EventcontainerController extends ActionController
                 'regionList' => $this->eventsService->getRegionList($this->settings, $this->currentPluginUid),
                 'pagerdata' => $pager->getPgr(),
                 'data' => $data,
+                'record' => $this->transformDataToRecordObject($data),
                 'detailPage' => $this->detailPageService->getUid(),
                 'detailPagePluginUid' => $this->detailPageService->getPluginUid($data),
                 'importEvents' => $this->importEvents,
@@ -181,6 +185,7 @@ class EventcontainerController extends ActionController
             $this->view->assign('events', $events ?? []);
             $this->view->assign('pageId', $this->request->getAttribute('frontend.page.information')->getId());
             $this->view->assign('data', $data);
+            $this->view->assign('record', $this->transformDataToRecordObject($data));
             $this->view->assign('detailPage', $this->detailPageService->getUid());
             $this->view->assign('detailPagePluginUid', $this->detailPageService->getPluginUid($data));
             $this->view->assign('importEvents', $this->importEvents);
@@ -220,6 +225,7 @@ class EventcontainerController extends ActionController
                 $this->view->assign('categoryList', $this->eventsService->getCategoryList($this->settings, $this->currentPluginUid));
                 $this->view->assign('groupList', $this->eventsService->getGroupList($this->settings, $this->currentPluginUid));
                 $this->view->assign('data', $data);
+                $this->view->assign('record', $this->transformDataToRecordObject($data));
                 $this->view->assign('importEvents', $this->importEvents);
 
                 if (!empty($event) && !empty($eventDispatcher)) {
@@ -370,5 +376,22 @@ class EventcontainerController extends ActionController
         return $this->responseFactory->createResponse()
             ->withStatus(404, '404 Not Found')
             ->withHeader('Refresh', '0,url=' . $url);
+    }
+
+    /**
+     * @param $data
+     * @return Record
+     */
+    protected function transformDataToRecordObject($data): Record
+    {
+        $data = $this->recordTransformationProcessor->process(
+            $this->request->getAttribute('currentContentObject'),
+            [],
+            [],
+            [
+                'data' => $data,
+            ]
+        );
+        return $data['record'];
     }
 }
