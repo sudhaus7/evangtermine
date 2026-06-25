@@ -343,7 +343,13 @@ class EventcontainerController extends ActionController
                 case 'etkey_eventtype':
                     if ($setting !== 'all') {
                         $settingArray = explode(',', $setting);
-                        if (!in_array($event->getCategories(), $settingArray)) {
+                        $found = false;
+                        foreach (explode(',', $event->getCategories()) as $item) {
+                            if (in_array($item, $settingArray)) {
+                                $found = true;
+                            }
+                        }
+                        if (!$found) {
                             return false;
                         }
                     }
@@ -351,7 +357,13 @@ class EventcontainerController extends ActionController
                 case 'etkey_people':
                     if ($setting != 0) {
                         $settingArray = explode(',', $setting);
-                        if (!in_array($event->getPeople(), $settingArray)) {
+                        $found = false;
+                        foreach (explode(',', $event->getPeople()) as $item) {
+                            if (in_array($item, $settingArray)) {
+                                $found = true;
+                            }
+                        }
+                        if (!$found) {
                             return false;
                         }
                     }
@@ -362,15 +374,29 @@ class EventcontainerController extends ActionController
                         unset($settingArray['all']);
                         unset($settingArray['alleBezirke']);
                         unset($settingArray['alleKreise']);
-                    }
-                    if (!empty($settingArray) && !in_array($event->getRegion(), $settingArray)) {
-                        return false;
+                        if (!empty($settingArray)) {
+                            $found = false;
+                            foreach (explode(',', $event->getRegion()) as $item) {
+                                if (in_array($item, $settingArray)) {
+                                    $found = true;
+                                }
+                            }
+                            if (!$found) {
+                                return false;
+                            }
+                        }
                     }
                     break;
                 case 'etkey_subregions':
                     if ($setting !== 'all') {
                         $settingArray = explode(',', $setting);
-                        if (!in_array($event->getEventSubregionId(), $settingArray)) {
+                        $found = false;
+                        foreach (explode(',', $event->getEventSubregionId()) as $item) {
+                            if (in_array($item, $settingArray)) {
+                                $found = true;
+                            }
+                        }
+                        if (!$found) {
                             return false;
                         }
                     }
@@ -378,7 +404,13 @@ class EventcontainerController extends ActionController
                 case 'etkey_regions2':
                     if ($setting !== 'all') {
                         $settingArray = explode(',', $setting);
-                        if (!in_array($event->getEventRegion2Id(), $settingArray)) {
+                        $found = false;
+                        foreach (explode(',', $event->getEventRegion2Id()) as $item) {
+                            if (in_array($item, $settingArray)) {
+                                $found = true;
+                            }
+                        }
+                        if (!$found) {
                             return false;
                         }
                     }
@@ -386,7 +418,13 @@ class EventcontainerController extends ActionController
                 case 'etkey_regions3':
                     if ($setting !== 'all') {
                         $settingArray = explode(',', $setting);
-                        if (!in_array($event->getEventRegion3Id(), $settingArray)) {
+                        $found = false;
+                        foreach (explode(',', $event->getEventRegion3Id()) as $item) {
+                            if (in_array($item, $settingArray)) {
+                                $found = true;
+                            }
+                        }
+                        if (!$found) {
                             return false;
                         }
                     }
