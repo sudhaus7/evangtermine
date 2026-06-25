@@ -16,6 +16,7 @@ declare(strict_types=1);
 namespace ArbkomEKvW\Evangtermine\Controller;
 
 use ArbkomEKvW\Evangtermine\Domain\Model\EtKeys;
+use ArbkomEKvW\Evangtermine\Domain\Model\Event;
 use ArbkomEKvW\Evangtermine\Event\ModifyEvangTermineShowActionViewEvent;
 use ArbkomEKvW\Evangtermine\Services\DetailPageService;
 use ArbkomEKvW\Evangtermine\Services\Events\EventsServiceInterface;
@@ -210,6 +211,10 @@ class EventcontainerController extends ActionController
             if (!empty($uid)) {
                 [$event, $meta, $detailItems] = $this->eventsService->findByUid($uid);
 
+                if (!$this->eventFitsPlugin($event)) {
+                    return $this->redirectToListPage($data['pid']);
+                }
+
                 // hand model data to the view
                 $this->view->assign('event', $event);
                 $this->view->assign('meta', $meta);
@@ -318,6 +323,84 @@ class EventcontainerController extends ActionController
             return true;
         }
         return false;
+    }
+
+    protected function eventFitsPlugin(Event $event): bool
+    {
+        foreach ($this->settings as $key => $setting) {
+            switch ($key) {
+                case 'etkey_vid':
+                    if (!empty($setting) && $setting != $event->getEventUserId()) {
+                        return false;
+                    }
+                    break;
+                case 'etkey_highlight':
+                    if ($setting == 'high' && $event->getHighlight() != 1) {
+                        return false;
+                    }
+                    break;
+                case 'etkey_eventtype':
+                    if ($setting !== 'all') {
+                        $settingArray = explode(',', $setting);
+                        if (!in_array($event->getCategories(), $settingArray)) {
+                            return false;
+                        }
+                    }
+                    break;
+                case 'etkey_people':
+                    if ($setting != 0) {
+                        $settingArray = explode(',', $setting);
+                        if (!in_array($event->getPeople(), $settingArray)) {
+                            return false;
+                        }
+                    }
+                    break;
+                case 'etkey_regions':
+                    if ($setting !== 'all') {
+                        $settingArray = explode(',', $setting);
+                        unset($settingArray['all']);
+                        unset($settingArray['alleBezirke']);
+                        unset($settingArray['alleKreise']);
+                    }
+                    if (!empty($settingArray) && !in_array($event->getRegion(), $settingArray)) {
+                        return false;
+                    }
+                    break;
+                case 'etkey_subregions':
+                    if ($setting !== 'all') {
+                        $settingArray = explode(',', $setting);
+                        if (!in_array($event->getEventSubregionId(), $settingArray)) {
+                            return false;
+                        }
+                    }
+                    break;
+                case 'etkey_regions2':
+                    if ($setting !== 'all') {
+                        $settingArray = explode(',', $setting);
+                        if (!in_array($event->getEventRegion2Id(), $settingArray)) {
+                            return false;
+                        }
+                    }
+                    break;
+                case 'etkey_regions3':
+                    if ($setting !== 'all') {
+                        $settingArray = explode(',', $setting);
+                        if (!in_array($event->getEventRegion3Id(), $settingArray)) {
+                            return false;
+                        }
+                    }
+                    break;
+                case 'etkey_places':
+                    if ($setting !== 'all') {
+                        $settingArray = explode(',', $setting);
+                        if (!in_array($event->getEventPlaceId(), $settingArray)) {
+                            return false;
+                        }
+                    }
+                    break;
+            }
+        }
+        return true;
     }
 
     /**
