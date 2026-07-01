@@ -202,7 +202,10 @@ class EventcontainerController extends ActionController
         // If the current plugin is a 'detail' plugin, or if it is the plugin in which the user clicked on a link.
         // We need this for multiple evang. Termine plugins on one site.
         if ($this->pluginIsDetailPlugin($data)) {
-            $uid = $this->request->getArguments()['uid'] ?? $this->request->getArguments()['ID'] ?? null;
+            $uid = $this->request->getArguments()['uid'] ??
+                $this->request->getArguments()['ID'] ??
+                $this->request->getQueryParams()['tx_evangtermine_list']['uid'] ??
+                null;
 
             if ($uid == -1) {
                 return $this->redirectToListPage($data['pid']);
@@ -354,7 +357,7 @@ class EventcontainerController extends ActionController
                     }
                     break;
                 case 'etkey_people':
-                    if ($setting != 0) {
+                    if ($setting != 0 && $setting != 'all') {
                         $settingArray = explode(',', $setting);
                         $found = false;
                         foreach (explode(',', $event->getPeople()) as $item) {
