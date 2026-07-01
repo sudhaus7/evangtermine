@@ -205,6 +205,7 @@ class EventcontainerController extends ActionController
             $uid = $this->request->getArguments()['uid'] ??
                 $this->request->getArguments()['ID'] ??
                 $this->request->getQueryParams()['tx_evangtermine_list']['uid'] ??
+                $this->request->getQueryParams()['tx_evangtermine_list']['ID'] ??
                 null;
 
             if ($uid == -1) {
