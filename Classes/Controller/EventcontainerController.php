@@ -334,12 +334,12 @@ class EventcontainerController extends ActionController
         foreach ($this->settings as $key => $setting) {
             switch ($key) {
                 case 'etkey_vid':
-                    if (!empty($setting) && $setting != $event->getEventUserId()) {
+                    if (!empty($setting) && !in_array($event->getEventUserId(), explode(',', $setting))) {
                         return false;
                     }
                     break;
                 case 'etkey_highlight':
-                    if ($setting == 'high' && $event->getHighlight() != 1) {
+                    if ($setting == 'high' && $event->getHighlight() <= 1) {
                         return false;
                     }
                     break;
