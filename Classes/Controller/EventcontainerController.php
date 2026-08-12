@@ -116,6 +116,28 @@ class EventcontainerController extends ActionController
         $formArguments = $requestArguments['etkeysForm'] ?? [];
         $this->etkeys = $this->getNewFromSettings();
 
+        // if it's a search, redirect to switch from "POST" to "GET
+        // we do this to prevent ERR_CACHE_MISS errors
+        if (!empty($formArguments) && empty($requestArguments['redirect'])) {
+            if (empty($requestArguments['sf_reset'])) {
+                return $this->redirect(
+                    'list',
+                    'Eventcontainer',
+                    'Evangtermine',
+                    array_merge($formArguments, ['redirect' => 1]),
+                    $data['pid'] ?? NULL,
+                );
+            } else {
+                return $this->redirect(
+                    'list',
+                    'Eventcontainer',
+                    'Evangtermine',
+                    ['redirect' => 1],
+                    $data['pid'] ?? NULL,
+                );
+            }
+        }
+
         // collect params from request
         $this->settingsUtility->fetchParamsFromRequest($requestArguments, $this->etkeys);
 
