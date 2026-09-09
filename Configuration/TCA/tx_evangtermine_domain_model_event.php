@@ -23,7 +23,7 @@ return [
     ],
     'palettes' => [
         'general' => [
-            'showitem' => 'hidden,--linebreak--,id,--linebreak--,hash,--linebreak--,title,--linebreak--,subtitle,--linebreak--,liturg_bez,--linebreak--,email,link,--linebreak--,short_description,--linebreak--,long_description,--linebreak--,image,caption,--linebreak--,highlight,--linebreak--,people,--linebreak--,categories,--linebreak--feedback_id,--linebreak--,poll_id,webform_linkname,--linebreak--,event_modified,--linebreak--,channels,--linebreak--,resources,--linebreak--,slug',
+            'showitem' => 'hidden,--linebreak--,id,--linebreak--,hash,--linebreak--,title,--linebreak--,subtitle,--linebreak--,liturg_bez,--linebreak--,email,link,--linebreak--,short_description,--linebreak--,long_description,--linebreak--,image,caption,--linebreak--,highlight,--linebreak--,people,--linebreak--,categories,--linebreak--feedback_id,--linebreak--,poll_id,webform_linkname,--linebreak--,event_modified,--linebreak--,channels,--linebreak--,resources,--linebreak--,tags,--linebreak--,slug',
         ],
         'date' => [
             'showitem' => 'start,end,--linebreak--,mode,--linebreak--,datum1,datum2,--linebreak--,monthbar,allday',
@@ -1043,6 +1043,15 @@ return [
         'resources' => [
             'exclude' => 1,
             'label' => 'Ressourcen',
+            'config' => [
+                'type' => 'input',
+                'eval' => 'trim',
+                'readOnly' => true,
+            ],
+        ],
+        'tags' => [
+            'exclude' => 1,
+            'label' => 'Tags',
             'config' => [
                 'type' => 'input',
                 'eval' => 'trim',

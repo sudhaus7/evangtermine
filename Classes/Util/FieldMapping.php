@@ -143,6 +143,7 @@ class FieldMapping
             'liturg_bez' => 'LITURG_BEZ',
             'channels' => 'CHANNELS',
             'resources' => 'RESOURCES',
+            'tags' => 'TAGS',
             'attributes' => 'attributes',
         ];
     }
