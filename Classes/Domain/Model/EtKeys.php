@@ -82,7 +82,7 @@ class EtKeys extends AbstractValueObject
         'until',
         'encoding',
         'ID',
-        'redius',
+        'radius',
         'tags',
     ];
 
