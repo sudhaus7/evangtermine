@@ -46,7 +46,6 @@ class EventsService extends EventsServiceBase implements EventsServiceInterface
 
     public function findByUid(int|string $uid): array
     {
-        // todo: ...
         return [$this->eventRepository->findByUid((int)$uid), '', ''];
     }
 
