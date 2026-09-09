@@ -10,6 +10,7 @@ use ArbkomEKvW\Evangtermine\Util\FieldMapping;
 use ArbkomEKvW\Evangtermine\Util\UrlUtility;
 use DateTime;
 use DateTimeZone;
+use Doctrine\DBAL\Exception;
 use Psr\Log\LoggerAwareInterface;
 use Psr\Log\LoggerAwareTrait;
 use SimpleXMLElement;
@@ -74,7 +75,7 @@ class ImportEventsCommand extends Command implements LoggerAwareInterface
      * @param OutputInterface $output
      * @throws ExtensionConfigurationExtensionNotConfiguredException
      * @throws ExtensionConfigurationPathDoesNotExistException
-     * @throws \Doctrine\DBAL\Exception
+     * @throws Exception
      */
     public function initialize(InputInterface $input, OutputInterface $output): void
     {
@@ -123,7 +124,7 @@ class ImportEventsCommand extends Command implements LoggerAwareInterface
      * @param OutputInterface $output
      * @return int
      * @throws SiteNotFoundException
-     * @throws \Doctrine\DBAL\Exception
+     * @throws Exception
      */
     public function execute(InputInterface $input, OutputInterface $output): int
     {
@@ -152,7 +153,7 @@ class ImportEventsCommand extends Command implements LoggerAwareInterface
      * @param InputInterface $input
      * @param OutputInterface $output
      * @throws SiteNotFoundException
-     * @throws \Doctrine\DBAL\Exception
+     * @throws Exception
      */
     protected function importAllEvents(InputInterface $input, OutputInterface $output): void
     {
@@ -279,7 +280,7 @@ class ImportEventsCommand extends Command implements LoggerAwareInterface
      * @param $uid
      * @return string
      * @throws SiteNotFoundException
-     * @throws \Doctrine\DBAL\Exception
+     * @throws Exception
      */
     protected function createSlug(array $event, $uid): string
     {
@@ -294,7 +295,7 @@ class ImportEventsCommand extends Command implements LoggerAwareInterface
      * @param string $slug
      * @param $uid
      * @return string
-     * @throws \Doctrine\DBAL\Exception
+     * @throws Exception
      */
     private function checkSlugForDuplicates(string $slug, $uid): string
     {
@@ -317,7 +318,7 @@ class ImportEventsCommand extends Command implements LoggerAwareInterface
      * @param InputInterface $input
      * @param OutputInterface $output
      * @return SplObjectStorage<SimpleXMLElement>
-     * @throws \Doctrine\DBAL\Exception
+     * @throws Exception
      */
     protected function getItems(InputInterface $input, OutputInterface $output): SplObjectStorage
     {
@@ -363,7 +364,7 @@ class ImportEventsCommand extends Command implements LoggerAwareInterface
      * @param SplObjectStorage $newItems
      * @param array $items
      * @param string $key
-     * @throws \Doctrine\DBAL\Exception
+     * @throws Exception
      */
     protected function getNewItems(SplObjectStorage $newItems, array $items, string $key): void
     {
@@ -421,7 +422,7 @@ class ImportEventsCommand extends Command implements LoggerAwareInterface
      * @param array $event
      * @param string $itemField
      * @param string $eventField
-     * @throws \Doctrine\DBAL\Exception
+     * @throws Exception
      */
     protected function insertImage(array $event, string $itemField, string $eventField): void
     {
@@ -505,7 +506,7 @@ class ImportEventsCommand extends Command implements LoggerAwareInterface
 
     /**
      * @param OutputInterface $output
-     * @throws \Doctrine\DBAL\Exception
+     * @throws Exception
      */
     protected function deleteEvents(OutputInterface $output): void
     {
@@ -531,7 +532,7 @@ class ImportEventsCommand extends Command implements LoggerAwareInterface
 
     /**
      * @param OutputInterface $output
-     * @throws \Doctrine\DBAL\Exception
+     * @throws Exception
      */
     protected function deleteEventsThatAreNotInApiAnymore(OutputInterface $output): void
     {
@@ -565,7 +566,7 @@ class ImportEventsCommand extends Command implements LoggerAwareInterface
      * @param array $urls
      * @param OutputInterface $output
      * @param SplObjectStorage $newItems
-     * @throws \Doctrine\DBAL\Exception
+     * @throws Exception
      */
     protected function getEventsFromApi(array $urls, OutputInterface $output, SplObjectStorage $newItems): void
     {
@@ -641,7 +642,7 @@ class ImportEventsCommand extends Command implements LoggerAwareInterface
 
     /**
      * @return array
-     * @throws \Doctrine\DBAL\Exception
+     * @throws Exception
      */
     protected function getPagesWithPlugin(): array
     {
