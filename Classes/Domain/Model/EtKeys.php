@@ -83,6 +83,7 @@ class EtKeys extends AbstractValueObject
         'encoding',
         'ID',
         'redius',
+        'tags',
     ];
 
     /**
@@ -316,6 +317,8 @@ class EtKeys extends AbstractValueObject
      * @var int
      */
     protected int $radius = 0;
+
+    protected string $tags = '';
 
     public function getVid(): string
     {
@@ -728,6 +731,16 @@ class EtKeys extends AbstractValueObject
     public function setRadius($radius): void
     {
         $this->radius = (int)$radius;
+    }
+
+    public function getTags(): string
+    {
+        return $this->tags;
+    }
+
+    public function setTags(string $tags): void
+    {
+        $this->tags = $tags;
     }
 
     public function getAllowedKeys(): array

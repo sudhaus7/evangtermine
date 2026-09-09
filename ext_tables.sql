@@ -103,6 +103,7 @@ CREATE TABLE tx_evangtermine_domain_model_event
 	liturg_bez varchar(255) DEFAULT '' NOT NULL,
 	channels varchar(255) DEFAULT '' NOT NULL,
 	resources text,
+	tags varchar(255) DEFAULT '' NOT NULL,
 	attributes text,
 	slug varchar(255) DEFAULT '' NOT NULL,
 	hash varchar(40) DEFAULT '' NOT NULL,
