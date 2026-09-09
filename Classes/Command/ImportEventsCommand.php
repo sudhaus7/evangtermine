@@ -647,7 +647,7 @@ class ImportEventsCommand extends Command implements LoggerAwareInterface
         $queryBuilder->select('*')
             ->from('tt_content')
             ->where(
-                $queryBuilder->expr()->eq('list_type', $queryBuilder->createNamedParameter('evangtermine_list'))
+                $queryBuilder->expr()->eq('CType', $queryBuilder->createNamedParameter('evangtermine_list'))
             );
         $plugins = $queryBuilder->executeQuery()->fetchAllAssociative();
         $pages = [];

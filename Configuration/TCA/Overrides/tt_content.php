@@ -16,32 +16,32 @@ use TYPO3\CMS\Extbase\Utility\ExtensionUtility;
  * The TYPO3 project - inspiring people to share!
  */
 
-ExtensionUtility::registerPlugin('evangtermine', 'List', 'Evangelische Termine - Liste');
-
-ExtensionUtility::registerPlugin('evangtermine', 'Detail', 'Evangelische Termine - Detail');
-
-ExtensionUtility::registerPlugin('evangtermine', 'Teaser', 'Evangelische Termine - Teaser');
-
-$pluginSignature = 'evangtermine_list';
-ExtensionManagementUtility::addToAllTCAtypes('tt_content', '--div--;Configuration,pi_flexform,', $pluginSignature, 'after:subheader');
-\TYPO3\CMS\Core\Utility\ExtensionManagementUtility::addPiFlexFormValue(
-    $pluginSignature,
-    // Flexform configuration schema file
+ExtensionUtility::registerPlugin(
+    'evangtermine',
+    'List',
+    'Evangelische Termine - Liste',
+    'evangtermine-icon',
+    'plugins',
+    '',
     'FILE:EXT:evangtermine/Configuration/Flexforms/flexform_ds.xml'
 );
 
-$pluginSignature = 'evangtermine_teaser';
-ExtensionManagementUtility::addToAllTCAtypes('tt_content', '--div--;Configuration,pi_flexform,', $pluginSignature, 'after:subheader');
-\TYPO3\CMS\Core\Utility\ExtensionManagementUtility::addPiFlexFormValue(
-    $pluginSignature,
-    // Flexform configuration schema file
+ExtensionUtility::registerPlugin(
+    'evangtermine',
+    'Detail',
+    'Evangelische Termine - Detail',
+    'evangtermine-icon',
+    'plugins',
+    '',
     'FILE:EXT:evangtermine/Configuration/Flexforms/flexform_ds.xml'
 );
 
-$pluginSignature = 'evangtermine_detail';
-ExtensionManagementUtility::addToAllTCAtypes('tt_content', '--div--;Configuration,pi_flexform,', $pluginSignature, 'after:subheader');
-\TYPO3\CMS\Core\Utility\ExtensionManagementUtility::addPiFlexFormValue(
-    $pluginSignature,
-    // Flexform configuration schema file
+ExtensionUtility::registerPlugin(
+    'evangtermine',
+    'Teaser',
+    'Evangelische Termine - Teaser',
+    'evangtermine-icon',
+    'plugins',
+    '',
     'FILE:EXT:evangtermine/Configuration/Flexforms/flexform_ds.xml'
 );
