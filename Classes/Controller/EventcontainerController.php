@@ -258,7 +258,7 @@ class EventcontainerController extends ActionController
                 }
             } else {
                 $this->addFlashMessage('Keine Event-ID übergeben', '', ContextualFeedbackSeverity::ERROR);
-                $this->redirect('genericinfo');
+                return $this->redirect('genericinfo');
             }
         } else {
             return $this->renderContentOfTeaserOrList($data['list_type']);
