@@ -355,11 +355,13 @@ class EventcontainerController extends ActionController
     {
         foreach ($this->settings as $key => $setting) {
             switch ($key) {
-                case 'etkey_vid':
+                // we can't check the event user id because it can happen that an event user displays events of other
+                // users. These events get returned from the API even if it's not reflected in the API response.
+                /*case 'etkey_vid':
                     if (!empty($setting) && !in_array($event->getEventUserId(), explode(',', $setting))) {
                         return false;
                     }
-                    break;
+                    break;*/
                 case 'etkey_highlight':
                     if ($setting == 'high' && $event->getHighlight() <= 1) {
                         return false;
